@@ -1017,6 +1017,7 @@ function render_notification_rule_table($notification, $number) {
                     <td colspan="3" class="notification_rule_ruleno"><strong>Rule '.$number.':</strong> '.$notification->name.'</td>
                     <td colspan="2" class="notification_rule_button">';
 
+    $html .= single_button_form ('create_new_rule', new moodle_url('/blocks/fn_mentor/notification_send.php', array('id'=>$notification->id, 'action'=>'send', 'sesskey'=>sesskey())), NULL, get_string('run_now', 'block_fn_mentor'));
     $html .= single_button_form ('create_new_rule', new moodle_url('/blocks/fn_mentor/notification.php', array('id'=>$notification->id, 'action'=>'edit')), NULL, get_string('open', 'block_fn_mentor'));
     $html .= single_button_form ('create_new_rule', new moodle_url('/blocks/fn_mentor/notification_delete.php', array('id'=>$notification->id, 'action'=>'edit')), NULL, get_string('delete', 'block_fn_mentor'), 'return confirm(\'Do you want to delete record?\')');
 
@@ -1284,4 +1285,290 @@ function _note_print($note, $detail = NOTES_SHOW_FULL) {
         echo '</div>';
     }
     echo '</div>';
+}
+
+function fn_send_notifications($notificationid=null) {
+    global $CFG, $DB;
+
+    mtrace( "BLOCK Mentors Mentees" );
+    $today = time();
+    $site = get_site();
+    $supportuser = core_user::get_support_user();
+    $subject = 'Progress Report from '.format_string($site->fullname);
+
+    if ($notification_rules = $DB->get_records('mentors_mentees_notification')) {
+
+        foreach ($notification_rules as $notification_rule) {
+
+            if ($notificationid && $notificationid <> $notification_rule->id) {
+                continue;
+            }
+
+            if (!$notification_rule->crontime) {
+                $notification_rule->crontime = '2000-01-01';
+            }
+
+            $date1 = new DateTime($notification_rule->crontime);
+            $now = new DateTime(date("Y-m-d"));
+
+            $diff = $now->diff($date1)->format("%a");
+
+            //Check period
+            if (($notification_rule->period > $diff) && !$notificationid) {
+                continue;
+            }
+
+            if (!($notification_rule->g1)
+                && !($notification_rule->g2)
+                && !($notification_rule->g3 && $notification_rule->g3_value)
+                && !($notification_rule->g4 && $notification_rule->g4_value)
+                && !($notification_rule->g5 && $notification_rule->g5_value)
+                && !($notification_rule->g6 && $notification_rule->g6_value)
+                && !($notification_rule->n1 && $notification_rule->n1_value)
+                && !($notification_rule->n2 && $notification_rule->n2_value) ) {
+                continue;
+            }
+
+            $courses = array();
+            $notification_message = array();
+
+            $get_courses = function($category, &$courses){
+                if ($category->courses) {
+                    foreach ($category->courses as $course) {
+                        $courses[] =  $course->id;
+                    }
+                }
+                if ($category->categories) {
+                    foreach ($category->categories as $subcat) {
+                        $get_courses($subcat, $course);
+                    }
+                }
+            };
+
+            //CATEGORY
+            if ($notification_rule->category) {
+
+                $notification_categories = explode(',', $notification_rule->category);
+
+                foreach ($notification_categories as $categoryid) {
+
+                    if ($parentcat_courses = $DB->get_records('course', array('category'=>$categoryid))) {
+                        foreach ($parentcat_courses as $cat_course) {
+                            $courses[] =  $cat_course->id;
+                        }
+                    }
+                    if ($category_structure = _get_course_category_tree($categoryid)) {
+                        foreach ($category_structure as $category) {
+
+                            if ($category->courses) {
+                                foreach ($category->courses as $subcat_course) {
+                                    $courses[] =  $subcat_course->id;
+                                }
+                            }
+                            if ($category->categories) {
+                                foreach ($category->categories as $subcategory) {
+                                    $get_courses($subcategory, $courses);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            //COURSE
+            if ($notification_rule->course) {
+                $notification = explode(',', $notification_rule->course);
+                $courses = array_merge($courses, $notification);
+            }
+
+            //PREPARE NOTIFICATION FOR EACH COURSES
+            foreach ($courses as $courseid) {
+                if ($course = $DB->get_record('course', array('id'=>$courseid))) {
+
+                    $context = context_course::instance($course->id);
+
+                    //if ($students = get_enrolled_users($context, 'moodle/grade:view')) {   print_r($students);die;
+                    if ($students = get_role_users(5, $context)) {
+                        foreach ($students as $student) {
+
+                            $message = "";
+                            $grade_summary = grade_summary($student->id, $course->id);
+                            $lastaccess = 0;
+
+                            $notification_message[$student->id][$course->id]['studentname'] = $student->firstname . ' ' . $student->lastname;
+
+                            if ($notification_rule->g1) {
+                                $message .= '<li>'.get_string('g1_message', 'block_fn_mentor', array('firstname'=>$student->firstname, 'g1'=>$grade_summary->attempted)).'</li>';
+                                $notification_message[$student->id][$course->id]['coursename'] = $course->fullname;
+                                $notification_message[$student->id][$course->id]['message'] = $message;
+                            }
+
+                            if ($notification_rule->g2) {
+                                $message .= '<li>'.get_string('g2_message', 'block_fn_mentor', array('firstname'=>$student->firstname, 'g2'=>$grade_summary->all)).'</li>';
+                                $notification_message[$student->id][$course->id]['coursename'] = $course->fullname;
+                                $notification_message[$student->id][$course->id]['message'] = $message;
+                            }
+
+                            if ($notification_rule->g3 && $notification_rule->g3_value) {
+                                if ($grade_summary->attempted < $notification_rule->g3_value){
+                                    $message .= '<li>'.get_string('g3_message', 'block_fn_mentor', array('firstname'=>$student->firstname, 'g3'=>$grade_summary->attempted, 'g3_value'=>$notification_rule->g3_value)).'</li>';
+                                    $notification_message[$student->id][$course->id]['coursename'] = $course->fullname;
+                                    $notification_message[$student->id][$course->id]['message'] = $message;
+                                }
+                            }
+
+                            if ($notification_rule->g4 && $notification_rule->g4_value) {
+                                if ($grade_summary->attempted < $notification_rule->g4_value){
+                                    $message .= '<li>'.get_string('g4_message', 'block_fn_mentor', array('firstname'=>$student->firstname, 'g4'=>$grade_summary->all, 'g4_value'=>$notification_rule->g3_value)).'</li>';
+                                    $notification_message[$student->id][$course->id]['coursename'] = $course->fullname;
+                                    $notification_message[$student->id][$course->id]['message'] = $message;
+                                }
+                            }
+
+                            if ($notification_rule->g5 && $notification_rule->g5_value) {
+                                if ($grade_summary->attempted > $notification_rule->g5_value){
+                                    $message .= '<li>'.get_string('g5_message', 'block_fn_mentor', array('firstname'=>$student->firstname, 'g5'=>$grade_summary->attempted, 'g5_value'=>$notification_rule->g5_value)).'</li>';
+                                    $notification_message[$student->id][$course->id]['coursename'] = $course->fullname;
+                                    $notification_message[$student->id][$course->id]['message'] = $message;
+                                }
+                            }
+
+                            if ($notification_rule->g6 && $notification_rule->g6_value) {
+                                if ($grade_summary->attempted > $notification_rule->g6_value){
+                                    $message .= '<li>'.get_string('g6_message', 'block_fn_mentor', array('firstname'=>$student->firstname, 'g6'=>$grade_summary->all, 'g6_value'=>$notification_rule->g6_value)).'</li>';
+                                    $notification_message[$student->id][$course->id]['coursename'] = $course->fullname;
+                                    $notification_message[$student->id][$course->id]['message'] = $message;
+                                }
+                            }
+
+
+                            if ($notification_rule->n1 && $notification_rule->n1_value) {
+                                if ($student->lastaccess > 0) {
+                                    $lastaccess = round(((time() - $student->lastaccess) /(24*60*60)), 0);
+                                }
+                                if ($lastaccess >= $notification_rule->n1_value){
+                                    $message .= '<li>'.get_string('n1_message', 'block_fn_mentor', array('firstname'=>$student->firstname, 'n1'=>$lastaccess)).'</li>';
+                                    $notification_message[$student->id][$course->id]['coursename'] = $course->fullname;
+                                    $notification_message[$student->id][$course->id]['message'] = $message;
+                                }
+                            }
+
+                            if ($notification_rule->n2 && $notification_rule->n2_value) {
+                                $last_activity = last_activity($student->id);
+                                if (is_numeric($last_activity)) {
+                                    if ($last_activity >= $notification_rule->n2_value){
+                                        $message .= '<li>'.get_string('n2_message', 'block_fn_mentor', array('firstname'=>$student->firstname, 'n2'=>$last_activity)).'</li>';
+                                        $notification_message[$student->id][$course->id]['coursename'] = $course->fullname;
+                                        $notification_message[$student->id][$course->id]['message'] = $message;
+                                    }
+                                }
+
+                                //echo last_activity (464, $notification_rule->n2_value);
+                            }
+
+
+                        }
+                    }
+                }
+            }
+
+            //SEND EMAILS FOR EACH RULE
+            foreach ($notification_message as $student_id => $course_messages) {
+
+                $course_array = array();
+                $messageHTML = '';
+
+                //STUDENT
+                if (!$student = $DB->get_record('user', array('id'=>$student_id))) {
+                    continue;
+                }
+
+                $header = new stdClass();
+                $header->sitename = format_string($site->fullname);
+                $header->studentname = fullname($student);
+
+                $mentee_url = new moodle_url('/blocks/fn_mentor/course_overview.php?menteeid='.$student_id);
+                $appended_message = '';
+                if ($notification_rule->appended_message) {
+                    $appended_message = '<p>' . $notification_rule->appended_message . '</p>';
+                }
+                $message_footer = $appended_message . '<hr />';
+                $message_footer .= '<p>'.get_string('linktomentorpage', 'block_fn_mentor', $mentee_url->out()).'</p>';
+                $message_footer .= 'This is an authomated message from '.format_string($site->fullname).'. Please do not reply to this message';
+
+                $send_message = false;
+
+                foreach ($course_messages as $course_id => $course_message) {
+                    if (!isset($course_message['message'])) {
+                        $send_message = false;
+                        continue;
+                    } else {
+                        $send_message = true;
+                    }
+                    $messageHTML .= 'Course: '.$course_message['coursename'].' <br />';
+                    $messageHTML .= '<ul>'.$course_message['message'].'</ul>';
+
+                    $course_array[] = $course_message['coursename'];
+
+                    //TEACHER
+                    if ($notification_rule->teacher) {
+                        //Course teachers
+                        $sql_techer = "SELECT u.id,
+                                                  u.firstname,
+                                                  u.lastname
+                                             FROM {context} ctx
+                                       INNER JOIN {role_assignments} ra
+                                               ON ctx.id = ra.contextid
+                                       INNER JOIN {user} u
+                                               ON ra.userid = u.id
+                                            WHERE ctx.contextlevel = ?
+                                              AND ra.roleid = ?
+                                              AND ctx.instanceid = ?";
+
+                        if ($teachers = $DB->get_records_sql($sql_techer, array(50, 3, $course_id))) {
+                            foreach ($teachers as $teacher) {
+                                if (!$to = $DB->get_record('user', array('id'=>$teacher->id))) {
+                                    continue;
+                                }
+                                $header->coursename = implode(', ', $course_array);
+                                $message_header = get_string('message_header', 'block_fn_mentor', $header);
+                                if($send_message)
+                                    email_to_user($to, $supportuser, $subject, '', $message_header.$messageHTML.$message_footer);
+                            }
+                        }
+                    }
+                }
+
+                //STUDENT
+                if ($notification_rule->student) {
+                    $header->coursename = implode(', ', $course_array);
+                    $message_header = get_string('message_header', 'block_fn_mentor', $header);
+                    if ($send_message)
+                        email_to_user($student, $supportuser, $subject, '', $message_header.$messageHTML.$message_footer);
+                }
+
+                //MENTOR
+                if ($notification_rule->mentor) {
+                    $mentors = get_mentors($student_id);
+                    foreach ($mentors as $mentor) {
+                        if (!$to = $DB->get_record('user', array('id'=>$mentor->mentorid))) {
+                            continue;
+                        }
+                        $header->coursename = implode(', ', $course_array);
+                        $message_header = get_string('message_header', 'block_fn_mentor', $header);
+                        if ($send_message)
+                            email_to_user($to, $supportuser, $subject, '', $message_header.$messageHTML.$message_footer);
+                    }
+                }
+
+                //return true;
+
+            }
+
+            $update_sql = "UPDATE {mentors_mentees_notification} SET crontime=? WHERE id=?";
+            $DB->execute($update_sql, array(date("Y-m-d"), $notification_rule->id));
+        } // END OF EACH NOTIFICATION
+    }
+
+    return true;
 }

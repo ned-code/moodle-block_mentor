@@ -89,6 +89,7 @@
 #sortbyForm {
     display: block;
     float: right;
+    margin: 0 0 0 10px;
 }
 
 #courseForm {
@@ -143,7 +144,6 @@
     width: 75%;
     float: right;
     margin-top: 18px;
-    background-color: #7f7f7f;
 }
 
 .mentee-course-overview-block {
@@ -201,7 +201,6 @@
 }
 
 .mentee-course-overview-center_table {
-    background-color: #7f7f7f;
     margin: 0;
     width: 100%;
     border-spacing: 10px;
@@ -213,12 +212,21 @@
     background-color: white;
     width: 33%;
 }
+.mentee-blue-border {
+     border-left: 4px solid #50b4ef;
+     border-right: 4px solid #50b4ef;
+     border-bottom: 4px solid #50b4ef;
+ }
+
+.mentee-grey-border {
+     border: 4px solid #787878;
+ }
 
 .overview-course {
     text-align: center;
     font-weight: bold;
     font-size: 16px;
-    margin: -7px -7px 7px -7px;
+    margin: -1px -1px 7px -1px;
 }
 
 .vertical-text {
@@ -230,7 +238,7 @@
     text-align: center;
     font-weight: bold;
     font-size: 16px;
-    margin: -7px -7px 7px -7px;
+    margin: -1px -1px 7px -1px;
 }
 
 .overview-progress-list {
@@ -254,7 +262,9 @@ td.overview-grade-right {
     font-weight: bold;
     padding: 6px;
 }
-
+.overview-teacher, .overview-mentor {
+    padding: 5px 10px 0;
+}
 .overview-teacher img {
     margin-bottom: -4px;
     margin-left: 5px;
@@ -264,10 +274,22 @@ td.overview-grade-right {
     margin-bottom: -4px;
     margin-left: 5px;
 }
+.vertical-textd {
+    padding: 5px 10px 0;
+}
 
 .mentee-menu {
     background-color: #7f7f7f;
     margin: 0;
+    border-spacing: 5px;
+}
+
+.mentee-menu td {
+    background-color: #c3c3c3;
+    padding: 5px;
+    text-align: center;
+    width: 20%;
+    border: 4px solid #f5f5f5;
 }
 .mentee-course-overview-center-course-title {
   color: white;
@@ -277,21 +299,12 @@ td.overview-grade-right {
   padding: 6px 0 0 10px;
 }
 .mentee-course-overview-center-course-title a {
-  color: white !important;
+  color: #787878 !important;
   float: left;
   font-size: 18px;
   font-weight: bold;
   padding: 6px 0 0 10px;
 }
-
-.mentee-menu td {
-    background-color: #c3c3c3;
-    border: 2px solid #7f7f7f;
-    padding: 5px;
-    text-align: center;
-    width: 20%;
-}
-
 td.active {
     background-color: yellow;
 }
@@ -302,10 +315,10 @@ td.active {
 }
 
 .simple-gradebook{
-    background-color: #7f7f7f;
     border-collapse: separate;
     padding: 0 10px;
     width: 100%;
+    margin-bottom: 16px;
 }
 
 .blue {
@@ -342,12 +355,12 @@ table.simplegradebook {
     font-family: Verdana, Geneva, Arial, Helvetica, sans-serif;
     font-weight: normal;
     font-size: 11px;
-    color: #fff;;
+    color: #fff;
     background-color: #666;
-    border: 0px;
     border-collapse: collapse;
     border: 1px black solid;
     margin-top: 10px;
+    margin-bottom: 10px;
 
 }
 table.simplegradebook td {
@@ -359,9 +372,6 @@ table.simplegradebook td {
     font-family: Verdana, Geneva, Arial, Helvetica, sans-serif;
     font-weight: normal;
     font-size: 11px;
-}
-table.simplegradebook td.name {
-
 }
 table.simplegradebook td.odd {
     background-color: #FFEDC9;
@@ -379,8 +389,8 @@ table.simplegradebook td.icon {
     text-align: center;
 }
 table.simplegradebook th {
-    background-color: #7F7F7F;
-    color: #fff;
+    background-color: #c3c3c3;
+    color: #555555;
     padding: 4px;
     text-align: center;
     border: 1px black solid;
@@ -456,12 +466,14 @@ div#notification-wrapper {
   width: 900px;
 }
 table.notification th {
-  background-color: #ededed;
-  border: 1px solid #b5afaf;
+    background-color: #ededed;
+    border: 1px solid #b5afaf;
+    padding: 10px 15px;
 }
 table.notification td {
-  background-color: white;
-  border: 1px solid #b5afaf;
+    background-color: white;
+    border: 1px solid #b5afaf;
+    padding: 15px;
 }
 #page-blocks-fn_mentor-notification .mform .fitem .felement {
   margin-left: 0 !important;
@@ -576,7 +588,7 @@ ul.fz_tree, ul.fz_tree ul {
   float: right;
   left: -10px;
   position: relative;
-  top: 0px;
+  top: 0;
 }
 .select.menucoursefilter {
   max-width: 150px;
@@ -595,4 +607,15 @@ ul.fz_tree, ul.fz_tree ul {
 }
 .notification_c5 {
   width: 192px;
+}
+.mentee-block-menu {
+    float: left;
+    display: block;
+    font-size: 12px;
+}
+.mentee-footer-menu {
+    overflow: hidden;
+}
+.simple-gradebook h3.notestitle, .simple-gradebook .notepost {
+    padding: 0 10px;
 }

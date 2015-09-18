@@ -272,7 +272,7 @@ foreach ($enrolled_courses as $enrolled_course) {
     if (isset($SESSION->completioncache)) {
         unset($SESSION->completioncache);
     }
-    $progress_data = new object();
+    $progress_data = new stdClass();
     $progress_data->content = new stdClass;
     $progress_data->content->items = array();
     $progress_data->content->icons = array();
@@ -429,10 +429,8 @@ foreach ($enrolled_courses as $enrolled_course) {
         $progress_data->content->icons[] = '<img src="' . $CFG->wwwroot . '/blocks/fn_mentor/pix/unmarked.gif" class="icon" alt="">';
 
     } else {
-        $progress_data->content->items[] = "<p>Completion tracking is not enabled at the site level.You must turn on this feature
-                                    on if you wish to use to use the Assignment Tracking System for this course </p>";
-        $progress_data->content->icons[] = '<img src="' . $CFG->wwwroot . '/blocks/fn_mentor/pix/warning.gif"
-                                                    class="icon" alt="">';
+        $progress_data->content->items[] = "<p>Completion tracking is not enabled in this course.</p>";
+        $progress_data->content->icons[] = '<img src="' . $CFG->wwwroot . '/blocks/fn_mentor/pix/warning.gif" class="icon" alt="">';
     }
 
     $progress_html = '';
@@ -445,10 +443,10 @@ foreach ($enrolled_courses as $enrolled_course) {
     ##################################
 
 
-    echo '<table class="mentee-course-overview-center_table">';
+    echo '<table class="mentee-course-overview-center_table block">';
     echo '<tr>';
     //1
-    echo '<td valign="top">';
+    echo '<td valign="top" class="mentee-grey-border">';
     echo '<div class="overview-course coursetitle"><a  href="'.$CFG->wwwroot.'/course/view.php?id='.$enrolled_course->id.'"
     onclick="window.open(\''.$CFG->wwwroot.'/course/view.php?id='.$enrolled_course->id.'\', \'\', \'width=800,height=600,toolbar=no,location=no,menubar=no,copyhistory=no,status=no,directories=no,scrollbars=yes,resizable=yes\'); return false;"
     class="" >'.$enrolled_course->fullname.'</a></div>';
@@ -501,12 +499,12 @@ foreach ($enrolled_courses as $enrolled_course) {
     echo '</div>';
     echo '</td>';
     //2
-    echo '<td valign="top">';
+    echo '<td valign="top" class="mentee-blue-border">';
     echo '<div class="overview-progress blue">Progress</div>';
     echo '<div class="vertical-textd">'.$progress_html.'</div>';
     echo '</td>';
     //3
-    echo '<td valign="top">';
+    echo '<td valign="top" class="mentee-blue-border">';
     echo '<div class="overview-progress blue">Grade</div>';
     echo print_grade_summary ($course->id , $mentee->id);
     echo '</td>';

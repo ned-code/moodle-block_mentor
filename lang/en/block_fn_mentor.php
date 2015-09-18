@@ -129,3 +129,5 @@ $string['open_progress_reports'] = 'Open Progress Reports';
 $string['show_all'] = 'Show all Mentors & Mentees';
 $string['allownotes'] = 'Allow mentor to see Notes';
 $string['show_mentor_sort'] = 'Show Mentor/Mentee sort menu';
+$string['run_now'] = 'Run now';
+$string['successful'] = 'Successful';

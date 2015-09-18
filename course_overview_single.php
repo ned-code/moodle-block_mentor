@@ -114,7 +114,7 @@ $student_menu_url = array();
 $mentees = array();
 
 if ($isadmin) {
-   $mentees = get_all_mentees();
+    $mentees = get_all_mentees();
 } elseif ($isteacher) {
     if ($mentees_by_mentor = get_mentees_by_mentor(0, $filter='teacher')) {
         foreach ($mentees_by_mentor as $mentee_by_mentor) {
@@ -140,8 +140,8 @@ $studentmenu = '';
 
 if ((!$isstudent) || ($isadmin || $ismentor  || $isteacher)) {
     $studentmenu = html_writer::tag('form', '<span>'.get_string('select_student', 'block_fn_mentor').'</span>'.
-                                html_writer::select($student_menu, 'sortby', $student_menu_url[$menteeid], null, array('onChange' => 'location=document.jump1.sortby.options[document.jump1.sortby.selectedIndex].value;')),
-                            array('id'=>'studentFilterForm', 'name'=>'jump1'));
+        html_writer::select($student_menu, 'sortby', $student_menu_url[$menteeid], null, array('onChange' => 'location=document.jump1.sortby.options[document.jump1.sortby.selectedIndex].value;')),
+        array('id'=>'studentFilterForm', 'name'=>'jump1'));
 
     $studentmenu = '<div class="mentee-course-overview-block-filter"> '.$studentmenu.' </div>';
 }
@@ -153,13 +153,13 @@ echo $studentmenu.'
               '.get_string('student', 'block_fn_mentor').'
           </div>
           <div class="mentee-course-overview-block-content">'.
-              $OUTPUT->container($OUTPUT->user_picture($mentee, array('courseid'=>$COURSE->id)), "userimage").
-              $OUTPUT->container('<a  href="'.$CFG->wwwroot.'/user/view.php?id='.$mentee->id.'&course=1"
+    $OUTPUT->container($OUTPUT->user_picture($mentee, array('courseid'=>$COURSE->id)), "userimage").
+    $OUTPUT->container('<a  href="'.$CFG->wwwroot.'/user/view.php?id='.$mentee->id.'&course=1"
                                 onclick="window.open(\''.$CFG->wwwroot.'/user/view.php?id='.$mentee->id.'&course=1\', \'\', \'width=800,height=600,toolbar=no,location=no,menubar=no,copyhistory=no,status=no,directories=no,scrollbars=yes,resizable=yes\'); return false;"
                                 class="" >'.fullname($mentee, true).'</a>
                     &nbsp;&nbsp;<a href="'.$CFG->wwwroot.'/message/index.php?id='.$mentee->id.'" ><img src="'.$CFG->wwwroot.'/blocks/fn_mentor/pix/email.png"></a>', "userfullname").
-              '<span class="mentee-lastaccess">'.$lastaccess.'</span>' .
-              '
+    '<span class="mentee-lastaccess">'.$lastaccess.'</span>' .
+    '
           </div>
       </div>';
 
@@ -217,20 +217,21 @@ if ($navpage == 'overview') {
 
 
 //CENTER
-echo '<div id="mentee-course-overview-center-single">'.
-     '<div id="mentee-course-overview-center-menu-container">';
+echo '<div id="mentee-course-overview-center-single" class="block">'.
+    '<div id="mentee-course-overview-center-menu-container">';
 echo '<div class="mentee-course-overview-center-course-title"><a  href="'.$CFG->wwwroot.'/course/view.php?id='.$course->id.'"
     onclick="window.open(\''.$CFG->wwwroot.'/course/view.php?id='.$course->id.'\', \'\', \'width=800,height=600,toolbar=no,location=no,menubar=no,copyhistory=no,status=no,directories=no,scrollbars=yes,resizable=yes\'); return false;"
     class="" >'.$course->fullname.'</a></div>';
 
 //if (!$isstudent) {
-    echo '<div class="mentee-course-overview-center-course-menu"><table class="mentee-menu">
+echo '<div class="mentee-course-overview-center-course-menu">
+          <table class="mentee-menu">
             <tr>
                 <td'.$class_overview.'><a href="'.$CFG->wwwroot.'/blocks/fn_mentor/course_overview_single.php?menteeid='.$menteeid.'&courseid='.$courseid.'">Overview</a></td>
                 <td'.$class_grade.'><a href="'.$CFG->wwwroot.'/blocks/fn_mentor/course_overview_single.php?page=grade&menteeid='.$menteeid.'&courseid='.$courseid.'">Grades</a></td>
                 <td'.$class_activity.'><a href="'.$CFG->wwwroot.'/blocks/fn_mentor/course_overview_single.php?page=outline&menteeid='.$menteeid.'&courseid='.$courseid.'">Activity</a></td>
                 <!--<td'.$class_note.'><a href="'.$CFG->wwwroot.'/blocks/fn_mentor/course_overview_single.php?page=notes&menteeid='.$menteeid.'&courseid='.$courseid.'">Notes</a></td>-->';
-      echo '</tr>
+echo '</tr>
           </table>
           </div>';
 //}
@@ -255,7 +256,7 @@ if ($navpage == 'overview'){
     if (isset($SESSION->completioncache)) {
         unset($SESSION->completioncache);
     }
-    $progress_data = new object();
+    $progress_data = new stdClass();
     $progress_data->content = new stdClass;
     $progress_data->content->items = array();
     $progress_data->content->icons = array();
@@ -291,65 +292,65 @@ if ($navpage == 'overview'){
             if ($completionstate == 0) {
                 //Show activity as complete when conditions are met
                 if (($activity->module == 1)
-                        && ($activity->modname == 'assignment' || $activity->modname == 'assign')
-                        && ($activity->completion == 2)
-                        && $assignment_status) {
+                    && ($activity->modname == 'assignment' || $activity->modname == 'assign')
+                    && ($activity->completion == 2)
+                    && $assignment_status) {
 
-                        if (isset($assignment_status)) {
-                            if ($assignment_status == 'saved') {
-                                $savedactivities++;
-                            } else if ($assignment_status == 'submitted') {
-                                $notattemptedactivities++;
-                            } else if ($assignment_status == 'waitinggrade') {
-                                $waitingforgradeactivities++;
-                            }
-                        }else{
+                    if (isset($assignment_status)) {
+                        if ($assignment_status == 'saved') {
+                            $savedactivities++;
+                        } else if ($assignment_status == 'submitted') {
                             $notattemptedactivities++;
+                        } else if ($assignment_status == 'waitinggrade') {
+                            $waitingforgradeactivities++;
                         }
+                    }else{
+                        $notattemptedactivities++;
+                    }
                 } else {
                     $notattemptedactivities++;
                 }
-            //COMPLETION_COMPLETE - COMPLETION_COMPLETE_PASS
+                //COMPLETION_COMPLETE - COMPLETION_COMPLETE_PASS
             } elseif ($completionstate == 1 || $completionstate == 2) {
                 if (($activity->module == 1)
-                        && ($activity->modname == 'assignment' || $activity->modname == 'assign')
-                        && ($activity->completion == 2)
-                        && $assignment_status) {
+                    && ($activity->modname == 'assignment' || $activity->modname == 'assign')
+                    && ($activity->completion == 2)
+                    && $assignment_status) {
 
-                        if (isset($assignment_status)) {
-                            if ($assignment_status == 'saved') {
-                                $savedactivities++;
-                            } else if ($assignment_status == 'submitted') {
-                                $completedactivities++;
-                            } else if ($assignment_status == 'waitinggrade') {
-                                $waitingforgradeactivities++;
-                            }
-                        }else{
+                    if (isset($assignment_status)) {
+                        if ($assignment_status == 'saved') {
+                            $savedactivities++;
+                        } else if ($assignment_status == 'submitted') {
                             $completedactivities++;
+                        } else if ($assignment_status == 'waitinggrade') {
+                            $waitingforgradeactivities++;
                         }
+                    }else{
+                        $completedactivities++;
+                    }
                 } else {
                     $completedactivities++;
                 }
 
-            //COMPLETION_COMPLETE_FAIL
+                //COMPLETION_COMPLETE_FAIL
             } elseif ($completionstate == 3) {
                 //Show activity as complete when conditions are met
                 if (($activity->module == 1)
-                        && ($activity->modname == 'assignment' || $activity->modname == 'assign')
-                        && ($activity->completion == 2)
-                        && $assignment_status) {
+                    && ($activity->modname == 'assignment' || $activity->modname == 'assign')
+                    && ($activity->completion == 2)
+                    && $assignment_status) {
 
-                        if (isset($assignment_status)) {
-                            if ($assignment_status == 'saved') {
-                                $savedactivities++;
-                            } else if ($assignment_status == 'submitted') {
-                                $incompletedactivities++;
-                            } else if ($assignment_status == 'waitinggrade') {
-                                $waitingforgradeactivities++;
-                            }
-                        }else{
+                    if (isset($assignment_status)) {
+                        if ($assignment_status == 'saved') {
+                            $savedactivities++;
+                        } else if ($assignment_status == 'submitted') {
                             $incompletedactivities++;
+                        } else if ($assignment_status == 'waitinggrade') {
+                            $waitingforgradeactivities++;
                         }
+                    }else{
+                        $incompletedactivities++;
+                    }
                 } else {
                     $incompletedactivities++;
                 }
@@ -412,8 +413,7 @@ if ($navpage == 'overview'){
         $progress_data->content->icons[] = '<img src="' . $CFG->wwwroot . '/blocks/fn_mentor/pix/unmarked.gif" class="icon" alt="">';
 
     } else {
-        $progress_data->content->items[] = "<p>Completion tracking is not enabled at the site level.You must turn on this feature
-                                    on if you wish to use to use the Assignment Tracking System for this course </p>";
+        $progress_data->content->items[] = "<p>Completion tracking is not enabled in this course.</p>";
         $progress_data->content->icons[] = '<img src="' . $CFG->wwwroot . '/blocks/fn_mentor/pix/warning.gif"
                                                     class="icon" alt="">';
     }
@@ -431,7 +431,7 @@ if ($navpage == 'overview'){
     echo '<table class="mentee-course-overview-center_table">';
     echo '<tr>';
     //1
-    echo '<td valign="top">';
+    echo '<td valign="top" class="mentee-grey-border">';
     echo '<div class="overview-teacher">';
     echo '<table class="mentee-teacher-table">';
     //Course teachers
@@ -455,7 +455,7 @@ if ($navpage == 'overview'){
             $lastaccess = get_string('lastaccess').get_string('labelsep', 'langconfig'). _format_time(time() - $teacher->lastaccess);
             echo '<div><a onclick="window.open(\''.$CFG->wwwroot.'/user/profile.php?id='.$teacher->id.'\', \'\', \'width=800,height=600,toolbar=no,location=no,menubar=no,copyhistory=no,status=no,directories=no,scrollbars=yes,resizable=yes\'); return false;" href="'.$CFG->wwwroot.'/user/profile.php?id='.$teacher->id.'">' . $teacher->firstname.' '.$teacher->lastname.'</a>
                   <a onclick="window.open(\''.$CFG->wwwroot.'/message/index.php?id='.$teacher->id.'\', \'\', \'width=800,height=600,toolbar=no,location=no,menubar=no,copyhistory=no,status=no,directories=no,scrollbars=yes,resizable=yes\'); return false;" href="'.$CFG->wwwroot.'/user/profile.php?id='.$teacher->id.'"><img src="'.$CFG->wwwroot.'/blocks/fn_mentor/pix/email.png"></a><br />'.
-                  '<span class="mentee-lastaccess">'.$lastaccess.'</span></div>';
+                '<span class="mentee-lastaccess">'.$lastaccess.'</span></div>';
         }
 
     }
@@ -473,7 +473,7 @@ if ($navpage == 'overview'){
             //echo '<a class="mentor-profile" target="_blank" href="'.$CFG->wwwroot.'/user/profile.php?id='.$mentor->mentorid.'">' . $mentor->firstname.' '.$mentor->lastname.'</a> <a href="'.$CFG->wwwroot.'/message/index.php?id='.$mentor->mentorid.'" ><img src="'.$CFG->wwwroot.'/blocks/fn_mentor/pix/email.png"></a><br />';
             echo '<div><a onclick="window.open(\''.$CFG->wwwroot.'/user/profile.php?id='.$mentor->mentorid.'\', \'\', \'width=620,height=450,toolbar=no,location=no,menubar=no,copyhistory=no,status=no,directories=no,scrollbars=yes,resizable=yes\'); return false;" href="'.$CFG->wwwroot.'/user/profile.php?id='.$mentor->mentorid.'">' . $mentor->firstname.' '.$mentor->lastname.'</a>
                   <a onclick="window.open(\''.$CFG->wwwroot.'/message/index.php?id='.$mentor->mentorid.'\', \'\', \'width=620,height=450,toolbar=no,location=no,menubar=no,copyhistory=no,status=no,directories=no,scrollbars=yes,resizable=yes\'); return false;" href="'.$CFG->wwwroot.'/user/profile.php?id='.$mentor->mentorid.'"><img src="'.$CFG->wwwroot.'/blocks/fn_mentor/pix/email.png"></a><br />'.
-                  '<span class="mentee-lastaccess">'.$lastaccess.'</span></div>';
+                '<span class="mentee-lastaccess">'.$lastaccess.'</span></div>';
         }
         echo '</td></tr>';
     }
@@ -481,12 +481,12 @@ if ($navpage == 'overview'){
     echo '</div>';
     echo '</td>';
     //2
-    echo '<td valign="top">';
+    echo '<td valign="top" class="mentee-blue-border">';
     echo '<div class="overview-progress blue">Progress</div>';
     echo '<div class="vertical-textd">'.$progress.'</div>';
     echo '</td>';
     //3
-    echo '<td valign="top">';
+    echo '<td valign="top" class="mentee-blue-border">';
     echo '<div class="overview-progress blue">Grade</div>';
     echo print_grade_summary ($course->id , $mentee->id);
     echo '</td>';
@@ -503,251 +503,259 @@ if ($navpage == 'overview'){
     echo '</td>';
     echo '</tr>';
     echo '<tr>';
-    echo '<td class="white" align="middle">';
+    echo '<td class="white mentee-blue-border" align="middle">';
 
     ##########################################
-        $unsubmitted = 0;//Sgow only submitted
-     /// Array of functions to call for grading purposes for modules.
-        $mod_grades_array = array(
-            'assign' => 'assign.submissions.fn.php',
-            'quiz' => 'quiz.submissions.fn.php',
-            'assignment' => 'assignment.submissions.fn.php',
-            'forum' => 'forum.submissions.fn.php',
-        );
+    $unsubmitted = 0;//Sgow only submitted
+    /// Array of functions to call for grading purposes for modules.
+    $mod_grades_array = array(
+        'assign' => 'assign.submissions.fn.php',
+        'quiz' => 'quiz.submissions.fn.php',
+        'assignment' => 'assignment.submissions.fn.php',
+        'forum' => 'forum.submissions.fn.php',
+    );
 
-        $cobject = new stdClass();
-        $cobject->course = $course;
+    $cobject = new stdClass();
+    $cobject->course = $course;
 
-        // if comes from course page
-        //$currentgroup = get_current_group($course->id);
+    // if comes from course page
+    //$currentgroup = get_current_group($course->id);
 
-        $simplegradebook = array();
-        $weekactivitycount = array();
-        $simplegradebook[$mentee->id]['name'] = $mentee->firstname.' '.substr($mentee->lastname,0,1).'.';
+    $simplegradebook = array();
+    $weekactivitycount = array();
+    $simplegradebook[$mentee->id]['name'] = $mentee->firstname.' '.substr($mentee->lastname,0,1).'.';
 
-        /// Collect modules data
-        //get_all_mods($course->id, $mods, $modnames, $modnamesplural, $modnamesused);
-        $modnames = get_module_types_names();
-        $modnamesplural = get_module_types_names(true);
-        $modinfo = get_fast_modinfo($course->id);
-        $mods = $modinfo->get_cms();
-        $modnamesused = $modinfo->get_used_module_names();
+    /// Collect modules data
+    //get_all_mods($course->id, $mods, $modnames, $modnamesplural, $modnamesused);
+    $modnames = get_module_types_names();
+    $modnamesplural = get_module_types_names(true);
+    $modinfo = get_fast_modinfo($course->id);
+    $mods = $modinfo->get_cms();
+    $modnamesused = $modinfo->get_used_module_names();
 
-        $mod_array = array($mods, $modnames, $modnamesplural, $modnamesused);
+    $mod_array = array($mods, $modnames, $modnamesplural, $modnamesused);
 
-        $cobject->mods = &$mods;
-        $cobject->modnames = &$modnames;
-        $cobject->modnamesplural = &$modnamesplural;
-        $cobject->modnamesused = &$modnamesused;
-        $cobject->sections = &$sections;
+    $cobject->mods = &$mods;
+    $cobject->modnames = &$modnames;
+    $cobject->modnamesplural = &$modnamesplural;
+    $cobject->modnamesused = &$modnamesused;
+    $cobject->sections = &$sections;
 
-      //FIND CURRENT WEEK
-        $courseformatoptions = course_get_format($course)->get_format_options();
-        $course_numsections = $courseformatoptions['numsections'];
+    //FIND CURRENT WEEK
+    $courseformatoptions = course_get_format($course)->get_format_options();
+    $course_numsections = $courseformatoptions['numsections'];
+    $courseformat = course_get_format($course)->get_format();
 
-        $timenow = time();
-        $weekdate = $course->startdate;    // this should be 0:00 Monday of that week
-        $weekdate += 7200;                 // Add two hours to avoid possible DST problems
+    $timenow = time();
+    $weekdate = $course->startdate;    // this should be 0:00 Monday of that week
+    $weekdate += 7200;                 // Add two hours to avoid possible DST problems
 
-        $weekofseconds = 604800;
-        $course_enddate = $course->startdate + ($weekofseconds * $course_numsections);
+    $weekofseconds = 604800;
+    $course_enddate = $course->startdate + ($weekofseconds * $course_numsections);
 
-        //  Calculate the current week based on today's date and the starting date of the course.
-        $currentweek = ($timenow > $course->startdate) ? (int) ((($timenow - $course->startdate) / $weekofseconds) + 1) : 0;
-        $currentweek = min($currentweek, $course_numsections);
-
-
-        /// Search through all the modules, pulling out grade data
-        //$sections = get_all_sections($course->id); // Sort everything the same as the course
-        $sections = get_fast_modinfo($course->id)->get_section_info_all();
-
-        //if ($view == "less"){
-        //    $upto = min($currentweek+1, sizeof($sections));
-        //}else{
-            $upto = sizeof($sections);
-        //}
+    //  Calculate the current week based on today's date and the starting date of the course.
+    $currentweek = ($timenow > $course->startdate) ? (int) ((($timenow - $course->startdate) / $weekofseconds) + 1) : 0;
+    $currentweek = min($currentweek, $course_numsections);
 
 
+    /// Search through all the modules, pulling out grade data
+    //$sections = get_all_sections($course->id); // Sort everything the same as the course
+    $sections = get_fast_modinfo($course->id)->get_section_info_all();
 
-        for ($i = 0; $i < $upto; $i++) {
-            $numberofitem = 0;
-            if (isset($sections[$i])) {   // should always be true
-                $section = $sections[$i];
-                if ($section->sequence) {
-                    $sectionmods = explode(",", $section->sequence);
-                    foreach ($sectionmods as $sectionmod) { //print_r($mods[$sectionmod]);die;
-                        if (empty($mods[$sectionmod])) {
-                            continue;
-                        }
+    //if ($view == "less"){
+    //    $upto = min($currentweek+1, sizeof($sections));
+    //}else{
+    $upto = sizeof($sections);
+    //}
 
-                        $mod = $mods[$sectionmod];
-                        if(! isset($mod_grades_array[$mod->modname])){
-                            continue;
-                        }
-                        /// Don't count it if you can't see it.
-                        $mcontext = context_module::instance($mod->id);
-                        if (!$mod->visible && !has_capability('moodle/course:viewhiddenactivities', $mcontext)) {
-                            continue;
-                        }
 
-                        $instance = $DB->get_record($mod->modname, array("id" => $mod->instance));
-                        $item = $DB->get_record('grade_items', array("itemtype" => 'mod', "itemmodule" => $mod->modname, "iteminstance" => $mod->instance));
 
-                        $libfile = $CFG->dirroot . '/mod/' . $mod->modname . '/lib.php';
-                        if (file_exists($libfile)) {
-                            require_once($libfile);
-                            $gradefunction = $mod->modname . "_get_user_grades";
+    for ($i = 0; $i < $upto; $i++) {
+        $numberofitem = 0;
+        if (isset($sections[$i])) {   // should always be true
+            $section = $sections[$i];
+            if ($section->sequence) {
+                $sectionmods = explode(",", $section->sequence);
+                foreach ($sectionmods as $sectionmod) { //print_r($mods[$sectionmod]);die;
+                    if (empty($mods[$sectionmod])) {
+                        continue;
+                    }
 
-                            if ((($mod->modname != 'forum') || (($instance->assessed > 0) && has_capability('mod/forum:rate', $mcontext))) && // Only include forums that are assessed only by teachers.
-                                    isset($mod_grades_array[$mod->modname])) {
+                    $mod = $mods[$sectionmod];
+                    if(! isset($mod_grades_array[$mod->modname])){
+                        continue;
+                    }
+                    /// Don't count it if you can't see it.
+                    $mcontext = context_module::instance($mod->id);
+                    if (!$mod->visible && !has_capability('moodle/course:viewhiddenactivities', $mcontext)) {
+                        continue;
+                    }
 
-                                if (function_exists($gradefunction)) {
-                                    ++$numberofitem;
-                                
-                                    $image = "<A target='_blank' HREF=\"$CFG->wwwroot/mod/$mod->modname/view.php?id=$mod->id\"   TITLE=\"$instance->name\">
+                    $instance = $DB->get_record($mod->modname, array("id" => $mod->instance));
+                    $item = $DB->get_record('grade_items', array("itemtype" => 'mod', "itemmodule" => $mod->modname, "iteminstance" => $mod->instance));
+
+                    $libfile = $CFG->dirroot . '/mod/' . $mod->modname . '/lib.php';
+                    if (file_exists($libfile)) {
+                        require_once($libfile);
+                        $gradefunction = $mod->modname . "_get_user_grades";
+
+                        if ((($mod->modname != 'forum') || (($instance->assessed > 0) && has_capability('mod/forum:rate', $mcontext))) && // Only include forums that are assessed only by teachers.
+                            isset($mod_grades_array[$mod->modname])) {
+
+                            if (function_exists($gradefunction)) {
+                                ++$numberofitem;
+
+                                $image = "<A target='_blank' HREF=\"$CFG->wwwroot/mod/$mod->modname/view.php?id=$mod->id\"   TITLE=\"$instance->name\">
                                     <IMG BORDER=0 VALIGN=absmiddle SRC=\"$CFG->wwwroot/mod/$mod->modname/pix/icon.png\" HEIGHT=16 WIDTH=16 ALT=\"$mod->modfullname\"></A>";
 
 
-                                    $weekactivitycount[$i]['mod'][] = $image;
-                                    foreach ($simplegradebook as $key => $value) {
+                                $weekactivitycount[$i]['mod'][] = $image;
+                                foreach ($simplegradebook as $key => $value) {
 
-                                        if (($mod->modname == 'quiz')||($mod->modname == 'forum')){
+                                    if (($mod->modname == 'quiz')||($mod->modname == 'forum')){
 
-                                            if($grade = $gradefunction($instance, $key)){
-                                                if ($item->gradepass > 0){
-                                                    if ($grade[$key]->rawgrade >=$item->gradepass){
-                                                        $simplegradebook[$key]['grade'][$i][$mod->id] = 'marked.gif';//passed
-                                                        $simplegradebook[$key]['avg'][]=array('grade'=>$grade[$key]->rawgrade, 'grademax'=>$item->grademax);
-                                                    }else{
-                                                        $simplegradebook[$key]['grade'][$i][$mod->id] = 'incomplete.gif';//fail
-                                                        $simplegradebook[$key]['avg'][]=array('grade'=>$grade[$key]->rawgrade, 'grademax'=>$item->grademax);
-                                                    }
+                                        if($grade = $gradefunction($instance, $key)){
+                                            if ($item->gradepass > 0){
+                                                if ($grade[$key]->rawgrade >=$item->gradepass){
+                                                    $simplegradebook[$key]['grade'][$i][$mod->id] = 'marked.gif';//passed
+                                                    $simplegradebook[$key]['avg'][]=array('grade'=>$grade[$key]->rawgrade, 'grademax'=>$item->grademax);
                                                 }else{
-                                                    $simplegradebook[$key]['grade'][$i][$mod->id] = 'graded_.gif';//Graded (grade-to-pass is not set)
+                                                    $simplegradebook[$key]['grade'][$i][$mod->id] = 'incomplete.gif';//fail
                                                     $simplegradebook[$key]['avg'][]=array('grade'=>$grade[$key]->rawgrade, 'grademax'=>$item->grademax);
                                                 }
                                             }else{
-                                                $simplegradebook[$key]['grade'][$i][$mod->id] = 'ungraded.gif';
-                                                if($unsubmitted){
-                                                    $simplegradebook[$key]['avg'][]=array('grade'=>0, 'grademax'=>$item->grademax);
-                                                }
+                                                $simplegradebook[$key]['grade'][$i][$mod->id] = 'graded_.gif';//Graded (grade-to-pass is not set)
+                                                $simplegradebook[$key]['avg'][]=array('grade'=>$grade[$key]->rawgrade, 'grademax'=>$item->grademax);
                                             }
-                                        } else if ($modstatus = __assignment_status($mod, $key, true)){
-
-                                            switch ($modstatus) {
-                                                case 'submitted':
-                                                    if($grade = $gradefunction($instance, $key)){
-                                                        if ($item->gradepass > 0){
-                                                            if ($grade[$key]->rawgrade >=$item->gradepass){
-                                                                $simplegradebook[$key]['grade'][$i][$mod->id] = 'marked.gif';//passed
-                                                                $simplegradebook[$key]['avg'][]=array('grade'=>$grade[$key]->rawgrade, 'grademax'=>$item->grademax);
-                                                            }else{
-                                                                $simplegradebook[$key]['grade'][$i][$mod->id] = 'incomplete.gif';//fail
-                                                                $simplegradebook[$key]['avg'][]=array('grade'=>$grade[$key]->rawgrade, 'grademax'=>$item->grademax);
-                                                            }
-                                                        }else{
-                                                            $simplegradebook[$key]['grade'][$i][$mod->id] = 'graded_.gif';//Graded (grade-to-pass is not set)
-                                                            $simplegradebook[$key]['avg'][]=array('grade'=>$grade[$key]->rawgrade, 'grademax'=>$item->grademax);
-                                                        }
-                                                    }else{
-
-                                                    }
-                                                    break;
-
-                                                case 'saved':
-                                                    $simplegradebook[$key]['grade'][$i][$mod->id] = 'saved.gif';
-                                                    break;
-
-                                                case 'waitinggrade':
-                                                    $simplegradebook[$key]['grade'][$i][$mod->id] = 'unmarked.gif';
-                                                    break;
-                                            }
-                                        } else {
+                                        }else{
                                             $simplegradebook[$key]['grade'][$i][$mod->id] = 'ungraded.gif';
                                             if($unsubmitted){
                                                 $simplegradebook[$key]['avg'][]=array('grade'=>0, 'grademax'=>$item->grademax);
                                             }
                                         }
+                                    } else if ($modstatus = __assignment_status($mod, $key, true)){
 
+                                        switch ($modstatus) {
+                                            case 'submitted':
+                                                if($grade = $gradefunction($instance, $key)){
+                                                    if ($item->gradepass > 0){
+                                                        if ($grade[$key]->rawgrade >=$item->gradepass){
+                                                            $simplegradebook[$key]['grade'][$i][$mod->id] = 'marked.gif';//passed
+                                                            $simplegradebook[$key]['avg'][]=array('grade'=>$grade[$key]->rawgrade, 'grademax'=>$item->grademax);
+                                                        }else{
+                                                            $simplegradebook[$key]['grade'][$i][$mod->id] = 'incomplete.gif';//fail
+                                                            $simplegradebook[$key]['avg'][]=array('grade'=>$grade[$key]->rawgrade, 'grademax'=>$item->grademax);
+                                                        }
+                                                    }else{
+                                                        $simplegradebook[$key]['grade'][$i][$mod->id] = 'graded_.gif';//Graded (grade-to-pass is not set)
+                                                        $simplegradebook[$key]['avg'][]=array('grade'=>$grade[$key]->rawgrade, 'grademax'=>$item->grademax);
+                                                    }
+                                                }else{
+
+                                                }
+                                                break;
+
+                                            case 'saved':
+                                                $simplegradebook[$key]['grade'][$i][$mod->id] = 'saved.gif';
+                                                break;
+
+                                            case 'waitinggrade':
+                                                $simplegradebook[$key]['grade'][$i][$mod->id] = 'unmarked.gif';
+                                                break;
+                                        }
+                                    } else {
+                                        $simplegradebook[$key]['grade'][$i][$mod->id] = 'ungraded.gif';
+                                        if($unsubmitted){
+                                            $simplegradebook[$key]['avg'][]=array('grade'=>0, 'grademax'=>$item->grademax);
+                                        }
                                     }
 
                                 }
 
                             }
+
                         }
                     }
                 }
             }
-            $weekactivitycount[$i]['numofweek'] = $numberofitem;
-        } // a new Moodle nesting record? ;-)
+        }
+        $weekactivitycount[$i]['numofweek'] = $numberofitem;
+    } // a new Moodle nesting record? ;-)
 
 
-        echo '<div class="tablecontainer">';
-        $gradebook = reset($simplegradebook);
+    echo '<div class="tablecontainer">';
+    $gradebook = reset($simplegradebook);
 
-        if (isset($gradebook['grade'])) {
-            //TABLE
-            echo "<table class='simplegradebook'>";
+    if (isset($gradebook['grade'])) {
+        //TABLE
+        echo "<table class='simplegradebook'>";
 
-            echo "<tr>";
-            //echo "<th>Name</th>";
-            //echo "<th>%</th>";
-            foreach ($weekactivitycount as $weeknum => $weekactivity) {
-                if ($weekactivity['numofweek']){
+        echo "<tr>";
+        //echo "<th>Name</th>";
+        //echo "<th>%</th>";
+        foreach ($weekactivitycount as $weeknum => $weekactivity) {
+            if ($weekactivity['numofweek']){
+                if ($courseformat == 'topics') {
+                    echo '<th colspan="'.$weekactivity['numofweek'].'">Topic-'.$weeknum.'</th>';
+                } elseif ($courseformat == 'weeks') {
                     echo '<th colspan="'.$weekactivity['numofweek'].'">Week-'.$weeknum.'</th>';
-                }
-            }
-            echo "</tr>";
-
-            echo "<tr>";
-            //echo "<td class='mod-icon'></td>";
-            //echo "<td class='mod-icon'></td>";
-            foreach ($weekactivitycount as $key => $value) {
-                if ($value['numofweek']){
-                    foreach ($value['mod'] as $imagelink) {
-                        echo '<td class="mod-icon">'.$imagelink.'</td>';
-                    }
-                }
-            }
-            echo "</tr>";
-            $counter = 0;
-            foreach ($simplegradebook as $studentid => $studentreport) {
-                $counter++;
-                if ($counter % 2 == 0){
-                    $studentClass = "even";
                 } else {
-                    $studentClass =  "odd";
-                }
-                echo '<tr>';
-                //echo '<td nowrap="nowrap" class="'.$studentClass.' name"><a target="_blank" href='.$CFG->wwwroot.'/grade/report/user/index.php?userid='.$studentid.'&id='.$course->id.'">'.$studentreport['name'].'</a></td>';
-                //echo $studentreport['courseavg'];
-                $gradetot = 0;
-                $grademaxtot = 0;
-                $avg = 0;
-
-                if (isset($studentreport['avg'])){
-
-                }else{
-                    echo '<td class="red"> - </td>';
+                    echo '<th colspan="'.$weekactivity['numofweek'].'">Section-'.$weeknum.'</th>';
                 }
 
-                foreach ($studentreport['grade'] as  $sgrades) {
-                    foreach ($sgrades as $sgrade) {
-                        //echo '<td>'.$sgrade.'</td>';
-                        echo '<td class="'.$studentClass.' icon">'.'<img src="' . $CFG->wwwroot . '/blocks/fn_mentor/pix/'.$sgrade.'" height="16" width="16" alt="">'.'</td>';
-                    }
+            }
+        }
+        echo "</tr>";
+
+        echo "<tr>";
+        //echo "<td class='mod-icon'></td>";
+        //echo "<td class='mod-icon'></td>";
+        foreach ($weekactivitycount as $key => $value) {
+            if ($value['numofweek']){
+                foreach ($value['mod'] as $imagelink) {
+                    echo '<td class="mod-icon">'.$imagelink.'</td>';
                 }
-                echo '</tr>';
+            }
+        }
+        echo "</tr>";
+        $counter = 0;
+        foreach ($simplegradebook as $studentid => $studentreport) {
+            $counter++;
+            if ($counter % 2 == 0){
+                $studentClass = "even";
+            } else {
+                $studentClass =  "odd";
+            }
+            echo '<tr>';
+            //echo '<td nowrap="nowrap" class="'.$studentClass.' name"><a target="_blank" href='.$CFG->wwwroot.'/grade/report/user/index.php?userid='.$studentid.'&id='.$course->id.'">'.$studentreport['name'].'</a></td>';
+            //echo $studentreport['courseavg'];
+            $gradetot = 0;
+            $grademaxtot = 0;
+            $avg = 0;
+
+            if (isset($studentreport['avg'])){
+
+            }else{
+                echo '<td class="red"> - </td>';
             }
 
-            echo "</table>";
-        } else {
-            echo '<div class="mentees-error">'.get_string('no_activities', 'block_fn_mentor').'</div>';
+            foreach ($studentreport['grade'] as  $sgrades) {
+                foreach ($sgrades as $sgrade) {
+                    //echo '<td>'.$sgrade.'</td>';
+                    echo '<td class="'.$studentClass.' icon">'.'<img src="' . $CFG->wwwroot . '/blocks/fn_mentor/pix/'.$sgrade.'" height="16" width="16" alt="">'.'</td>';
+                }
+            }
+            echo '</tr>';
         }
 
+        echo "</table>";
+    } else {
+        echo '<div class="mentees-error">'.get_string('no_activities', 'block_fn_mentor').'</div>';
+    }
 
 
-        echo "</div>";
+
+    echo "</div>";
     ##########################################
     echo '</td>';
     echo '</tr>';
@@ -766,7 +774,7 @@ if ($navpage == 'overview'){
         echo '</td>';
         echo '</tr>';
         echo '<tr>';
-        echo '<td class="white">';
+        echo '<td class="white mentee-blue-border">';
 
         if ($courseid && $view) {
             $sql_notes = "SELECT p.*, c.fullname
@@ -870,83 +878,83 @@ elseif ($navpage == 'outline') {
 
     foreach ($sections as $i => $section) {
 
-            if ($section->uservisible) { // prevent hidden sections in user activity. Thanks to Geoff Wilbert!
-                // Check the section has modules/resources, if not there is nothing to display.
-                if (!empty($modinfo->sections[$i])) {
-                    $itemsprinted = true;
-                    echo '<div class="section">';
-                    echo '<h2>';
-                    echo get_section_name($course, $section);
-                    echo "</h2>";
+        if ($section->uservisible) { // prevent hidden sections in user activity. Thanks to Geoff Wilbert!
+            // Check the section has modules/resources, if not there is nothing to display.
+            if (!empty($modinfo->sections[$i])) {
+                $itemsprinted = true;
+                echo '<div class="section">';
+                echo '<h2>';
+                echo get_section_name($course, $section);
+                echo "</h2>";
 
-                    echo '<div class="content">';
+                echo '<div class="content">';
 
-                    if ($mode == "outline") {
-                        echo "<table cellpadding=\"4\" cellspacing=\"0\">";
-                    }
-
-                    foreach ($modinfo->sections[$i] as $cmid) {
-                        $mod = $modinfo->cms[$cmid];
-
-                        if (empty($mod->uservisible)) {
-                            //continue;
-                        }
-
-                        $instance = $DB->get_record("$mod->modname", array("id"=>$mod->instance));
-                        $libfile = "$CFG->dirroot/mod/$mod->modname/lib.php";
-
-                        if (file_exists($libfile)) {
-                            require_once($libfile);
-
-                            switch ($mode) {
-                                case "outline":
-                                    $user_outline = $mod->modname."_user_outline";
-                                    if (function_exists($user_outline)) {
-                                        $output = $user_outline($course, $user, $mod, $instance);
-                                        _report_outline_print_row($mod, $instance, $output);
-                                    }
-                                    break;
-                                case "complete":
-                                    $user_complete = $mod->modname."_user_complete";
-                                    if (function_exists($user_complete)) {
-                                        $image = $OUTPUT->pix_icon('icon', $mod->modfullname, 'mod_'.$mod->modname, array('class'=>'icon'));
-                                        echo "<h4>$image $mod->modfullname: ".
-                                             "<a target=\"_blank\" href=\"$CFG->wwwroot/mod/$mod->modname/view.php?id=$mod->id\">".
-                                             format_string($instance->name,true)."</a></h4>";
-
-                                        ob_start();
-
-                                        echo "<ul>";
-                                        $user_complete($course, $user, $mod, $instance);
-                                        echo "</ul>";
-
-                                        $output = ob_get_contents();
-                                        ob_end_clean();
-
-                                        if (str_replace(' ', '', $output) != '<ul></ul>') {
-                                            echo $output;
-                                        }
-                                    }
-                                    break;
-                                }
-                            }
-                        }
-
-                    if ($mode == "outline") {
-                        echo "</table>";
-                    }
-                    echo '</div>';  // content
-                    echo '</div>';  // section
+                if ($mode == "outline") {
+                    echo "<table cellpadding=\"4\" cellspacing=\"0\">";
                 }
-            }
-    }
-     /*
-    if (!$itemsprinted) {
-        echo $OUTPUT->notification(get_string('nothingtodisplay'));
-    }
 
-    echo $OUTPUT->footer();
-    */
+                foreach ($modinfo->sections[$i] as $cmid) {
+                    $mod = $modinfo->cms[$cmid];
+
+                    if (empty($mod->uservisible)) {
+                        //continue;
+                    }
+
+                    $instance = $DB->get_record("$mod->modname", array("id"=>$mod->instance));
+                    $libfile = "$CFG->dirroot/mod/$mod->modname/lib.php";
+
+                    if (file_exists($libfile)) {
+                        require_once($libfile);
+
+                        switch ($mode) {
+                            case "outline":
+                                $user_outline = $mod->modname."_user_outline";
+                                if (function_exists($user_outline)) {
+                                    $output = $user_outline($course, $user, $mod, $instance);
+                                    _report_outline_print_row($mod, $instance, $output);
+                                }
+                                break;
+                            case "complete":
+                                $user_complete = $mod->modname."_user_complete";
+                                if (function_exists($user_complete)) {
+                                    $image = $OUTPUT->pix_icon('icon', $mod->modfullname, 'mod_'.$mod->modname, array('class'=>'icon'));
+                                    echo "<h4>$image $mod->modfullname: ".
+                                        "<a target=\"_blank\" href=\"$CFG->wwwroot/mod/$mod->modname/view.php?id=$mod->id\">".
+                                        format_string($instance->name,true)."</a></h4>";
+
+                                    ob_start();
+
+                                    echo "<ul>";
+                                    $user_complete($course, $user, $mod, $instance);
+                                    echo "</ul>";
+
+                                    $output = ob_get_contents();
+                                    ob_end_clean();
+
+                                    if (str_replace(' ', '', $output) != '<ul></ul>') {
+                                        echo $output;
+                                    }
+                                }
+                                break;
+                        }
+                    }
+                }
+
+                if ($mode == "outline") {
+                    echo "</table>";
+                }
+                echo '</div>';  // content
+                echo '</div>';  // section
+            }
+        }
+    }
+    /*
+   if (!$itemsprinted) {
+       echo $OUTPUT->notification(get_string('nothingtodisplay'));
+   }
+
+   echo $OUTPUT->footer();
+   */
 }
 
 elseif ($navpage == 'notes') {
