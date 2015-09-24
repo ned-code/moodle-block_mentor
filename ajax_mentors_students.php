@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -16,9 +15,9 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Strings for component 'block_fazzi_enrollment', language 'en'
+ * Strings for component 'block_fn_mentor', language 'en'
  *
- * @package   block_fazzi_enrollment
+ * @package   block_fn_mentor
  * @copyright Michael Gardener <mgardener@cissq.com>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -37,49 +36,49 @@ $filter = optional_param('filter', '', PARAM_RAW);
 confirm_sesskey();
 
 require_login();
-$records = NULL;
+$records = null;
 $data = array();
-$select_options = array();
+$selectoptions = array();
 
 $idfield = array(
-            'all_mentors'=>'id',
-            'mentors_without_mentee'=>'id',
-            'all_students'=>'id',
-            'students_without_mentor'=>'id',
-            'get_mentees'=>'studentid'
-            );
+    'all_mentors' => 'id',
+    'mentors_without_mentee' => 'id',
+    'all_students' => 'id',
+    'students_without_mentor' => 'id',
+    'get_mentees' => 'studentid'
+);
 
-//PERMISSION
+// PERMISSION.
 if ( has_capability('block/fn_mentor:assignmentor', context_system::instance(), $USER->id)) {
 
     switch ($action) {
         case 'all_mentors':
-            $records = get_all_mentors();
+            $records = block_fn_mentor_get_all_mentors();
             break;
 
         case 'mentors_without_mentee':
-            $records = get_mentors_without_mentee();
+            $records = block_fn_mentor_get_mentors_without_mentee();
             break;
 
         case 'all_students':
-            $records = get_all_students($filter);
+            $records = block_fn_mentor_get_all_students($filter);
             break;
 
         case 'students_without_mentor':
-            $records = get_students_without_mentor($filter);
+            $records = block_fn_mentor_get_students_without_mentor($filter);
             break;
 
         case 'get_mentees':
-            $records = get_mentees($mentorid);
+            $records = block_fn_mentor_get_mentees($mentorid);
             break;
     }
 
-    if($records) {
+    if ($records) {
         $i = 0;
         foreach ($records as $record) {
             $i++;
-            $select_options[$i]['id'] = $record->$idfield[$action];
-            $select_options[$i]['label'] =  $record->firstname.' '.$record->lastname;
+            $selectoptions[$i]['id'] = $record->$idfield[$action];
+            $selectoptions[$i]['label'] =  $record->firstname.' '.$record->lastname;
         }
         $data['success'] = true;
         $data['message'] = '';
@@ -93,6 +92,6 @@ if ( has_capability('block/fn_mentor:assignmentor', context_system::instance(), 
     $data['message'] = get_string('permission_error', 'block_fn_mentor');
 }
 
-$data['options'] = $select_options;
+$data['options'] = $selectoptions;
 
 echo json_encode($data);

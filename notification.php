@@ -38,7 +38,7 @@ require_login();
 //require_capability('local/fn_mentor:view', context_system::instance(), $USER->id);
 
 if (($action == 'edit') && ($id)) {
-    $notification_rule = $DB->get_record('mentors_mentees_notification',array('id'=>$id),'*',MUST_EXIST);
+    $notification_rule = $DB->get_record('block_fn_mentor_notification',array('id'=>$id),'*',MUST_EXIST);
 }
 
 $title = get_string('page_title_assign_mentor', 'block_fn_mentor');
@@ -50,6 +50,8 @@ $PAGE->set_context(context_system::instance());
 $PAGE->set_title($title);
 $PAGE->set_heading($heading);
 $PAGE->set_cacheable(true);
+
+$PAGE->requires->css('/blocks/fn_mentor/css/styles.css');
 
 $PAGE->requires->jquery();
 $PAGE->requires->js('/blocks/fn_mentor/js/selection.js');
@@ -113,11 +115,11 @@ if ($mform->is_cancelled()) {
         $rec->id = $id;
         $rec->timemodified = time();
 
-        $DB->update_record('mentors_mentees_notification', $rec);
+        $DB->update_record('block_fn_mentor_notification', $rec);
 
         redirect(new moodle_url('/blocks/fn_mentor/notification_rules.php'), get_string('successful', 'block_fn_mentor'));
 
-    } elseif ($id = $DB->insert_record('mentors_mentees_notification', $rec)) {
+    } elseif ($id = $DB->insert_record('block_fn_mentor_notification', $rec)) {
         redirect(new moodle_url('/blocks/fn_mentor/notification_rules.php'), get_string('successful', 'block_fn_mentor'));
     }
 

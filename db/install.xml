@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<XMLDB PATH="blocks/fn_mentor/db" VERSION="20141117" COMMENT="XMLDB file for Moodle blocks/fn_mentor"
+<XMLDB PATH="blocks/fn_mentor/db" VERSION="20150922" COMMENT="XMLDB file for Moodle blocks/fn_mentor"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
 >
   <TABLES>
-    <TABLE NAME="mentors_mentees_notification" COMMENT="mentors_mentees_notification table retrofitted from MySQL">
+    <TABLE NAME="block_fn_mentor_notification" COMMENT="block_fn_mentor_notification table retrofitted from MySQL">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="18" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="name" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false"/>

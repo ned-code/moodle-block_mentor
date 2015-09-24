@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -16,9 +15,9 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Strings for component 'block_fazzi_enrollment', language 'en'
+ * Strings for component 'block_fn_mentor', language 'en'
  *
- * @package   block_fazzi_enrollment
+ * @package   block_fn_mentor
  * @copyright Michael Gardener <mgardener@cissq.com>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -32,7 +31,7 @@ global $CFG, $DB, $OUTPUT, $PAGE, $COURSE;
 
 $action   = optional_param('action', false, PARAM_TEXT);
 $mentorid = optional_param('mentorid', 0, PARAM_INT);
-$studentids = optional_param('studentids', NULL, PARAM_RAW);
+$studentids = optional_param('studentids', null, PARAM_RAW);
 
 confirm_sesskey();
 
@@ -42,20 +41,20 @@ $data = array();
 $data['success'] = true;
 $data['message'] = '';
 
-//PERMISSION
+// PERMISSION.
 if ( has_capability('block/fn_mentor:assignmentor', context_system::instance(), $USER->id)) {
 
     switch ($action) {
         case 'add':
-            $mentor_role = get_config('block_fn_mentor', 'mentor_role_user');
+            $mentorrole = get_config('block_fn_mentor', 'mentor_role_user');
 
-            $sqlUsers = "SELECT u.id FROM {user} u WHERE id IN ($studentids)";
-            $users = $DB->get_records_sql($sqlUsers);
+            $sqlusers = "SELECT u.id FROM {user} u WHERE id IN ($studentids)";
+            $users = $DB->get_records_sql($sqlusers);
 
-            if ($mentor_role && $mentorid) {
+            if ($mentorrole && $mentorid) {
                 foreach ($users as $user) {
-                    $user_context = context_user::instance($user->id);
-                    role_assign($mentor_role, $mentorid, $user_context);
+                    $usercontext = context_user::instance($user->id);
+                    role_assign($mentorrole, $mentorid, $usercontext);
                 }
             } else {
                 $data['success'] = false;
@@ -64,15 +63,15 @@ if ( has_capability('block/fn_mentor:assignmentor', context_system::instance(), 
             break;
 
         case 'remove':
-            $mentor_role = get_config('block_fn_mentor', 'mentor_role_user');
+            $mentorrole = get_config('block_fn_mentor', 'mentor_role_user');
 
-            $sqlUsers = "SELECT u.id FROM {user} u WHERE id IN ($studentids)";
-            $users = $DB->get_records_sql($sqlUsers);
+            $sqlusers = "SELECT u.id FROM {user} u WHERE id IN ($studentids)";
+            $users = $DB->get_records_sql($sqlusers);
 
-            if ($mentor_role && $mentorid) {
+            if ($mentorrole && $mentorid) {
                 foreach ($users as $user) {
-                    $user_context = context_user::instance($user->id);
-                    role_unassign($mentor_role, $mentorid, $user_context->id);
+                    $usercontext = context_user::instance($user->id);
+                    role_unassign($mentorrole, $mentorid, $usercontext->id);
                 }
             } else {
                 $data['success'] = false;

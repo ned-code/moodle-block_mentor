@@ -49,12 +49,12 @@ $PAGE->navbar->add(get_string('notification_rules', 'block_fn_mentor'), new mood
 
 
 if (($action == 'send') && ($id)) {
-    $notification_rule = $DB->get_record('mentors_mentees_notification',array('id'=>$id),'*',MUST_EXIST);
+    $notification_rule = $DB->get_record('block_fn_mentor_notification',array('id'=>$id),'*',MUST_EXIST);
 }
 
 
 if ($process) {
-    fn_send_notifications($notification_rule->id);
+    block_fn_mentor_send_notifications($notification_rule->id);
     redirect(new moodle_url('/blocks/fn_mentor/notification_rules.php'), get_string('successful', 'block_fn_mentor'), 0);
 } else {
     echo $OUTPUT->header();

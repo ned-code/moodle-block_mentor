@@ -21,6 +21,7 @@
  * @copyright Michael Gardener <mgardener@cissq.com>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
 require_once($CFG->libdir . '/formslib.php');
 $PAGE->requires->js('/blocks/fn_mentor/validation.js');
 
@@ -33,21 +34,21 @@ class notification_form extends moodleform {
 
         //$mform->setDefault('email',$this->_customdata['email']);
 
-        $g1 = 'checkbox';
+        $g1 = 'block_fn_mentor_checkbox';
         if (isset($this->_customdata['g1'])) {
             if ($this->_customdata['g1']) {
                 $g1 = 'checkbox_checked';
             }
         }
 
-        $g2 = 'checkbox';
+        $g2 = 'block_fn_mentor_checkbox';
         if (isset($this->_customdata['g2'])) {
             if ($this->_customdata['g2']) {
                 $g2 = 'checkbox_checked';
             }
         }
 
-        $g3 = 'checkbox';
+        $g3 = 'block_fn_mentor_checkbox';
         if (isset($this->_customdata['g3'])) {
             if ($this->_customdata['g3']) {
                 $g3 = 'checkbox_checked';
@@ -61,7 +62,7 @@ class notification_form extends moodleform {
             }
         }
 
-        $g4 = 'checkbox';
+        $g4 = 'block_fn_mentor_checkbox';
         if (isset($this->_customdata['g4'])) {
             if ($this->_customdata['g4']) {
                 $g4 = 'checkbox_checked';
@@ -75,7 +76,7 @@ class notification_form extends moodleform {
             }
         }
 
-        $g5 = 'checkbox';
+        $g5 = 'block_fn_mentor_checkbox';
         if (isset($this->_customdata['g5'])) {
             if ($this->_customdata['g5']) {
                 $g5 = 'checkbox_checked';
@@ -89,7 +90,7 @@ class notification_form extends moodleform {
             }
         }
 
-        $g6 = 'checkbox';
+        $g6 = 'block_fn_mentor_checkbox';
         if (isset($this->_customdata['g6'])) {
             if ($this->_customdata['g6']) {
                 $g6 = 'checkbox_checked';
@@ -103,7 +104,7 @@ class notification_form extends moodleform {
             }
         }
 
-        $n1 = 'checkbox';
+        $n1 = 'block_fn_mentor_checkbox';
         if (isset($this->_customdata['n1'])) {
             if ($this->_customdata['n1']) {
                 $n1 = 'checkbox_checked';
@@ -117,7 +118,7 @@ class notification_form extends moodleform {
             }
         }
 
-        $n2 = 'checkbox';
+        $n2 = 'block_fn_mentor_checkbox';
         if (isset($this->_customdata['n2'])) {
             if ($this->_customdata['n2']) {
                 $n2 = 'checkbox_checked';
@@ -131,21 +132,21 @@ class notification_form extends moodleform {
             }
         }
 
-        $teacher = 'checkbox';
+        $teacher = 'block_fn_mentor_checkbox';
         if (isset($this->_customdata['teacher'])) {
             if ($this->_customdata['teacher']) {
                 $teacher = 'checkbox_checked';
             }
         }
 
-        $student = 'checkbox';
+        $student = 'block_fn_mentor_checkbox';
         if (isset($this->_customdata['student'])) {
             if ($this->_customdata['student']) {
                 $student = 'checkbox_checked';
             }
         }
 
-        $mentor = 'checkbox';
+        $mentor = 'block_fn_mentor_checkbox';
         if (isset($this->_customdata['mentor'])) {
             if ($this->_customdata['mentor']) {
                 $mentor = 'checkbox_checked';
@@ -181,12 +182,12 @@ class notification_form extends moodleform {
         $c1->text = (
             html_writer::tag('p', $g1('g1', 'g1', '_checkbox', 1) . ' Grade for all completed activities <G1>') .
             html_writer::tag('p', $g2('g2', 'g2', '_checkbox', 1) . ' Grade for all available activities <G2>') .
-            html_writer::tag('p', $g3('g3', 'g3', '_checkbox', 1) . ' Grade below ' . textinput('g3_value', 'g3_value', '_textinput', $g3_value) . ' % for all completed activities <G3>') .
-            html_writer::tag('p', $g4('g4', 'g4', '_checkbox', 1) . ' Grade below ' . textinput('g4_value', 'g4_value', '_textinput', $g4_value) . ' % for all available activities <G4>') .
-            html_writer::tag('p', $g5('g5', 'g5', '_checkbox', 1) . ' Grade above ' . textinput('g5_value', 'g5_value', '_textinput', $g5_value) . ' % for all completed activities <G5>') .
-            html_writer::tag('p', $g6('g6', 'g6', '_checkbox', 1) . ' Grade above ' . textinput('g6_value', 'g6_value', '_textinput', $g6_value) . ' % for all available activities <G6>') .
-            html_writer::tag('p', $n1('n1', 'n1', '_checkbox', 1) . ' No login for ' . textinput('n1_value', 'n1_value', '_textinput', $n1_value) . ' days <N1>') .
-            html_writer::tag('p', $n2('n2', 'n2', '_checkbox', 1) . ' No activity for ' . textinput('n2_value', 'n2_value', '_textinput', $n2_value) . ' days <N2>')
+            html_writer::tag('p', $g3('g3', 'g3', '_checkbox', 1) . ' Grade below ' . block_fn_mentor_textinput('g3_value', 'g3_value', '_textinput', $g3_value) . ' % for all completed activities <G3>') .
+            html_writer::tag('p', $g4('g4', 'g4', '_checkbox', 1) . ' Grade below ' . block_fn_mentor_textinput('g4_value', 'g4_value', '_textinput', $g4_value) . ' % for all available activities <G4>') .
+            html_writer::tag('p', $g5('g5', 'g5', '_checkbox', 1) . ' Grade above ' . block_fn_mentor_textinput('g5_value', 'g5_value', '_textinput', $g5_value) . ' % for all completed activities <G5>') .
+            html_writer::tag('p', $g6('g6', 'g6', '_checkbox', 1) . ' Grade above ' . block_fn_mentor_textinput('g6_value', 'g6_value', '_textinput', $g6_value) . ' % for all available activities <G6>') .
+            html_writer::tag('p', $n1('n1', 'n1', '_checkbox', 1) . ' No login for ' . block_fn_mentor_textinput('n1_value', 'n1_value', '_textinput', $n1_value) . ' days <N1>') .
+            html_writer::tag('p', $n2('n2', 'n2', '_checkbox', 1) . ' No activity for ' . block_fn_mentor_textinput('n2_value', 'n2_value', '_textinput', $n2_value) . ' days <N2>')
         );
 
         $c2->text = (
@@ -196,7 +197,7 @@ class notification_form extends moodleform {
         );
 
         $c3->text = (
-            html_writer::tag('p', 'Every ' . textinput('period', 'period', '_textinput', $period) . ' days')
+            html_writer::tag('p', 'Every ' . block_fn_mentor_textinput('period', 'period', '_textinput', $period) . ' days')
         );
 
         $table->data[] = new html_table_row(array( $c1, $c2, $c3));
@@ -234,11 +235,11 @@ class notification_form extends moodleform {
         $c1 = new html_table_cell();
         $c1->colspan = 3;
 
-        $categories = _get_course_category_tree();
+        $categories = block_fn_mentor_get_course_category_tree();
 
 
 
-        $c1->text = category_tree_form($categories,
+        $c1->text = block_fn_mentor_category_tree_form($categories,
                                        (isset($this->_customdata['category']))?$this->_customdata['category']:'',
                                        (isset($this->_customdata['course']))?$this->_customdata['course']:'');
         $table->data[] = new html_table_row(array( $c1));

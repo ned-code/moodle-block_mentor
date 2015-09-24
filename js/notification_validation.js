@@ -8,7 +8,7 @@ return true;
 var rules = [];
 
 // standard form fields
-rules.push("required,name, Rulen name is required.");
+rules.push("required,name, Rule name is required.");
 rules.push("digits_only, g3_value, This field may only contain digits.");
 rules.push("digits_only, g4_value, This field may only contain digits.");
 rules.push("digits_only, g5_value, This field may only contain digits.");

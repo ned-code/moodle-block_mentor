@@ -28,32 +28,32 @@ require_once('lib.php');
 
 global $CFG, $DB, $OUTPUT, $PAGE, $SITE;
 
-//PARAMETERS
-$mentor_menu = optional_param('mentor_menu', 'all_mentors', PARAM_TEXT);
-$student_menu = optional_param('student_menu', 'all_students', PARAM_TEXT);
+// PARAMETERS.
+$mentormenu = optional_param('mentor_menu', 'all_mentors', PARAM_TEXT);
+$studentmenu = optional_param('student_menu', 'all_students', PARAM_TEXT);
 
 require_login();
 
-//PERMISSION
+// PERMISSION.
 require_capability('block/fn_mentor:assignmentor', context_system::instance(), $USER->id);
 
-switch ($mentor_menu) {
+switch ($mentormenu) {
     case 'all_mentors':
-        $mentors = get_all_mentors();
+        $mentors = block_fn_mentor_get_all_mentors();
         break;
 
     case 'mentors_without_mentee':
-        $mentors = get_mentors_without_mentee();
+        $mentors = block_fn_mentor_get_mentors_without_mentee();
         break;
 }
 
-switch ($student_menu) {
+switch ($studentmenu) {
     case 'all_students':
-        $students = get_all_students();
+        $students = block_fn_mentor_get_all_students();
         break;
 
     case 'students_without_mentor':
-        $students = get_students_without_mentor();
+        $students = block_fn_mentor_get_students_without_mentor();
         break;
 }
 
@@ -67,7 +67,8 @@ $PAGE->set_title($title);
 $PAGE->set_heading($heading);
 $PAGE->set_cacheable(true);
 
-//$PAGE->requires->js('/blocks/fn_mentor/js/jquery.js');
+$PAGE->requires->css('/blocks/fn_mentor/css/styles.css');
+
 $PAGE->requires->jquery();
 $PAGE->requires->js('/blocks/fn_mentor/js/selection.js');
 
@@ -86,14 +87,11 @@ $form = new assign_mentor_form(null, array(
 
 if ($form->is_cancelled()) {
     redirect(new moodle_url('/course/view.php?id=' . $courseid));
-    // DWE we should check if we have selected users or emails around here.
-} else if ($data = $form->get_data()) {
-    //
 }
 
-$toform = new object();
-$toform->mentor_menu = $mentor_menu;
-$toform->student_menu = $student_menu;
+$toform = new stdclass();
+$toform->mentor_menu = $mentormenu;
+$toform->student_menu = $studentmenu;
 
 $form->set_data($toform);
 

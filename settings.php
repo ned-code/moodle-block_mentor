@@ -52,7 +52,8 @@ if ($mentor_user = $DB->get_record('role', array('shortname'=>'mentor_user'))) {
     $mentor_role_user_default = 0;
 }
 
+$settings->add(new admin_setting_configselect('block_fn_mentor/studentrole', get_string('studentrole', 'block_fn_mentor'),'', 5, $role_options));
 $settings->add(new admin_setting_configselect('block_fn_mentor/mentor_role_system', get_string('mentor_role_system', 'block_fn_mentor'),'', $mentor_role_system_default, $role_options));
 $settings->add(new admin_setting_configselect('block_fn_mentor/mentor_role_user', get_string('mentor_role_user', 'block_fn_mentor'),'', $mentor_role_user_default, $role_options));
-$settings->add(new admin_setting_configtext('block_fn_mentor/maxnumberofmentees', get_string('maxnumberofmentees', 'block_fn_mentor'), '', '15'));
+$settings->add(new admin_setting_configtext('block_fn_mentor/maxnumberofmentees', get_string('maxnumberofmentees', 'block_fn_mentor'), '', '15', PARAM_INT));
 $settings->add(new admin_setting_configcheckbox('block_fn_mentor/allownotes', get_string('allownotes', 'block_fn_mentor'), '', '0'));

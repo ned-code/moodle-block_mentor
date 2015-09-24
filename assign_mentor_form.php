@@ -40,32 +40,32 @@ class assign_mentor_form extends moodleform {
         $table = new html_table();
         $table->attributes['class'] = 'assignmentor';
 
-        $mentor_menu = array(
+        $mentormenu = array(
                         'all_mentors' => get_string('all_mentors', 'block_fn_mentor'),
                         'mentors_without_mentee' => get_string('mentors_without_mentee', 'block_fn_mentor')
                         );
-        $mentor_roleid = get_config('block_fn_mentor', 'mentor_role_system');
-        $assign_role_url = new moodle_url($CFG->wwwroot.'/admin/roles/assign.php', array('contextid' => 1, 'roleid' => $mentor_roleid));
-        $assign_role_button =  single_button($assign_role_url->out(), get_string('manage_mentor_role', 'block_fn_mentor'), 'single_button', 'assign_role');
-        $info_button =  single_button($assign_role_url->out(), get_string('info_about_selected_people', 'block_fn_mentor'), 'single_button', 'assign_role');
+        $mentorroleid = get_config('block_fn_mentor', 'mentor_role_system');
+        $assignroleurl = new moodle_url($CFG->wwwroot.'/admin/roles/assign.php', array('contextid' => 1, 'roleid' => $mentorroleid));
+        $assignrolebutton =  block_fn_mentor_single_button($assignroleurl->out(), get_string('manage_mentor_role', 'block_fn_mentor'), 'single_button', 'assign_role');
+        $infobutton =  block_fn_mentor_single_button($assignroleurl->out(), get_string('info_about_selected_people', 'block_fn_mentor'), 'single_button', 'assign_role');
 
-        //MENTOR SELECT
-        $select_mentor = new html_table_cell();
+        // MENTOR SELECT.
+        $selectmentor = new html_table_cell();
 
-        $mentor_options = array();
+        $mentoroptions = array();
         foreach ($this->_customdata['mentors'] as $user) {
-            $mentor_options[$user->id] = $user->firstname . " " . $user->lastname;
+            $mentoroptions[$user->id] = $user->firstname . " " . $user->lastname;
         }
 
-        $select_mentor->text =  html_writer::tag('div', get_config('block_fn_mentor','mentors'), array('class' => 'object_labels')) .
+        $selectmentor->text =  html_writer::tag('div', get_config('block_fn_mentor','mentors'), array('class' => 'object_labels')) .
                                 html_writer::tag('div',
-                                    html_writer::select($mentor_menu, '', '', null, array('id' => 'mentor_menu')).
-                                    html_writer::select($mentor_options, '', '', null, array('id' => 'selectmentor', 'size' => 20))) .
-                                    $assign_role_button;
+                                    html_writer::select($mentormenu, '', '', null, array('id' => 'mentor_menu')).
+                                    html_writer::select($mentoroptions, '', '', null, array('id' => 'selectmentor', 'size' => 20))) .
+                                    $assignrolebutton;
 
-        $select_mentee = new html_table_cell();
+        $selectmentee = new html_table_cell();
 
-        $select_mentee->text =  html_writer::tag('div', get_config('block_fn_mentor','mentees'), array('class' => 'object_labels') ) .
+        $selectmentee->text =  html_writer::tag('div', get_config('block_fn_mentor','mentees'), array('class' => 'object_labels') ) .
                                 html_writer::tag('div', html_writer::select(array(), '', '', null, array('id' => 'selectmentee', 'multiple' => 'multiple', 'size' => 21)));
 
 
@@ -78,50 +78,42 @@ class assign_mentor_form extends moodleform {
         };
 
 
-        $center_buttons = new html_table_cell();
-        $center_buttons->text = (
+        $centerbuttons = new html_table_cell();
+        $centerbuttons->text = (
             $embed($OUTPUT->larrow() . ' ' . get_string('add_button', 'block_fn_mentor'), 'add_button') .
             $embed(get_string('remove_button', 'block_fn_mentor') . ' ' . $OUTPUT->rarrow(), 'remove_button') .
             $embed(get_string('add_all', 'block_fn_mentor'), 'add_all') .
             $embed(get_string('remove_all', 'block_fn_mentor'), 'remove_all')
         );
 
-
-
-        $student_menu = array(
+        $studentmenu = array(
                         'all_students' => get_string('all_students', 'block_fn_mentor'),
                         'students_without_mentor' => get_string('students_without_mentor', 'block_fn_mentor')
                         );
 
-        //STUDENT SELECT
-        $student_options = array();
+        // STUDENT SELECT.
+        $studentoptions = array();
+
         foreach ($this->_customdata['students'] as $user) {
-            $student_options[$user->id] = $user->firstname . " " . $user->lastname;
+            $studentoptions[$user->id] = $user->firstname . " " . $user->lastname;
         }
-        $select_student = new html_table_cell();
-        $select_student->text =  html_writer::tag('div', get_string('students', 'block_fn_mentor'), array('class' => 'object_labels') ) .
+
+        $selectstudent = new html_table_cell();
+        $selectstudent->text =  html_writer::tag('div', get_string('students', 'block_fn_mentor'), array('class' => 'object_labels') ) .
                           html_writer::tag('div',
-                            html_writer::select($student_menu, '', '', null, array('id' => 'student_menu')).
-                            html_writer::select($student_options, '', '', null, array('id' => 'selectstudent', 'multiple' => 'multiple', 'size' => 20))).
+                            html_writer::select($studentmenu, '', '', null, array('id' => 'student_menu')).
+                            html_writer::select($studentoptions, '', '', null, array('id' => 'selectstudent', 'multiple' => 'multiple', 'size' => 20))).
                           html_writer::tag('div',
                                        get_string('search', 'block_fn_mentor') .
                                        ' <input type="text" id="student_search" name="student_search">', array('id' => 'student_search_container'));
 
+        $selectmentor->style = 'vertical-align: top;';
+        $selectmentee->style = 'vertical-align: top;';
+        $centerbuttons->style = 'vertical-align: middle;';
+        $selectstudent->style = 'vertical-align: top;';
 
-        //$table->data[] = new html_table_row(array($selected_required_label, $role_filter_label));
-        $select_mentor->style = 'vertical-align: top;';
-        $select_mentee->style = 'vertical-align: top;';
-        $center_buttons->style = 'vertical-align: middle;';
-        $select_student->style = 'vertical-align: top;';
-
-        $table->data[] = new html_table_row(array($select_mentor, $select_mentee, $center_buttons, $select_student));
-        /*
-        $table->data[] = new html_table_row(array('', '', '', html_writer::tag('div',
-                                       get_string('search', 'block_fn_mentor') .
-                                       ' <input type="text" id="student_search" name="student_search">', array('id' => 'student_search_container'))));
-         */
+        $table->data[] = new html_table_row(array($selectmentor, $selectmentee, $centerbuttons, $selectstudent));
 
         $mform->addElement('static', 'selectors', '', html_writer::table($table));
-
     }
 }

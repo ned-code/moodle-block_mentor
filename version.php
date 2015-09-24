@@ -15,16 +15,16 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Strings for component 'block_mentors_mentees', language 'en'
+ * Strings for component 'block_fn_mentor', language 'en'
  *
- * @package   block_mentors_mentees
+ * @package   block_fn_mentor
  * @copyright Michael Gardener <mgardener@cissq.com>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2015091200;        // The current plugin version (Date: YYYYMMDDXX)
+$plugin->version   = 2015092300;        // The current plugin version (Date: YYYYMMDDXX)
 $plugin->requires  = 2013051400;        // Requires this Moodle version
 $plugin->component = 'block_fn_mentor'; // Full name of the plugin (used for diagnostics)
 $plugin->cron = 30;

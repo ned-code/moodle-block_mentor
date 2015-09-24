@@ -1,4 +1,26 @@
 <?php
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
+/**
+ * Strings for component 'block_fn_mentor', language 'en'
+ *
+ * @package   block_fn_mentor
+ * @copyright Michael Gardener <mgardener@cissq.com>
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 
 require_once('../../config.php');
 require_once($CFG->dirroot . '/course/lib.php');
@@ -6,16 +28,6 @@ require_once($CFG->dirroot . '/blocks/fn_mentor/lib.php');
 require_once($CFG->libdir . '/completionlib.php');
 
 global $CFG, $DB, $OUTPUT, $PAGE, $COURSE;
-//Check sesubmission plugin
-if ($assignCheck = $DB->get_record_sql("SELECT * FROM {$CFG->prefix}assign LIMIT 0, 1")){
-    if(isset($assignCheck->resubmission)){
-        $resubmission = true;
-    }else{
-        $resubmission = false;
-    }
-}else{
-    $resubmission = false;
-}
 
 $USINGHTMLEDITOR = false;
 
@@ -60,7 +72,7 @@ if ($completion->is_enabled()) {
         }
         $data = $completion->get_data($activity, true, $menteeid, null);
         $completionstate = $data->completionstate;
-        $assignment_status = __assignment_status($activity, $menteeid, $resubmission);
+        $assignment_status = block_fn_mentor_assignment_status($activity, $menteeid);
         //echo "$completionstate - $activity->name - $activity->completion - $assignment_status<br>";
         if ($completionstate == 0) {
             if (($activity->module == 1)
@@ -214,7 +226,7 @@ else if ($show == 'incompleted') {
             }
             $data = $completion->get_data($activity, true, $menteeid, null);
             $activitystate = $data->completionstate;
-            $assignment_status = __assignment_status($activity, $menteeid, $resubmission);
+            $assignment_status = block_fn_mentor_assignment_status($activity, $menteeid);
             if ($activitystate == 3) {
                 if (($activity->module == 1)
                         && ($activity->modname == 'assignment' || $activity->modname == 'assign')
@@ -254,7 +266,7 @@ else if ($show == 'notattempted') {
             }
             $data = $completion->get_data($activity, true, $menteeid, null);
             $activitystate = $data->completionstate;
-            $assignment_status = __assignment_status($activity, $menteeid, $resubmission);
+            $assignment_status = block_fn_mentor_assignment_status($activity, $menteeid);
             if ($activitystate == 0) {
                 if (($activity->module == 1)
                         && ($activity->modname == 'assignment' || $activity->modname == 'assign')
@@ -282,7 +294,7 @@ else if ($show == 'waitingforgrade') {
             }
             $data = $completion->get_data($activity, true, $menteeid, null);
             $activitystate = $data->completionstate;
-            $assignment_status = __assignment_status($activity, $menteeid, $resubmission);
+            $assignment_status = block_fn_mentor_assignment_status($activity, $menteeid);
             if (($activitystate == 0)||($activitystate == 1)||($activitystate == 2)||($activitystate == 3)) {
                 if (($activity->module == 1)
                         && ($activity->modname == 'assignment' || $activity->modname == 'assign')
@@ -312,7 +324,7 @@ else if ($show == 'draft') {
             }
             $data = $completion->get_data($activity, true, $menteeid, null);
             $activitystate = $data->completionstate;
-            $assignment_status = __assignment_status($activity, $menteeid, $resubmission);
+            $assignment_status = block_fn_mentor_assignment_status($activity, $menteeid);
             if (($activitystate == 0) || ($activitystate == 1) || ($activitystate == 2) || ($activitystate == 3)) {
                 if (($activity->module == 1)
                         && ($activity->modname == 'assignment' || $activity->modname == 'assign')

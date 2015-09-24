@@ -39,6 +39,7 @@ $string['mentors'] = 'Mentors';
 $string['mentees'] = 'Mentees';
 $string['gradeall'] = 'Grade for all attempted activities and/or all available activities';
 $string['page_title_assign_mentor'] = 'Assign Mentors to Students';
+$string['studentrole'] = 'Student role';
 $string['mentor_role_system'] = 'Mentor role - Sytem';
 $string['mentor_role_user'] = 'Mentor role - User';
 $string['add_button'] = 'Add';

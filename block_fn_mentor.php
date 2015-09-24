@@ -44,42 +44,42 @@ class block_fn_mentor extends block_base {
     function get_content() {
         global $CFG, $OUTPUT, $USER, $DB, $COURSE;
 
+        $studentrole = get_config('block_fn_mentor', 'studentrole');
+
         $sortby = optional_param('sortby', 'mentor', PARAM_TEXT);
         $coursefilter = optional_param('coursefilter', 0, PARAM_INT);
         $showall = optional_param('showall', 0, PARAM_INT);
 
         $isadmin   = is_siteadmin($USER->id);
-        $ismentor  = has_system_role($USER->id, get_config('block_fn_mentor', 'mentor_role_system'));
-        $isteacher = _isteacherinanycourse($USER->id);
-        $isstudent = _isstudentinanycourse($USER->id);
+        $ismentor  = block_fn_mentor_has_system_role($USER->id, get_config('block_fn_mentor', 'mentor_role_system'));
+        $isteacher = block_fn_mentor_isteacherinanycourse($USER->id);
+        $isstudent = block_fn_mentor_isstudentinanycourse($USER->id);
 
 
-        $str_mentor = get_config('block_fn_mentor', 'mentor');
-        $str_mentors = get_config('block_fn_mentor', 'mentors');
-        $str_mentee = get_config('block_fn_mentor', 'mentee');
-        $str_mentees = get_config('block_fn_mentor', 'mentees');
+        $strmentor = get_config('block_fn_mentor', 'mentor');
+        $strmentors = get_config('block_fn_mentor', 'mentors');
+        $strmentee = get_config('block_fn_mentor', 'mentee');
+        $strmentees = get_config('block_fn_mentor', 'mentees');
         $maxnumberofmentees = get_config('block_fn_mentor', 'maxnumberofmentees');
 
-        if (! is_integer($maxnumberofmentees)) {
+        if ( !$maxnumberofmentees) {
             $maxnumberofmentees = 15;
         }
-
-
 
         //Additional user filter according to user type
         $filter = '';
         if ($isadmin) {
             $filter = 'admin';
-            $this->title = $str_mentors . ' - ' . $str_mentees;
+            $this->title = $strmentors . ' - ' . $strmentees;
         } elseif ($isteacher) {
             $filter = 'teacher';
-            $this->title = $str_mentors . ' - ' . $str_mentees;
+            $this->title = $strmentors . ' - ' . $strmentees;
         } elseif ($ismentor) {
             $filter = 'mentor';
-            $this->title = 'My ' . $str_mentees;
+            $this->title = 'My ' . $strmentees;
         } elseif ($isstudent) {
             $filter = 'student';
-            $this->title = 'My ' . $str_mentors;
+            $this->title = 'My ' . $strmentors;
         }
 
         if ($this->content !== null) {
@@ -136,7 +136,7 @@ class block_fn_mentor extends block_base {
             }
         // COURSES - TEACHER
         } elseif ($isteacher) {
-            if ($courses = get_teacher_courses()) {
+            if ($courses = block_fn_mentor_get_teacher_courses()) {
                 foreach ($courses as $course) {
                     $courseURL[$course->id] = $CFG->wwwroot.'/index.php?coursefilter='.$course->id.'&sortby='.$sortby.'&showall='.$showall;
                     $coursemenu[$courseURL[$course->id]] = $course->fullname;
@@ -144,7 +144,7 @@ class block_fn_mentor extends block_base {
             }
         // COURSES - TEACHER
         } elseif ($ismentor) {
-            if ($students = get_mentees_by_mentor(0, $filter)) {
+            if ($students = block_fn_mentor_get_mentees_by_mentor(0, $filter)) {
                 $students = reset($students);
                 $student_ids =  implode(",", array_keys($students['mentee']));
 
@@ -157,10 +157,10 @@ class block_fn_mentor extends block_base {
                                  INNER JOIN {course} c
                                          ON ctx.instanceid = c.id
                                       WHERE ra.userid IN ($student_ids)
-                                        AND ra.roleid = 5
-                                        AND ctx.contextlevel = 50";
+                                        AND ra.roleid = ?
+                                        AND ctx.contextlevel = ?";
 
-                    if ($courses = $DB->get_records_sql($sql)) {
+                    if ($courses = $DB->get_records_sql($sql, array($studentrole, 50))) {
                         foreach ($courses as $course) {
                             $courseURL[$course->id] = $CFG->wwwroot.'/index.php?coursefilter='.$course->id.'&sortby='.$sortby.'&showall='.$showall;
                             $coursemenu[$courseURL[$course->id]] = $course->fullname;
@@ -193,45 +193,55 @@ class block_fn_mentor extends block_base {
         }
 
         if (($isstudent) && (!$isteacher && !$isadmin && !$ismentor)) {
-            $this->content->text .= render_mentees_by_student($USER->id);
+            $this->content->text .= block_fn_mentor_render_mentees_by_student($USER->id);
         } else {
 
             $number_of_mentees = 0;
 
             if ($sortby == 'mentor') {
-                $visible_mentees =  get_mentees_by_mentor($coursefilter, $filter);
+                $visible_mentees =  block_fn_mentor_get_mentees_by_mentor($coursefilter, $filter);
                 foreach ($visible_mentees as $visible_mentee) {
                     $number_of_mentees += sizeof($visible_mentee['mentee']);
                 }
                 if (($number_of_mentees > $maxnumberofmentees) && (!$showall)) {
 
-                    $this->content->text .= '<div class="mentee-block-menu"><img class="mentee-img" style="width: 12px;" src="'.$CFG->wwwroot.'/blocks/fn_mentor/pix/mentor_bullet.png">
-                                             <a href="'.$CFG->wwwroot.'/blocks/fn_mentor/course_overview.php">'.get_string('open_progress_reports', 'block_fn_mentor').'</a></div>';
 
-                    $this->content->text .= '<div class="mentee-block-menu"><img class="mentee-img" style="width: 12px;" src="'.$CFG->wwwroot.'/blocks/fn_mentor/pix/mentor_bullet.png">
-                                             <a href="'.$CFG->wwwroot.'/index.php?sortby='.$sortby.'&coursefilter='.$coursefilter.'&showall=1">'.get_string('show_all', 'block_fn_mentor').'</a></div>';
+                        $this->content->text .= '<div class="mentee-footer-menu">
+                                             <div class="mentee-block-menu">
+                                             <img class="mentee-img" src="' . $OUTPUT->pix_url('i/navigationitem') . '">
+                                             <a href="' . $CFG->wwwroot . '/blocks/fn_mentor/course_overview.php">' . get_string('open_progress_reports', 'block_fn_mentor') . '</a></div>';
 
+                    if ($this->instance->pagetypepattern == 'my-index') {
+                        $this->content->text .= '<div class="mentee-block-menu">
+                                             <img class="mentee-img" src="' . $OUTPUT->pix_url('i/navigationitem') . '">
+                                             <a href="' . $CFG->wwwroot . '/my/index.php?sortby=' . $sortby . '&coursefilter=' . $coursefilter . '&showall=1">' . get_string('show_all', 'block_fn_mentor') . '</a></div>
+                                             </div>';
+                    } else {
+                        $this->content->text .= '<div class="mentee-block-menu">
+                                             <img class="mentee-img" src="' . $OUTPUT->pix_url('i/navigationitem') . '">
+                                             <a href="' . $CFG->wwwroot . '/index.php?sortby=' . $sortby . '&coursefilter=' . $coursefilter . '&showall=1">' . get_string('show_all', 'block_fn_mentor') . '</a></div>
+                                             </div>';
+                    }
                 } else {
-                    $this->content->text .= render_mentees_by_mentor($visible_mentees);
+                    $this->content->text .= block_fn_mentor_render_mentees_by_mentor($visible_mentees);
                 }
-
             }
 
-
             if ($sortby == 'mentee') {
-                $visible_mentees =  get_mentors_by_mentee($coursefilter, $filter);
+                $visible_mentees =  block_fn_mentor_get_mentors_by_mentee($coursefilter, $filter);
                 $number_of_mentees += sizeof($visible_mentees);
 
                 if (($number_of_mentees > $maxnumberofmentees) && (!$showall)) {
 
-                    $this->content->text .= '<div class="mentee-block-menu"><img class="mentee-img" style="width: 12px;" src="'.$CFG->wwwroot.'/blocks/fn_mentor/pix/mentor_bullet.png">
+                    $this->content->text .= '<div class="mentee-footer-menu">
+                                            <div class="mentee-block-menu"><img class="mentee-img" src="'.$OUTPUT->pix_url('i/navigationitem').'">
                                              <a href="'.$CFG->wwwroot.'/blocks/fn_mentor/course_overview.php">'.get_string('open_progress_reports', 'block_fn_mentor').'</a></div>';
 
-                    $this->content->text .= '<div class="mentee-block-menu"><img class="mentee-img" style="width: 12px;" src="'.$CFG->wwwroot.'/blocks/fn_mentor/pix/mentor_bullet.png">
-                                             <a href="'.$CFG->wwwroot.'/index.php?sortby='.$sortby.'&coursefilter='.$coursefilter.'&showall=1">'.get_string('show_all', 'block_fn_mentor').'</a></div>';
+                    $this->content->text .= '<div class="mentee-block-menu"><img class="mentee-img" src="'.$OUTPUT->pix_url('i/navigationitem').'">
+                                             <a href="'.$CFG->wwwroot.'/index.php?sortby='.$sortby.'&coursefilter='.$coursefilter.'&showall=1">'.get_string('show_all', 'block_fn_mentor').'</a></div></div>';
 
                 } else {
-                    $this->content->text .= render_mentors_by_mentee($visible_mentees);
+                    $this->content->text .= block_fn_mentor_render_mentors_by_mentee($visible_mentees);
                 }
             }
 
@@ -266,7 +276,7 @@ class block_fn_mentor extends block_base {
     }
 
     public function cron() {
-        fn_send_notifications();
+        block_fn_mentor_send_notifications();
     }
 
 }

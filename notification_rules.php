@@ -40,7 +40,7 @@ require_login();
 require_capability('block/fn_mentor:createnotificationrule', context_system::instance());
 
 if (($action == 'edit') && ($id)) {
-    $notification_rule = $DB->get_record('mentors_mentees_notification',array('id'=>$id),'*',MUST_EXIST);
+    $notification_rule = $DB->get_record('block_fn_mentor_notification',array('id'=>$id),'*',MUST_EXIST);
 }
 
 $title = get_string('page_title_assign_mentor', 'block_fn_mentor');
@@ -53,6 +53,8 @@ $PAGE->set_title($title);
 $PAGE->set_heading($heading);
 $PAGE->set_cacheable(true);
 
+$PAGE->requires->css('/blocks/fn_mentor/css/styles.css');
+
 $PAGE->navbar->add(get_string('pluginname', 'block_fn_mentor'), new moodle_url('/blocks/fn_mentor/course_overview.php'));
 $PAGE->navbar->add(get_string('notification_rules', 'block_fn_mentor'), new moodle_url('/blocks/fn_mentor/notification_rules.php'));
 
@@ -64,15 +66,15 @@ echo $OUTPUT->header();
 echo '<div id="notification-wrapper">';
 echo '<h1>' . get_string('notification_rules', 'block_fn_mentor') . '</h1>';
 
-if ($notification_rules = $DB->get_records('mentors_mentees_notification')) {
+if ($notification_rules = $DB->get_records('block_fn_mentor_notification')) {
     $rule_number = 0;
     foreach ($notification_rules as $notification_rule) {
         $rule_number++;
-        echo render_notification_rule_table($notification_rule, $rule_number);
+        echo block_fn_mentor_render_notification_rule_table($notification_rule, $rule_number);
     }
 }
 
-echo single_button_form ('create_new_rule', new moodle_url('/blocks/fn_mentor/notification.php'), NULL, get_string('create_new_rule', 'block_fn_mentor'));
+echo block_fn_mentor_single_button_form ('create_new_rule', new moodle_url('/blocks/fn_mentor/notification.php'), NULL, get_string('create_new_rule', 'block_fn_mentor'));
 echo '</div>';
 
 
