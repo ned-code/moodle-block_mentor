@@ -39,3 +39,6 @@
 .mentee-footer-menu {
     overflow: hidden;
 }
+.mentee-footer-menu .mentee {
+    margin: 5px 0;
+}

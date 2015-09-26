@@ -452,7 +452,9 @@ function block_fn_mentor_render_mentors_by_mentee($data) {
             $mentee_icon = 'mentee_red.png';
         }
 
-        $html .= '<div class="mentee"><strong><img class="mentor-img" src="'.$CFG->wwwroot.'/blocks/fn_mentor/pix/'.$mentee_icon.'"><a href="'.$CFG->wwwroot.'/blocks/fn_mentor/course_overview.php?menteeid='.$mentee['mentee']->studentid.'" >' .$mentee['mentee']->firstname . ' ' . $mentee['mentee']->lastname . '</strong></a></div>';
+        $html .= '<div class="mentee"><strong>
+                  <img class="mentor-img" src="'.$CFG->wwwroot.'/blocks/fn_mentor/pix/'.$mentee_icon.'">
+                  <a href="'.$CFG->wwwroot.'/blocks/fn_mentor/course_overview.php?menteeid='.$mentee['mentee']->studentid.'" >' .$mentee['mentee']->firstname . ' ' . $mentee['mentee']->lastname . '</strong></a></div>';
         foreach ($mentee['mentor'] as $mentor) {
             $html .= '<div class="mentor"><img class="mentee-img" src="'.$CFG->wwwroot.'/blocks/fn_mentor/pix/mentor_bullet.png">
             <a  href="'.$CFG->wwwroot.'/user/profile.php?id='.$mentor->mentorid.'"
@@ -471,9 +473,13 @@ function block_fn_mentor_render_mentees_by_student($menteeid) {
     $mentee = $DB->get_record('user', array('id'=>$menteeid));
 
     if ($mentors = block_fn_mentor_get_mentors($menteeid)) {
-        $html .= '<div class="mentee"><img class="mentor-img" src="'.$CFG->wwwroot.'/blocks/fn_mentor/pix/mentee_red.png"><a href="'.$CFG->wwwroot.'/blocks/fn_mentor/course_overview.php?menteeid='.$mentee->id.'" >' .$mentee->firstname . ' ' . $mentee->lastname . '</a></div>';
+        $html .= '<div class="mentee">
+                  <img class="mentor-img" src="'.$CFG->wwwroot.'/blocks/fn_mentor/pix/mentee_red.png">
+                  <a href="'.$CFG->wwwroot.'/blocks/fn_mentor/course_overview.php?menteeid='.$mentee->id.'" >' .$mentee->firstname . ' ' . $mentee->lastname . '</a></div>';
         foreach ($mentors as $mentor) {
-            $html .= '<div class="mentor"><img class="mentee-img" src="'.$CFG->wwwroot.'/blocks/fn_mentor/pix/mentor_bullet.png"><a class="mentor-profile" href="'.$CFG->wwwroot.'/user/profile.php?id='.$mentor->mentorid.'">' .$mentor->firstname . ' ' . $mentor->lastname . '</a></div>';
+            $html .= '<div class="mentor">
+                      <img class="mentee-img" src="'.$CFG->wwwroot.'/blocks/fn_mentor/pix/mentor_bullet.png">
+                      <a class="mentor-profile" href="'.$CFG->wwwroot.'/user/profile.php?id='.$mentor->mentorid.'">' .$mentor->firstname . ' ' . $mentor->lastname . '</a></div>';
         }
 
     }

@@ -172,18 +172,18 @@ class block_fn_mentor extends block_base {
 
 
 
-        //MENU
+        // MENU.
         if ($isteacher || $isadmin || $ismentor) {
             $this->content->text .= '<div id="mentor-form-container">';
         }
-        //SORT
+        // SORT.
         if ($isteacher || $isadmin && (isset($this->config->show_mentor_sort) && $this->config->show_mentor_sort)) {
             $this->content->text .= html_writer::tag('form',
                                         get_string('sortby', 'block_fn_mentor') . ' ' .
                                         html_writer::select($sortmenu, 'sortby', $sortbyURL[$sortby], null, array('onChange' => 'location=document.jump1.sortby.options[document.jump1.sortby.selectedIndex].value;')),
                                     array('id'=>'sortbyForm', 'name'=>'jump1'));
         }
-        //COURSE
+        // COURSE.
         if (($isteacher || $isadmin || $ismentor) && $courses) {
             $this->content->text .= html_writer::tag('form',
                                         get_string('course', 'block_fn_mentor') . ' ' .
@@ -205,22 +205,17 @@ class block_fn_mentor extends block_base {
                 }
                 if (($number_of_mentees > $maxnumberofmentees) && (!$showall)) {
 
+                    $this->content->text .= '<div class="mentee-footer-menu">';
 
-                        $this->content->text .= '<div class="mentee-footer-menu">
-                                             <div class="mentee-block-menu">
-                                             <img class="mentee-img" src="' . $OUTPUT->pix_url('i/navigationitem') . '">
-                                             <a href="' . $CFG->wwwroot . '/blocks/fn_mentor/course_overview.php">' . get_string('open_progress_reports', 'block_fn_mentor') . '</a></div>';
+                    $this->content->text .= '<div class="mentee"><img src="'.$OUTPUT->pix_url('i/group').'" class="mentee-img">
+                                             <a href="'.$CFG->wwwroot.'/blocks/fn_mentor/course_overview.php">'. get_string('open_progress_reports', 'block_fn_mentor').'</a></div>';
 
                     if ($this->instance->pagetypepattern == 'my-index') {
-                        $this->content->text .= '<div class="mentee-block-menu">
-                                             <img class="mentee-img" src="' . $OUTPUT->pix_url('i/navigationitem') . '">
-                                             <a href="' . $CFG->wwwroot . '/my/index.php?sortby=' . $sortby . '&coursefilter=' . $coursefilter . '&showall=1">' . get_string('show_all', 'block_fn_mentor') . '</a></div>
-                                             </div>';
+                        $this->content->text .= '<div class="mentee"><img src="'.$OUTPUT->pix_url('i/report').'" class="mentee-img">
+                                                 <a href="'.$CFG->wwwroot . '/my/index.php?sortby=' . $sortby . '&coursefilter=' . $coursefilter . '&showall=1">'. get_string('show_all', 'block_fn_mentor').'</a></div>';
                     } else {
-                        $this->content->text .= '<div class="mentee-block-menu">
-                                             <img class="mentee-img" src="' . $OUTPUT->pix_url('i/navigationitem') . '">
-                                             <a href="' . $CFG->wwwroot . '/index.php?sortby=' . $sortby . '&coursefilter=' . $coursefilter . '&showall=1">' . get_string('show_all', 'block_fn_mentor') . '</a></div>
-                                             </div>';
+                        $this->content->text .= '<div class="mentee"><img src="'.$OUTPUT->pix_url('i/report').'" class="mentee-img">
+                                                 <a href="'.$CFG->wwwroot . '/index.php?sortby=' . $sortby . '&coursefilter=' . $coursefilter . '&showall=1">'. get_string('show_all', 'block_fn_mentor').'</a></div>';
                     }
                 } else {
                     $this->content->text .= block_fn_mentor_render_mentees_by_mentor($visible_mentees);
