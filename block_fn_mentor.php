@@ -244,17 +244,19 @@ class block_fn_mentor extends block_base {
 
         $this->content->text .= '<hr style="margin-top:12px;height:1px;border:none;color:#ddd;background-color:#ddd;" /><div class="mentee-footer-menu">';
 
-        if ($isadmin) {
+        if (has_capability('block/fn_mentor:assignmentor', context_system::instance())) {
             $this->content->text .= '<div class="mentee-block-menu">
                                      <img class="mentee-img" src="'.$OUTPUT->pix_url('i/navigationitem').'">
                                      <a href="'.$CFG->wwwroot.'/blocks/fn_mentor/assign_mentor.php">'.get_string('assign_mentor', 'block_fn_mentor').'</a></div>';
         }
-        if ($isadmin && has_capability('block/fn_mentor:createnotificationrule', context_system::instance())) {
+        if (has_capability('block/fn_mentor:createnotificationrule', context_system::instance())) {
             $this->content->text .= '<div class="mentee-block-menu">
                                      <img class="mentee-img" src="'.$OUTPUT->pix_url('i/navigationitem').'">
                                      <a href="'.$CFG->wwwroot.'/blocks/fn_mentor/notification_rules.php">'.get_string('manage_notification', 'block_fn_mentor').'</a></div>';
         }
         $this->content->text .= '</div>';
+        $this->content->text .= '</div>';
+
         return $this->content;
     }
 

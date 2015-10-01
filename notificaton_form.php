@@ -37,21 +37,21 @@ class notification_form extends moodleform {
         $g1 = 'block_fn_mentor_checkbox';
         if (isset($this->_customdata['g1'])) {
             if ($this->_customdata['g1']) {
-                $g1 = 'checkbox_checked';
+                $g1 = 'block_fn_mentor_checkbox_checked';
             }
         }
 
         $g2 = 'block_fn_mentor_checkbox';
         if (isset($this->_customdata['g2'])) {
             if ($this->_customdata['g2']) {
-                $g2 = 'checkbox_checked';
+                $g2 = 'block_fn_mentor_checkbox_checked';
             }
         }
 
         $g3 = 'block_fn_mentor_checkbox';
         if (isset($this->_customdata['g3'])) {
             if ($this->_customdata['g3']) {
-                $g3 = 'checkbox_checked';
+                $g3 = 'block_fn_mentor_checkbox_checked';
             }
         }
 
@@ -65,7 +65,7 @@ class notification_form extends moodleform {
         $g4 = 'block_fn_mentor_checkbox';
         if (isset($this->_customdata['g4'])) {
             if ($this->_customdata['g4']) {
-                $g4 = 'checkbox_checked';
+                $g4 = 'block_fn_mentor_checkbox_checked';
             }
         }
 
@@ -79,7 +79,7 @@ class notification_form extends moodleform {
         $g5 = 'block_fn_mentor_checkbox';
         if (isset($this->_customdata['g5'])) {
             if ($this->_customdata['g5']) {
-                $g5 = 'checkbox_checked';
+                $g5 = 'block_fn_mentor_checkbox_checked';
             }
         }
 
@@ -93,7 +93,7 @@ class notification_form extends moodleform {
         $g6 = 'block_fn_mentor_checkbox';
         if (isset($this->_customdata['g6'])) {
             if ($this->_customdata['g6']) {
-                $g6 = 'checkbox_checked';
+                $g6 = 'block_fn_mentor_checkbox_checked';
             }
         }
 
@@ -107,7 +107,7 @@ class notification_form extends moodleform {
         $n1 = 'block_fn_mentor_checkbox';
         if (isset($this->_customdata['n1'])) {
             if ($this->_customdata['n1']) {
-                $n1 = 'checkbox_checked';
+                $n1 = 'block_fn_mentor_checkbox_checked';
             }
         }
 
@@ -121,7 +121,7 @@ class notification_form extends moodleform {
         $n2 = 'block_fn_mentor_checkbox';
         if (isset($this->_customdata['n2'])) {
             if ($this->_customdata['n2']) {
-                $n2 = 'checkbox_checked';
+                $n2 = 'block_fn_mentor_checkbox_checked';
             }
         }
 
@@ -135,21 +135,21 @@ class notification_form extends moodleform {
         $teacher = 'block_fn_mentor_checkbox';
         if (isset($this->_customdata['teacher'])) {
             if ($this->_customdata['teacher']) {
-                $teacher = 'checkbox_checked';
+                $teacher = 'block_fn_mentor_checkbox_checked';
             }
         }
 
         $student = 'block_fn_mentor_checkbox';
         if (isset($this->_customdata['student'])) {
             if ($this->_customdata['student']) {
-                $student = 'checkbox_checked';
+                $student = 'block_fn_mentor_checkbox_checked';
             }
         }
 
         $mentor = 'block_fn_mentor_checkbox';
         if (isset($this->_customdata['mentor'])) {
             if ($this->_customdata['mentor']) {
-                $mentor = 'checkbox_checked';
+                $mentor = 'block_fn_mentor_checkbox_checked';
             }
         }
 
