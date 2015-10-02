@@ -102,25 +102,29 @@ class block_fn_mentor extends block_base {
             return $this->content;
         }
 
+        if ($this->instance->pagetypepattern == 'my-index') {
+            $indexphp = "my/index.php";
+        } else {
+            $indexphp = "index.php";
+        }
 
-        //SORT SELECT
+        // SORT SELECT
         $sortbyURL = array(
-                        'mentor' => $CFG->wwwroot.'/index.php?coursefilter='.$coursefilter.'&sortby=mentor',
-                        'mentee' => $CFG->wwwroot.'/index.php?coursefilter='.$coursefilter.'&sortby=mentee'
-                        );
+            'mentor' => $CFG->wwwroot.'/'.$indexphp.'?coursefilter='.$coursefilter.'&sortby=mentor',
+            'mentee' => $CFG->wwwroot.'/'.$indexphp.'?coursefilter='.$coursefilter.'&sortby=mentee'
+        );
         $sortmenu= array(
-                        $sortbyURL['mentor'] => get_config('block_fn_mentor', 'mentor'),
-                        $sortbyURL['mentee'] => get_config('block_fn_mentor', 'mentee')
-                        );
+            $sortbyURL['mentor'] => get_config('block_fn_mentor', 'mentor'),
+            $sortbyURL['mentee'] => get_config('block_fn_mentor', 'mentee')
+        );
 
-        //COURSE SELECT
+        // COURSE SELECT
         $courseURL = array(
-                        //$CFG->wwwroot.'/index.php?course=0&sortby='.$sortby => get_string('all_courses', 'block_fn_mentor')
-                        0 => $CFG->wwwroot.'/index.php?coursefilter=0&sortby='.$sortby.'&showall='.$showall
-                        );
+            0 => $CFG->wwwroot.'/'.$indexphp.'?coursefilter=0&sortby='.$sortby.'&showall='.$showall
+        );
         $coursemenu = array($courseURL[0] => get_string('all_courses', 'block_fn_mentor') );
 
-        // COURSES - ADMIN
+        // COURSES - ADMIN.
         if ($isadmin) {
             $sqlCourse = "SELECT c.id,
                                  c.fullname
@@ -130,7 +134,7 @@ class block_fn_mentor extends block_base {
 
             if ($courses = $DB->get_records_sql($sqlCourse, array(1, 1))) {
                 foreach ($courses as $course) {
-                    $courseURL[$course->id] = $CFG->wwwroot.'/index.php?coursefilter='.$course->id.'&sortby='.$sortby.'&showall='.$showall;
+                    $courseURL[$course->id] = $CFG->wwwroot.'/'.$indexphp.'?coursefilter='.$course->id.'&sortby='.$sortby.'&showall='.$showall;
                     $coursemenu[$courseURL[$course->id]] = $course->fullname;
                 }
             }
@@ -138,7 +142,7 @@ class block_fn_mentor extends block_base {
         } elseif ($isteacher) {
             if ($courses = block_fn_mentor_get_teacher_courses()) {
                 foreach ($courses as $course) {
-                    $courseURL[$course->id] = $CFG->wwwroot.'/index.php?coursefilter='.$course->id.'&sortby='.$sortby.'&showall='.$showall;
+                    $courseURL[$course->id] = $CFG->wwwroot.'/'.$indexphp.'?coursefilter='.$course->id.'&sortby='.$sortby.'&showall='.$showall;
                     $coursemenu[$courseURL[$course->id]] = $course->fullname;
                 }
             }
@@ -162,15 +166,13 @@ class block_fn_mentor extends block_base {
 
                     if ($courses = $DB->get_records_sql($sql, array($studentrole, 50))) {
                         foreach ($courses as $course) {
-                            $courseURL[$course->id] = $CFG->wwwroot.'/index.php?coursefilter='.$course->id.'&sortby='.$sortby.'&showall='.$showall;
+                            $courseURL[$course->id] = $CFG->wwwroot.'/'.$indexphp.'?coursefilter='.$course->id.'&sortby='.$sortby.'&showall='.$showall;
                             $coursemenu[$courseURL[$course->id]] = $course->fullname;
                         }
                     }
                 }
             }
         }
-
-
 
         // MENU.
         if ($isteacher || $isadmin || $ismentor) {
@@ -210,13 +212,9 @@ class block_fn_mentor extends block_base {
                     $this->content->text .= '<div class="mentee"><img src="'.$OUTPUT->pix_url('i/group').'" class="mentee-img">
                                              <a href="'.$CFG->wwwroot.'/blocks/fn_mentor/course_overview.php">'. get_string('open_progress_reports', 'block_fn_mentor').'</a></div>';
 
-                    if ($this->instance->pagetypepattern == 'my-index') {
-                        $this->content->text .= '<div class="mentee"><img src="'.$OUTPUT->pix_url('i/report').'" class="mentee-img">
-                                                 <a href="'.$CFG->wwwroot . '/my/index.php?sortby=' . $sortby . '&coursefilter=' . $coursefilter . '&showall=1">'. get_string('show_all', 'block_fn_mentor').'</a></div>';
-                    } else {
-                        $this->content->text .= '<div class="mentee"><img src="'.$OUTPUT->pix_url('i/report').'" class="mentee-img">
-                                                 <a href="'.$CFG->wwwroot . '/index.php?sortby=' . $sortby . '&coursefilter=' . $coursefilter . '&showall=1">'. get_string('show_all', 'block_fn_mentor').'</a></div>';
-                    }
+                    $this->content->text .= '<div class="mentee"><img src="'.$OUTPUT->pix_url('i/report').'" class="mentee-img">
+                                             <a href="'.$CFG->wwwroot . '/'.$indexphp.'?sortby=' . $sortby . '&coursefilter=' . $coursefilter . '&showall=1">'. get_string('show_all', 'block_fn_mentor').'</a></div>';
+
                 } else {
                     $this->content->text .= block_fn_mentor_render_mentees_by_mentor($visible_mentees);
                 }
@@ -233,7 +231,7 @@ class block_fn_mentor extends block_base {
                                              <a href="'.$CFG->wwwroot.'/blocks/fn_mentor/course_overview.php">'.get_string('open_progress_reports', 'block_fn_mentor').'</a></div>';
 
                     $this->content->text .= '<div class="mentee-block-menu"><img class="mentee-img" src="'.$OUTPUT->pix_url('i/navigationitem').'">
-                                             <a href="'.$CFG->wwwroot.'/index.php?sortby='.$sortby.'&coursefilter='.$coursefilter.'&showall=1">'.get_string('show_all', 'block_fn_mentor').'</a></div></div>';
+                                             <a href="'.$CFG->wwwroot.'/'.$indexphp.'?sortby='.$sortby.'&coursefilter='.$coursefilter.'&showall=1">'.get_string('show_all', 'block_fn_mentor').'</a></div></div>';
 
                 } else {
                     $this->content->text .= block_fn_mentor_render_mentors_by_mentee($visible_mentees);
