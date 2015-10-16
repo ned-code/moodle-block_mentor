@@ -1479,7 +1479,7 @@ function block_fn_mentor_send_notifications($notificationid=null) {
                 }
                 $message_footer = $appended_message . '<hr />';
                 $message_footer .= '<p>'.get_string('linktomentorpage', 'block_fn_mentor', $mentee_url->out()).'</p>';
-                $message_footer .= 'This is an authomated message from '.format_string($site->fullname).'. Please do not reply to this message';
+                $message_footer .= 'This is an automated message from '.format_string($site->fullname).'. Please do not reply to this message';
 
                 $send_message = false;
 
