@@ -23,20 +23,28 @@
  */
 
 require_once('../../config.php');
+require_once($CFG->dirroot . '/blocks/fn_mentor/lib.php');
 
-$id = optional_param('id', 0, PARAM_INT);
+$id = required_param('id', PARAM_INT);
+$securitykey = required_param('key', PARAM_TEXT);
 
-require_login();
+$msg = $DB->get_record('block_fn_mentor_notifica_msg', array('id'=>$id, 'securitykey'=>$securitykey), '*', MUST_EXIST);
 
-require_capability('block/fn_mentor:createnotificationrule', context_system::instance(), $USER->id);
+$title = get_string('page_title_assign_mentor', 'block_fn_mentor');
+$heading = $SITE->fullname;
 
-if($record = $DB->get_record('block_fn_mentor_notification', array('id'=>$id))){
+$PAGE->set_url('/blocks/fn_mentor/notification.php');
+$PAGE->set_pagelayout('popup');
+$PAGE->set_context(context_system::instance());
+$PAGE->set_title($title);
+$PAGE->set_heading($heading);
+$PAGE->set_cacheable(true);
 
-    $DB->delete_records('block_fn_mentor_notification',  array('id'=>$id));
+$PAGE->requires->css('/blocks/fn_mentor/css/styles.css');
 
-    redirect(new moodle_url('/blocks/fn_mentor/notification_rules.php'), get_string('successful', 'block_fn_mentor'));
-}else{
-    echo $OUTPUT->header();
-    echo 'Not found';
-    echo $OUTPUT->footer();
-}
+$PAGE->navbar->add(get_string('pluginname', 'block_fn_mentor'), new moodle_url('/blocks/fn_mentor/course_overview.php'));
+$PAGE->navbar->add(get_string('notification', 'block_fn_mentor'), new moodle_url('/blocks/fn_mentor/notification.php'));
+
+echo $OUTPUT->header();
+echo $msg->message;
+echo $OUTPUT->footer();

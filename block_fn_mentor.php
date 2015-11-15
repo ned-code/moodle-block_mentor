@@ -253,7 +253,6 @@ class block_fn_mentor extends block_base {
                                      <a href="'.$CFG->wwwroot.'/blocks/fn_mentor/notification_rules.php">'.get_string('manage_notification', 'block_fn_mentor').'</a></div>';
         }
         $this->content->text .= '</div>';
-        $this->content->text .= '</div>';
 
         return $this->content;
     }

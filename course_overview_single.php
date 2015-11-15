@@ -29,8 +29,6 @@ require_once $CFG->libdir.'/gradelib.php';
 require_once $CFG->dirroot.'/grade/lib.php';
 require_once $CFG->dirroot.'/grade/report/user/lib.php';
 
-//global $CFG, $DB, $OUTPUT, $PAGE, $SITE;
-
 //Parameters
 $menteeid      = optional_param('menteeid', 0, PARAM_INT);
 $courseid      = optional_param('courseid', 0, PARAM_INT);
@@ -278,17 +276,11 @@ if ($navpage == 'overview'){
             }
 
             $data = $completion->get_data($activity, true, $menteeid, null);
-            /*
-            COMPLETION_INCOMPLETE 0
-            COMPLETION_COMPLETE 1
-            COMPLETION_COMPLETE_PASS 2
-            COMPLETION_COMPLETE_FAIL 3
-            */
+
             $completionstate = $data->completionstate;
             $assignment_status = block_fn_mentor_assignment_status($activity, $menteeid);
 
-            //echo "$activity->name | $completionstate | $assignment_status <br>\n";
-            //COMPLETION_INCOMPLETE
+            // COMPLETION_INCOMPLETE.
             if ($completionstate == 0) {
                 //Show activity as complete when conditions are met
                 if (($activity->module == 1)

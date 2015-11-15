@@ -26,8 +26,6 @@ require_once('../../config.php');
 require_once($CFG->dirroot . '/blocks/fn_mentor/lib.php');
 require_once($CFG->dirroot . '/blocks/fn_mentor/notificaton_form.php');
 
-global $CFG, $DB, $OUTPUT, $PAGE, $SITE;
-
 //Parameters
 $id       = optional_param('id', 0, PARAM_INT);
 $action   = optional_param('action', 'add', PARAM_TEXT);
@@ -104,8 +102,8 @@ if ($mform->is_cancelled()) {
 
     $fields = array('name','category','course','g1','g2','g3','g3_value',
                     'g4','g4_value','g5', 'g5_value','g6','g6_value',
-                    'n1','n1_value','n2','n2_value','period','mentor',
-                    'student','teacher','appended_message');
+                    'n1','n1_value','n2','n2_value','period','mentoremail','mentorsms',
+                    'studentemail','studentsms','teacheremail','teachersms','appended_message');
 
     foreach ($fields as $field) {
         $rec->$field = (isset($fromform->$field)) ? $fromform->$field : NULL;

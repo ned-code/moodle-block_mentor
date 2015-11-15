@@ -25,6 +25,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 $settings->add(new admin_setting_configtext('block_fn_mentor/blockname', get_string('blockname', 'block_fn_mentor'), '', get_string('pluginname', 'block_fn_mentor')));
+$settings->add(new admin_setting_configtext('block_fn_mentor/pagelayout', get_string('pagelayout', 'block_fn_mentor'), '','course'));
 
 $settings->add(new admin_setting_configtext('block_fn_mentor/mentor', get_string('wordformentor', 'block_fn_mentor'), '', get_string('mentor', 'block_fn_mentor')));
 $settings->add(new admin_setting_configtext('block_fn_mentor/mentors', get_string('wordformentors', 'block_fn_mentor'), '', get_string('mentors', 'block_fn_mentor')));
@@ -53,6 +54,7 @@ if ($mentor_user = $DB->get_record('role', array('shortname'=>'mentor_user'))) {
 }
 
 $settings->add(new admin_setting_configselect('block_fn_mentor/studentrole', get_string('studentrole', 'block_fn_mentor'),'', 5, $role_options));
+$settings->add(new admin_setting_configselect('block_fn_mentor/teacherrole', get_string('teacherrole', 'block_fn_mentor'),'', 3, $role_options));
 $settings->add(new admin_setting_configselect('block_fn_mentor/mentor_role_system', get_string('mentor_role_system', 'block_fn_mentor'),'', $mentor_role_system_default, $role_options));
 $settings->add(new admin_setting_configselect('block_fn_mentor/mentor_role_user', get_string('mentor_role_user', 'block_fn_mentor'),'', $mentor_role_user_default, $role_options));
 $settings->add(new admin_setting_configtext('block_fn_mentor/maxnumberofmentees', get_string('maxnumberofmentees', 'block_fn_mentor'), '', '15', PARAM_INT));

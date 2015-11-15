@@ -54,11 +54,14 @@ if (($action == 'send') && ($id)) {
 
 
 if ($process) {
-    block_fn_mentor_send_notifications($notification_rule->id);
-    redirect(new moodle_url('/blocks/fn_mentor/notification_rules.php'), get_string('successful', 'block_fn_mentor'), 0);
+    $report = block_fn_mentor_send_notifications($notification_rule->id, true);
+    echo $OUTPUT->header();
+    echo $OUTPUT->confirm($report,
+        new moodle_url('/blocks/fn_mentor/notification_rules.php'), '/blocks/fn_mentor/notification_rules.php');
+    echo $OUTPUT->footer();
 } else {
     echo $OUTPUT->header();
-    echo $OUTPUT->confirm('It will send notification emails. Do you want to continue?',
+    echo $OUTPUT->confirm(get_string('confirmsend', 'block_fn_mentor'),
         new moodle_url('/blocks/fn_mentor/notification_send.php', array('id' => $id, 'process' => 1)), '/blocks/fn_mentor/notification_rules.php');
     echo $OUTPUT->footer();
 }

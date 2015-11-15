@@ -1,44 +1,44 @@
-#mentor-form-container {
+.block_fn_mentor #mentor-form-container {
     border-bottom: 1px solid #ddd;
     margin-bottom: 5px;
     overflow: hidden;
     padding-bottom: 5px;
 }
-#sortbyForm {
+.block_fn_mentor #sortbyForm {
     display: block;
     float: right;
     margin: 0 0 0 10px;
 }
-#studentFilterForm .select.menusortby {
+.block_fn_mentor #studentFilterForm .select.menusortby {
     display: block;
     margin: 0 !important;
 }
-#courseForm {
+.block_fn_mentor #courseForm {
     display: block;
     float: right;
 }
-.select.menucoursefilter {
+.block_fn_mentor .select.menucoursefilter {
     max-width: 150px;
 }
-.mentor-img {
+.block_fn_mentor .mentor-img {
     margin-right: 6px;
 }
-.mentee-img {
+.block_fn_mentor .mentee-img {
     margin-left: 10px;
     margin-right: 6px;
 }
-.mentor {
+.block_fn_mentor .mentor {
     margin: 5px 0;
 }
-.mentee-block-menu {
+.block_fn_mentor .mentee-block-menu {
     display: block;
     float: left;
     font-size: 11px;
     width: 50%;
 }
-.mentee-footer-menu {
+.block_fn_mentor .mentee-footer-menu {
     overflow: hidden;
 }
-.mentee-footer-menu .mentee {
+.block_fn_mentor .mentee-footer-menu .mentee {
     margin: 5px 0;
 }

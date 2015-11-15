@@ -390,7 +390,6 @@ function block_fn_mentor_render_mentees_by_mentor($data) {
         </strong></div>';
         foreach ($mentor['mentee'] as $mentee) {
             $grade_summary = block_fn_mentor_grade_summary($mentee->studentid, $coursefilter);
-            //print_r($grade_summary);die;
             if (($grade_summary->attempted >= 50) && ($grade_summary->all >= 50)) {
                 $mentee_icon = 'mentee_green.png';
             } elseif (($grade_summary->attempted >= 50) && ($grade_summary->all < 50)) {
@@ -608,10 +607,11 @@ function block_fn_mentor_assignment_status($mod, $userid) {
 
 function block_fn_mentor_grade_summary($studentid, $courseid=0) {
 
-    global $CFG, $DB;
+    global $DB;
 
     $data = new stdClass();
     $courses = array();
+    $coursegrades = array();
 
     $grade_total = array('attempted_grade'=>0,
                          'attempted_max'=>0,
@@ -702,6 +702,60 @@ function block_fn_mentor_grade_summary($studentid, $courseid=0) {
 
     $data->attempted = $attempted;
     $data->all = $all;
+    foreach ($courses as $id => $value) {
+        $sqlcourseaverage = "SELECT gg.id,
+                                gg.rawgrademax,
+                                gg.finalgrade
+                           FROM {grade_items} gi
+                           JOIN {grade_grades} gg
+                             ON gi.id = gg.itemid
+                          WHERE gi.itemtype = ?
+                            AND gi.courseid = ?
+                            AND gg.userid = ?";
+        if ($courseaverage = $DB->get_record_sql($sqlcourseaverage, array('course', $id, $studentid))) {
+            $coursegrades[$id] = ($courseaverage->finalgrade / $courseaverage->rawgrademax)*100;
+        }
+    }
+
+    if (count($coursegrades)) {
+        $data->allcourseaverge = round(array_sum($coursegrades) / count($coursegrades));
+    } else {
+        $data->allcourseaverge = 0;
+    }
+
+
+    if ($courseid) {
+
+        if (isset($coursegrades[$courseid])) {
+            $data->courseaverage = round($coursegrades[$courseid]);
+        } else {
+            $data->courseaverage = 0;
+        }
+
+        $sqlactivity = "SELECT gi.id,
+                           gg.finalgrade
+                      FROM mdl_grade_items AS gi
+           LEFT OUTER JOIN mdl_grade_grades AS gg
+                        ON gi.id = gg.itemid
+                     WHERE gi.courseid = ?
+                       AND gi.itemtype = ?
+                       AND gg.userid = ?";
+        if ($gradedavtivities = $DB->get_records_sql($sqlactivity, array($courseid, 'mod', $studentid))) {
+            $numofactivities = 0;
+            $numofgraded = 0;
+            foreach ($gradedavtivities as $gradedavtivity) {
+                $numofactivities++;
+                if (is_numeric($gradedavtivity->finalgrade)) {
+                    $numofgraded++;
+                }
+            }
+            $data->numofcompleted = "$numofgraded/$numofactivities";
+            $data->percentageofcompleted = round(($numofgraded / $numofactivities) * 100);
+        } else {
+            $data->numofcompleted = "N/A";
+            $data->percentageofcompleted = 0;
+        }
+    }
 
     return $data;
 }
@@ -716,14 +770,13 @@ function block_fn_mentor_print_grade_summary ($courseid , $studentid) {
 
     $html .= '<table class="mentee-course-overview-grade_table">';
     $html .= '<tr>';
-    $html .= '<td class="overview-grade-left" valign="middle">Including all attempted activities:</td>';
-    $class = ($grade_summary->attempted >= 50) ? 'green' : 'red';
-    $html .= '<td class="overview-grade-right '.$class.'" valign="middle">'.$grade_summary->attempted.'%</td>';
+    $html .= '<td class="overview-grade-left" valign="middle">'.get_string('numofcomplete', 'block_fn_mentor').':</td>';
+    $html .= '<td class="overview-grade-right grey" valign="middle">'.$grade_summary->numofcompleted.'</td>';
     $html .= '</tr>';
     $html .= '<tr>';
-    $html .= '<td class="overview-grade-left" valign="middle">Including all available activities:</td>';
-    $class = ($grade_summary->all >= 50) ? 'green' : 'red';
-    $html .= '<td class="overview-grade-right '.$class.'" valign="middle">'.$grade_summary->all.'%</td>';
+    $html .= '<td class="overview-grade-left" valign="middle">'.get_string('currentgrade', 'block_fn_mentor').':</td>';
+    $class = ($grade_summary->percentageofcompleted >= 50) ? 'green' : 'red';
+    $html .= '<td class="overview-grade-right '.$class.'" valign="middle">'.$grade_summary->courseaverage.'%</td>';
     $html .= '</tr>';
     $html .= '</table>';
     return $html;
@@ -998,7 +1051,7 @@ function block_fn_mentor_render_notification_rule_table($notification, $number) 
     $html = '';
     $html .= '<table class="notification_rule" cellspacing="0">
                  <tr>
-                    <td colspan="3" class="notification_rule_ruleno"><strong>Rule '.$number.':</strong> '.$notification->name.'</td>
+                    <td colspan="3" class="notification_rule_ruleno"><strong>'.get_string('rule', 'block_fn_mentor').' '.$number.':</strong> '.$notification->name.'</td>
                     <td colspan="2" class="notification_rule_button">';
 
     $html .= block_fn_mentor_single_button_form ('create_new_rule', new moodle_url('/blocks/fn_mentor/notification_send.php', array('id'=>$notification->id, 'action'=>'send', 'sesskey'=>sesskey())), NULL, get_string('run_now', 'block_fn_mentor'));
@@ -1008,11 +1061,11 @@ function block_fn_mentor_render_notification_rule_table($notification, $number) 
     $html .='</td>
                   </tr>
                   <tr>
-                    <th class="notification_c1">'.get_string('apply_to', 'block_fn_mentor').'</th>
-                    <th class="notification_c2">'.get_string('when_to_send', 'block_fn_mentor').'</th>
-                    <th class="notification_c3">'.get_string('who_to_send', 'block_fn_mentor').'</th>
-                    <th class="notification_c4">'.get_string('how_often', 'block_fn_mentor').'</th>
-                    <th class="notification_c5">'.get_string('appended_message', 'block_fn_mentor').'</th>
+                    <th class="notification_c1" nowrap="nowrap">'.get_string('apply_to', 'block_fn_mentor').'</th>
+                    <th class="notification_c2" nowrap="nowrap">'.get_string('when_to_send', 'block_fn_mentor').'</th>
+                    <th class="notification_c3" nowrap="nowrap">'.get_string('who_to_send', 'block_fn_mentor').'</th>
+                    <th class="notification_c4" nowrap="nowrap">'.get_string('how_often', 'block_fn_mentor').'</th>
+                    <th class="notification_c5" nowrap="nowrap">'.get_string('appended_message', 'block_fn_mentor').'</th>
                   </tr>
                   <tr>
                     <td class="notification_rule_body notification_c1">';
@@ -1038,26 +1091,14 @@ function block_fn_mentor_render_notification_rule_table($notification, $number) 
     }
     $html .= '</td><td class="notification_rule_body notification_c2">';
 
-    if ($notification->g1
-            || $notification->g2 || $notification->g3 || $notification->g4
-            || $notification->g5 || $notification->g6 || $notification->n1
-            || $notification->n2){
+    if ($notification->g2 || $notification->g4 || $notification->g6 || $notification->n1 || $notification->n2){
 
         $html .= '<ul>';
-        if ($notification->g1) {
-            $html .= '<li>'.get_string('g1', 'block_fn_mentor').'</li>';
-        }
         if ($notification->g2) {
             $html .= '<li>'.get_string('g2', 'block_fn_mentor').'</li>';
         }
-        if ($notification->g3) {
-            $html .= '<li>'.get_string('g3', 'block_fn_mentor', $notification->g3_value).'</li>';
-        }
         if ($notification->g4) {
             $html .= '<li>'.get_string('g4', 'block_fn_mentor', $notification->g4_value).'</li>';
-        }
-        if ($notification->g5) {
-            $html .= '<li>'.get_string('g5', 'block_fn_mentor', $notification->g5_value).'</li>';
         }
         if ($notification->g6) {
             $html .= '<li>'.get_string('g6', 'block_fn_mentor', $notification->g6_value).'</li>';
@@ -1071,19 +1112,44 @@ function block_fn_mentor_render_notification_rule_table($notification, $number) 
         $html .= '</ul>';
     }
 
-    $html .= '</td><td class="notification_rule_body notification_c3">';
+    $html .= '</td><td class="notification_rule_body notification_c3" nowrap="nowrap">';
 
-    if ($notification->mentor || $notification->student || $notification->teacher){
+    $mentornotificationtype = array();
+    $teachernotificationtype = array();
+    $studentnotificationtype = array();
+
+    if ($notification->mentoremail || $notification->mentorsms || $notification->studentemail || $notification->studentsms || $notification->teacheremail || $notification->teachersms){
         $html .= '<ul>';
-        if ($notification->mentor) {
-            $html .= '<li>'.get_string('mentor', 'block_fn_mentor').'</li>';
+        if ($notification->mentoremail) {
+            $mentornotificationtype[] = get_string('email', 'block_fn_mentor');
         }
-        if ($notification->student) {
-            $html .= '<li>'.get_string('student', 'block_fn_mentor').'</li>';
+        if ($notification->mentorsms) {
+            $mentornotificationtype[] = get_string('sms', 'block_fn_mentor');
         }
-        if ($notification->teacher) {
-            $html .= '<li>'.get_string('teacher', 'block_fn_mentor').'</li>';
+        if ($mentornotificationtype) {
+            $html .= '<li>'.get_string('mentornotificationtype', 'block_fn_mentor', implode(', ', $mentornotificationtype)).'</li>';
         }
+
+        if ($notification->studentemail) {
+            $studentnotificationtype[] = get_string('email', 'block_fn_mentor');
+        }
+        if ($notification->studentsms) {
+            $studentnotificationtype[] = get_string('sms', 'block_fn_mentor');
+        }
+        if ($studentnotificationtype) {
+            $html .= '<li>'.get_string('studentnotificationtype', 'block_fn_mentor', implode(', ', $studentnotificationtype)).'</li>';
+        }
+
+        if ($notification->teacheremail) {
+            $teachernotificationtype[] = get_string('email', 'block_fn_mentor');
+        }
+        if ($notification->teachersms) {
+            $teachernotificationtype[] = get_string('sms', 'block_fn_mentor');
+        }
+        if ($teachernotificationtype) {
+            $html .= '<li>'.get_string('teachernotificationtype', 'block_fn_mentor', implode(', ', $teachernotificationtype)).'</li>';
+        }
+
         $html .= '</ul>';
     }
     $html .= '</td>
@@ -1272,14 +1338,13 @@ function block_fn_mentor_note_print($note, $detail = NOTES_SHOW_FULL) {
     echo '</div>';
 }
 
-function block_fn_mentor_send_notifications($notificationid=null) {
-    global $CFG, $DB;
+function block_fn_mentor_send_notifications($notificationid=null, $output=false) {
+    global $DB;
 
-    mtrace( "BLOCK Mentors Mentees" );
-    $today = time();
-    $site = get_site();
-    $supportuser = core_user::get_support_user();
-    $subject = 'Progress Report from '.format_string($site->fullname);
+    $notificationreport = '';
+    $time = time();
+    $studentroleid = get_config('block_fn_mentor', 'studentrole');
+    $teacherroleid = get_config('block_fn_mentor', 'teacherrole');
 
     if ($notification_rules = $DB->get_records('block_fn_mentor_notification')) {
 
@@ -1303,11 +1368,8 @@ function block_fn_mentor_send_notifications($notificationid=null) {
                 continue;
             }
 
-            if (!($notification_rule->g1)
-                && !($notification_rule->g2)
-                && !($notification_rule->g3 && $notification_rule->g3_value)
+            if (!($notification_rule->g2)
                 && !($notification_rule->g4 && $notification_rule->g4_value)
-                && !($notification_rule->g5 && $notification_rule->g5_value)
                 && !($notification_rule->g6 && $notification_rule->g6_value)
                 && !($notification_rule->n1 && $notification_rule->n1_value)
                 && !($notification_rule->n2 && $notification_rule->n2_value) ) {
@@ -1330,7 +1392,7 @@ function block_fn_mentor_send_notifications($notificationid=null) {
                 }
             };
 
-            //CATEGORY
+            // CATEGORY.
             if ($notification_rule->category) {
 
                 $notification_categories = explode(',', $notification_rule->category);
@@ -1360,20 +1422,19 @@ function block_fn_mentor_send_notifications($notificationid=null) {
                 }
             }
 
-            //COURSE
+            // COURSE.
             if ($notification_rule->course) {
                 $notification = explode(',', $notification_rule->course);
                 $courses = array_merge($courses, $notification);
             }
 
-            //PREPARE NOTIFICATION FOR EACH COURSES
+            // PREPARE NOTIFICATION FOR EACH COURSES.
             foreach ($courses as $courseid) {
                 if ($course = $DB->get_record('course', array('id'=>$courseid))) {
 
                     $context = context_course::instance($course->id);
 
-                    //if ($students = get_enrolled_users($context, 'moodle/grade:view')) {   print_r($students);die;
-                    if ($students = get_role_users(5, $context)) {
+                    if ($students = get_role_users($studentroleid, $context)) {
                         foreach ($students as $student) {
 
                             $message = "";
@@ -1382,50 +1443,26 @@ function block_fn_mentor_send_notifications($notificationid=null) {
 
                             $notification_message[$student->id][$course->id]['studentname'] = $student->firstname . ' ' . $student->lastname;
 
-                            if ($notification_rule->g1) {
-                                $message .= '<li>'.get_string('g1_message', 'block_fn_mentor', array('firstname'=>$student->firstname, 'g1'=>$grade_summary->attempted)).'</li>';
-                                $notification_message[$student->id][$course->id]['coursename'] = $course->fullname;
-                                $notification_message[$student->id][$course->id]['message'] = $message;
-                            }
 
                             if ($notification_rule->g2) {
-                                $message .= '<li>'.get_string('g2_message', 'block_fn_mentor', array('firstname'=>$student->firstname, 'g2'=>$grade_summary->all)).'</li>';
+                                $message .= '<li>'.get_string('g2_message', 'block_fn_mentor', array('firstname'=>$student->firstname, 'g2'=>$grade_summary->courseaverage)).'</li>';
                                 $notification_message[$student->id][$course->id]['coursename'] = $course->fullname;
                                 $notification_message[$student->id][$course->id]['message'] = $message;
                             }
-
-                            if ($notification_rule->g3 && $notification_rule->g3_value) {
-                                if ($grade_summary->attempted < $notification_rule->g3_value){
-                                    $message .= '<li>'.get_string('g3_message', 'block_fn_mentor', array('firstname'=>$student->firstname, 'g3'=>$grade_summary->attempted, 'g3_value'=>$notification_rule->g3_value)).'</li>';
-                                    $notification_message[$student->id][$course->id]['coursename'] = $course->fullname;
-                                    $notification_message[$student->id][$course->id]['message'] = $message;
-                                }
-                            }
-
                             if ($notification_rule->g4 && $notification_rule->g4_value) {
-                                if ($grade_summary->attempted < $notification_rule->g4_value){
-                                    $message .= '<li>'.get_string('g4_message', 'block_fn_mentor', array('firstname'=>$student->firstname, 'g4'=>$grade_summary->all, 'g4_value'=>$notification_rule->g3_value)).'</li>';
+                                if ($grade_summary->courseaverage < $notification_rule->g4_value){
+                                    $message .= '<li>'.get_string('g4_message', 'block_fn_mentor', array('firstname'=>$student->firstname, 'g4'=>$grade_summary->courseaverage, 'g4_value'=>$notification_rule->g3_value)).'</li>';
                                     $notification_message[$student->id][$course->id]['coursename'] = $course->fullname;
                                     $notification_message[$student->id][$course->id]['message'] = $message;
                                 }
                             }
-
-                            if ($notification_rule->g5 && $notification_rule->g5_value) {
-                                if ($grade_summary->attempted > $notification_rule->g5_value){
-                                    $message .= '<li>'.get_string('g5_message', 'block_fn_mentor', array('firstname'=>$student->firstname, 'g5'=>$grade_summary->attempted, 'g5_value'=>$notification_rule->g5_value)).'</li>';
-                                    $notification_message[$student->id][$course->id]['coursename'] = $course->fullname;
-                                    $notification_message[$student->id][$course->id]['message'] = $message;
-                                }
-                            }
-
                             if ($notification_rule->g6 && $notification_rule->g6_value) {
-                                if ($grade_summary->attempted > $notification_rule->g6_value){
-                                    $message .= '<li>'.get_string('g6_message', 'block_fn_mentor', array('firstname'=>$student->firstname, 'g6'=>$grade_summary->all, 'g6_value'=>$notification_rule->g6_value)).'</li>';
+                                if ($grade_summary->courseaverage > $notification_rule->g6_value){
+                                    $message .= '<li>'.get_string('g6_message', 'block_fn_mentor', array('firstname'=>$student->firstname, 'g6'=>$grade_summary->courseaverage, 'g6_value'=>$notification_rule->g6_value)).'</li>';
                                     $notification_message[$student->id][$course->id]['coursename'] = $course->fullname;
                                     $notification_message[$student->id][$course->id]['message'] = $message;
                                 }
                             }
-
 
                             if ($notification_rule->n1 && $notification_rule->n1_value) {
                                 if ($student->lastaccess > 0) {
@@ -1447,113 +1484,239 @@ function block_fn_mentor_send_notifications($notificationid=null) {
                                         $notification_message[$student->id][$course->id]['message'] = $message;
                                     }
                                 }
-
-                                //echo last_activity (464, $notification_rule->n2_value);
                             }
-
-
                         }
                     }
                 }
             }
-
-            //SEND EMAILS FOR EACH RULE
+            ///print_object($notification_message);die;
+            // SEND EMAILS FOR EACH RULE.
             foreach ($notification_message as $student_id => $course_messages) {
 
-                $course_array = array();
-                $messageHTML = '';
-
-                //STUDENT
+                // STUDENT.
                 if (!$student = $DB->get_record('user', array('id'=>$student_id))) {
                     continue;
                 }
 
-                $header = new stdClass();
-                $header->sitename = format_string($site->fullname);
-                $header->studentname = fullname($student);
-
-                $mentee_url = new moodle_url('/blocks/fn_mentor/course_overview.php?menteeid='.$student_id);
-                $appended_message = '';
-                if ($notification_rule->appended_message) {
-                    $appended_message = '<p>' . $notification_rule->appended_message . '</p>';
-                }
-                $message_footer = $appended_message . '<hr />';
-                $message_footer .= '<p>'.get_string('linktomentorpage', 'block_fn_mentor', $mentee_url->out()).'</p>';
-                $message_footer .= 'This is an automated message from '.format_string($site->fullname).'. Please do not reply to this message';
-
-                $send_message = false;
-
                 foreach ($course_messages as $course_id => $course_message) {
                     if (!isset($course_message['message'])) {
-                        $send_message = false;
                         continue;
-                    } else {
-                        $send_message = true;
                     }
-                    $messageHTML .= 'Course: '.$course_message['coursename'].' <br />';
-                    $messageHTML .= '<ul>'.$course_message['message'].'</ul>';
+                    // TEACHER.
+                    if ($notification_rule->teacheremail || $notification_rule->teachersms) {
+                        // Course teachers.
+                        $sqlteacher = "SELECT u.id,
+                                              u.firstname,
+                                              u.lastname
+                                         FROM {context} ctx
+                                   INNER JOIN {role_assignments} ra
+                                           ON ctx.id = ra.contextid
+                                   INNER JOIN {user} u
+                                           ON ra.userid = u.id
+                                        WHERE ctx.contextlevel = ?
+                                          AND ra.roleid = ?
+                                          AND ctx.instanceid = ?";
 
-                    $course_array[] = $course_message['coursename'];
-
-                    //TEACHER
-                    if ($notification_rule->teacher) {
-                        //Course teachers
-                        $sql_techer = "SELECT u.id,
-                                                  u.firstname,
-                                                  u.lastname
-                                             FROM {context} ctx
-                                       INNER JOIN {role_assignments} ra
-                                               ON ctx.id = ra.contextid
-                                       INNER JOIN {user} u
-                                               ON ra.userid = u.id
-                                            WHERE ctx.contextlevel = ?
-                                              AND ra.roleid = ?
-                                              AND ctx.instanceid = ?";
-
-                        if ($teachers = $DB->get_records_sql($sql_techer, array(50, 3, $course_id))) {
+                        if ($teachers = $DB->get_records_sql($sqlteacher, array(50, $teacherroleid, $course_id))) {
                             foreach ($teachers as $teacher) {
-                                if (!$to = $DB->get_record('user', array('id'=>$teacher->id))) {
+                                if (!$to = $DB->get_record('user', array('id' => $teacher->id))) {
                                     continue;
                                 }
-                                $header->coursename = implode(', ', $course_array);
-                                $message_header = get_string('message_header', 'block_fn_mentor', $header);
-                                if($send_message)
-                                    email_to_user($to, $supportuser, $subject, '', $message_header.$messageHTML.$message_footer);
+                                $rec = new stdClass();
+                                $rec->notificationid = $notification_rule->id;
+                                $rec->type = 'teacher';
+                                $rec->receiverid = $teacher->id;
+                                $rec->userid = $student_id;
+                                $rec->courseid = $course_id;
+                                $rec->message = $course_message['message'];
+                                $rec->timecreated = $time;
+                                $rec->securitykey = md5(uniqid(rand(), true));
+                                $rec->sent = 0;
+                                $DB->insert_record('block_fn_mentor_notifica_msg', $rec);
                             }
                         }
                     }
-                }
 
-                //STUDENT
-                if ($notification_rule->student) {
-                    $header->coursename = implode(', ', $course_array);
-                    $message_header = get_string('message_header', 'block_fn_mentor', $header);
-                    if ($send_message)
-                        email_to_user($student, $supportuser, $subject, '', $message_header.$messageHTML.$message_footer);
-                }
+                    //STUDENT
+                    if ($notification_rule->studentemail || $notification_rule->studentsms) {
+                        $rec = new stdClass();
+                        $rec->notificationid = $notification_rule->id;
+                        $rec->type = 'student';
+                        $rec->receiverid = $student_id;
+                        $rec->userid = $student_id;
+                        $rec->courseid = $course_id;
+                        $rec->message = $course_message['message'];
+                        $rec->timecreated = $time;
+                        $rec->securitykey = md5(uniqid(rand(), true));
+                        $rec->sent = 0;
+                        $DB->insert_record('block_fn_mentor_notifica_msg', $rec);
+                    }
 
-                //MENTOR
-                if ($notification_rule->mentor) {
-                    $mentors = block_fn_mentor_get_mentors($student_id);
-                    foreach ($mentors as $mentor) {
-                        if (!$to = $DB->get_record('user', array('id'=>$mentor->mentorid))) {
-                            continue;
+                    //MENTOR
+                    if ($notification_rule->mentoremail || $notification_rule->mentorsms) {
+                        $mentors = block_fn_mentor_get_mentors($student_id);
+                        foreach ($mentors as $mentor) {
+                            if (!$to = $DB->get_record('user', array('id' => $mentor->mentorid))) {
+                                continue;
+                            }
+                            $rec = new stdClass();
+                            $rec->notificationid = $notification_rule->id;
+                            $rec->type = 'mentor';
+                            $rec->receiverid = $mentor->mentorid;
+                            $rec->userid = $student_id;
+                            $rec->courseid = $course_id;
+                            $rec->message = $course_message['message'];
+                            $rec->timecreated = $time;
+                            $rec->securitykey = md5(uniqid(rand(), true));
+                            $rec->sent = 0;
+                            $DB->insert_record('block_fn_mentor_notifica_msg', $rec);
                         }
-                        $header->coursename = implode(', ', $course_array);
-                        $message_header = get_string('message_header', 'block_fn_mentor', $header);
-                        if ($send_message)
-                            email_to_user($to, $supportuser, $subject, '', $message_header.$messageHTML.$message_footer);
                     }
                 }
-
-                //return true;
-
             }
-
             $update_sql = "UPDATE {block_fn_mentor_notification} SET crontime=? WHERE id=?";
             $DB->execute($update_sql, array(date("Y-m-d"), $notification_rule->id));
-        } // END OF EACH NOTIFICATION
+        } // END OF EACH NOTIFICATION.
+
+        $notificationreport .= block_fn_mentor_group_messages();
     }
 
+    if ($output) {
+        return $notificationreport;
+    }
+}
+
+function block_fn_mentor_group_messages () {
+    global $DB;
+
+    $site = get_site();
+    $supportuser = core_user::get_support_user();
+    $subject = get_string('progressreportfrom', 'block_fn_mentor', format_string($site->fullname));
+    $notificationreport = '';
+
+    $sqlgroup = "SELECT n.id,
+                        n.notificationid,
+                        n.type,
+                        n.receiverid,
+                        n.userid,
+                        n.courseid,
+                        n.message,
+                        n.securitykey,
+                        n.timecreated,
+                        n.sent
+                   FROM {block_fn_mentor_notifica_msg} n
+                  WHERE n.sent = 0
+               GROUP BY n.receiverid,
+                        n.type,
+                        n.notificationid,
+                        n.timecreated";
+
+    if ($groups = $DB->get_records_sql($sqlgroup)) {
+        foreach ($groups as $group) {
+            $emailbody = '';
+            $notification = $DB->get_record('block_fn_mentor_notification', array('id' => $group->notificationid));
+
+            if ($messages = $DB->get_records('block_fn_mentor_notifica_msg',
+                array('receiverid' => $group->receiverid, 'type' => $group->type, 'timecreated' => $group->timecreated, 'notificationid' => $group->notificationid, 'sent' => '0'), 'userid ASC')) {
+
+                foreach ($messages as $message) {
+                    $student = $DB->get_record('user', array('id' => $message->userid));
+                    $course = $DB->get_record('course', array('id' => $message->courseid));
+
+                    $emailbody .= get_string('progressreportfrom', 'block_fn_mentor', format_string($site->fullname)).' <br />';
+                    $emailbody .= get_string('student', 'block_fn_mentor').':  <strong>' . $student->firstname . ' ' . $student->lastname . '</strong> <br /><hr />';
+
+                    $emailbody .= get_string('course', 'block_fn_mentor').': ' . $course->fullname . ' <br />';
+                    $emailbody .= '<ul>' . $message->message . '</ul>';
+
+                    $menteeurl = new moodle_url('/blocks/fn_mentor/course_overview.php', array('menteeid' => $student->id));
+                    $emailbody .= '<p>' . get_string('linktomentorpage', 'block_fn_mentor', $menteeurl->out()) . '</p><hr />';
+
+                    $message->sent = 1;
+                    $DB->update_record('block_fn_mentor_notifica_msg', $message);
+                }
+
+                $appended_message = '';
+                if ($notification->appended_message) {
+                    $appended_message = '<p>' . $notification->appended_message . '</p>';
+                }
+                $emailbody .= $appended_message . '<hr />';
+                $emailbody .= get_string('authomatedmessage', 'block_fn_mentor', format_string($site->fullname));
+
+
+
+                $rec = new stdClass();
+                $rec->notificationid = $group->notificationid;
+                $rec->type = 'email';
+                $rec->receiverid = $group->receiverid;
+                $rec->message = $emailbody;
+                $rec->timecreated = time();
+                $rec->securitykey = md5(uniqid(rand(), true));
+                $rec->sent = 0;
+                $nid = $DB->insert_record('block_fn_mentor_notifica_msg', $rec);
+
+                $messageurl = new moodle_url('/blocks/fn_mentor/notification_message.php', array('id'=>$nid,'key'=>$rec->securitykey));
+                $smsbody = get_string('progressreportfrom', 'block_fn_mentor', format_string($site->fullname))."\n".
+                           get_string('clickhere', 'block_fn_mentor', $messageurl->out(false));
+
+                $sent = 0;
+                if ($to = $DB->get_record('user', array('id' => $group->receiverid))) {
+                    $emailsent = $group->type . 'email';
+                    $smssent = $group->type . 'sms';
+                    if ($notification->$emailsent) {
+                        if (email_to_user($to, $supportuser, $subject, '', $emailbody)) {
+                            $sent = 1;
+                            $notificationreport .= $to->firstname . ' ' . $to->lastname . get_string('emailsent', 'block_fn_mentor') . '<br>';
+                        } else {
+                            $notificationreport .= $to->firstname . ' ' . $to->lastname . get_string('emailerror', 'block_fn_mentor') . '<br>';
+                        }
+                    }
+                    if ($notification->$smssent) {
+                        if (block_fn_mentor_sms_to_user($to, $supportuser, $subject, '', $smsbody)) {
+                            $sent = 1;
+                            $notificationreport .= $to->firstname . ' ' . $to->lastname . get_string('smssent', 'block_fn_mentor') . '<br>';
+                        } else {
+                            $notificationreport .= $to->firstname . ' ' . $to->lastname . get_string('smserror', 'block_fn_mentor') . '<br>';
+                        }
+                    }
+                    $rec->id = $nid;
+                    $rec->sent = $sent;
+                    $DB->update_record('block_fn_mentor_notifica_msg', $rec);
+                }
+            }
+        }
+    }
+    return $notificationreport;
+}
+
+function block_fn_mentor_sms_to_user ($user, $from, $subject, $messagetext, $messagehtml = '') {
+
+    global $DB;
+
+    $sqlphonenumber = "SELECT t1.shortname, t2.data
+						 FROM {user_info_field} AS t1 , {user_info_data} AS t2
+					    WHERE t1.id = t2.fieldid
+						  AND t1.shortname = 'mobilephone'
+						  AND t2.userid = ?";
+
+    if ($phonenumber = $DB->get_record_sql($sqlphonenumber, array($user->id))) {
+        $smsnumber = $phonenumber->data;
+
+        $sqlprovider = "SELECT t1.shortname, t2.data
+     					  FROM {user_info_field} AS t1 , {user_info_data} AS t2
+					 	 WHERE t1.id = t2.fieldid
+						   AND t1.shortname = 'mobileprovider'
+						   AND t2.userid = ?";
+
+        if ($phoneprovider = $DB->get_record_sql($sqlprovider, array($user->id))) {
+            $sms_provider_full = $phoneprovider->data;
+            $sms_provider_array = explode('~', $sms_provider_full);
+            $sms_provider = $sms_provider_array[1];
+            $user->email = $smsnumber . $sms_provider;
+
+            email_to_user($user, $from, '', strip_tags($messagehtml), '');
+        }
+
+    }
     return true;
 }

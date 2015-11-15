@@ -26,8 +26,6 @@ require_once('../../config.php');
 require_once('assign_mentor_form.php');
 require_once('lib.php');
 
-global $CFG, $DB, $OUTPUT, $PAGE, $SITE;
-
 // PARAMETERS.
 $mentormenu = optional_param('mentor_menu', 'all_mentors', PARAM_TEXT);
 $studentmenu = optional_param('student_menu', 'all_students', PARAM_TEXT);

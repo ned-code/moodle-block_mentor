@@ -28,37 +28,13 @@ $PAGE->requires->js('/blocks/fn_mentor/validation.js');
 class notification_form extends moodleform {
 
     public function definition() {
-        global $CFG, $DB, $USER, $COURSE, $OUTPUT;
 
         $mform =& $this->_form;
-
-        //$mform->setDefault('email',$this->_customdata['email']);
-
-        $g1 = 'block_fn_mentor_checkbox';
-        if (isset($this->_customdata['g1'])) {
-            if ($this->_customdata['g1']) {
-                $g1 = 'block_fn_mentor_checkbox_checked';
-            }
-        }
 
         $g2 = 'block_fn_mentor_checkbox';
         if (isset($this->_customdata['g2'])) {
             if ($this->_customdata['g2']) {
                 $g2 = 'block_fn_mentor_checkbox_checked';
-            }
-        }
-
-        $g3 = 'block_fn_mentor_checkbox';
-        if (isset($this->_customdata['g3'])) {
-            if ($this->_customdata['g3']) {
-                $g3 = 'block_fn_mentor_checkbox_checked';
-            }
-        }
-
-        $g3_value = '';
-        if (isset($this->_customdata['g3_value'])) {
-            if ($this->_customdata['g3_value'] >= 0) {
-                $g3_value = $this->_customdata['g3_value'];
             }
         }
 
@@ -73,20 +49,6 @@ class notification_form extends moodleform {
         if (isset($this->_customdata['g4_value'])) {
             if ($this->_customdata['g4_value'] >= 0) {
                 $g4_value = $this->_customdata['g4_value'];
-            }
-        }
-
-        $g5 = 'block_fn_mentor_checkbox';
-        if (isset($this->_customdata['g5'])) {
-            if ($this->_customdata['g5']) {
-                $g5 = 'block_fn_mentor_checkbox_checked';
-            }
-        }
-
-        $g5_value = '';
-        if (isset($this->_customdata['g5_value'])) {
-            if ($this->_customdata['g5_value']  >= 0) {
-                $g5_value = $this->_customdata['g5_value'];
             }
         }
 
@@ -132,24 +94,42 @@ class notification_form extends moodleform {
             }
         }
 
-        $teacher = 'block_fn_mentor_checkbox';
-        if (isset($this->_customdata['teacher'])) {
-            if ($this->_customdata['teacher']) {
-                $teacher = 'block_fn_mentor_checkbox_checked';
+        $teacheremail = 'block_fn_mentor_checkbox';
+        if (isset($this->_customdata['teacheremail'])) {
+            if ($this->_customdata['teacheremail']) {
+                $teacheremail = 'block_fn_mentor_checkbox_checked';
+            }
+        }
+        $teachersms = 'block_fn_mentor_checkbox';
+        if (isset($this->_customdata['teachersms'])) {
+            if ($this->_customdata['teachersms']) {
+                $teachersms = 'block_fn_mentor_checkbox_checked';
             }
         }
 
-        $student = 'block_fn_mentor_checkbox';
-        if (isset($this->_customdata['student'])) {
-            if ($this->_customdata['student']) {
-                $student = 'block_fn_mentor_checkbox_checked';
+        $studentemail = 'block_fn_mentor_checkbox';
+        if (isset($this->_customdata['studentemail'])) {
+            if ($this->_customdata['studentemail']) {
+                $studentemail = 'block_fn_mentor_checkbox_checked';
+            }
+        }
+        $studentsms = 'block_fn_mentor_checkbox';
+        if (isset($this->_customdata['studentsms'])) {
+            if ($this->_customdata['studentsms']) {
+                $studentsms = 'block_fn_mentor_checkbox_checked';
             }
         }
 
-        $mentor = 'block_fn_mentor_checkbox';
-        if (isset($this->_customdata['mentor'])) {
-            if ($this->_customdata['mentor']) {
-                $mentor = 'block_fn_mentor_checkbox_checked';
+        $mentoremail = 'block_fn_mentor_checkbox';
+        if (isset($this->_customdata['mentoremail'])) {
+            if ($this->_customdata['mentoremail']) {
+                $mentoremail = 'block_fn_mentor_checkbox_checked';
+            }
+        }
+        $mentorsms = 'block_fn_mentor_checkbox';
+        if (isset($this->_customdata['mentorsms'])) {
+            if ($this->_customdata['mentorsms']) {
+                $mentorsms = 'block_fn_mentor_checkbox_checked';
             }
         }
 
@@ -172,46 +152,79 @@ class notification_form extends moodleform {
 
         $table = new html_table();
         $table->attributes['class'] = 'notification';
-        $table->head = array('When and what to send', 'Who to send it to', 'How often to send');
-
 
         $c1 = new html_table_cell();
-        $c2 = new html_table_cell();
-        $c3 = new html_table_cell();
+        $c1->colspan = 2;
+        $c1->header = true;
+        $c1->text = get_string('whentosend', 'block_fn_mentor');
+        $table->data[] = new html_table_row(array( $c1));
+
+        $c1 = new html_table_cell();
+        $c1->colspan = 2;
 
         $c1->text = (
-            html_writer::tag('p', $g1('g1', 'g1', '_checkbox', 1) . ' Grade for all completed activities <G1>') .
-            html_writer::tag('p', $g2('g2', 'g2', '_checkbox', 1) . ' Grade for all available activities <G2>') .
-            html_writer::tag('p', $g3('g3', 'g3', '_checkbox', 1) . ' Grade below ' . block_fn_mentor_textinput('g3_value', 'g3_value', '_textinput', $g3_value) . ' % for all completed activities <G3>') .
-            html_writer::tag('p', $g4('g4', 'g4', '_checkbox', 1) . ' Grade below ' . block_fn_mentor_textinput('g4_value', 'g4_value', '_textinput', $g4_value) . ' % for all available activities <G4>') .
-            html_writer::tag('p', $g5('g5', 'g5', '_checkbox', 1) . ' Grade above ' . block_fn_mentor_textinput('g5_value', 'g5_value', '_textinput', $g5_value) . ' % for all completed activities <G5>') .
-            html_writer::tag('p', $g6('g6', 'g6', '_checkbox', 1) . ' Grade above ' . block_fn_mentor_textinput('g6_value', 'g6_value', '_textinput', $g6_value) . ' % for all available activities <G6>') .
+            //html_writer::tag('p', $g1('g1', 'g1', '_checkbox', 1) . ' Grade for all completed activities <G1>') .
+            html_writer::tag('p', $g2('g2', 'g2', '_checkbox', 1) . ' Course Grade') .
+            //html_writer::tag('p', $g3('g3', 'g3', '_checkbox', 1) . ' Grade below ' . block_fn_mentor_textinput('g3_value', 'g3_value', '_textinput', $g3_value) . ' % for all completed activities <G3>') .
+            html_writer::tag('p', $g4('g4', 'g4', '_checkbox', 1) . ' Course Grade below ' . block_fn_mentor_textinput('g4_value', 'g4_value', '_textinput', $g4_value) . ' %') .
+            //html_writer::tag('p', $g5('g5', 'g5', '_checkbox', 1) . ' Grade above ' . block_fn_mentor_textinput('g5_value', 'g5_value', '_textinput', $g5_value) . ' % for all completed activities <G5>') .
+            html_writer::tag('p', $g6('g6', 'g6', '_checkbox', 1) . ' Course Grade above ' . block_fn_mentor_textinput('g6_value', 'g6_value', '_textinput', $g6_value) . ' %') .
             html_writer::tag('p', $n1('n1', 'n1', '_checkbox', 1) . ' No login for ' . block_fn_mentor_textinput('n1_value', 'n1_value', '_textinput', $n1_value) . ' days <N1>') .
             html_writer::tag('p', $n2('n2', 'n2', '_checkbox', 1) . ' No activity for ' . block_fn_mentor_textinput('n2_value', 'n2_value', '_textinput', $n2_value) . ' days <N2>')
         );
 
-        $c2->text = (
-            html_writer::tag('p', $teacher('teacher', 'teacher', '_checkbox', 1) . ' Teacher') .
-            html_writer::tag('p', $mentor('mentor', 'mentor', '_checkbox', 1) . ' Mentor') .
-            html_writer::tag('p', $student('student', 'student', '_checkbox', 1) . ' Student')
+        $table->data[] = new html_table_row(array( $c1));
+
+        // Second row.
+        $c1 = new html_table_cell();
+        $c2 = new html_table_cell();
+        $c1->header = true;
+        $c2->header = true;
+        $c1->text = get_string('whotosend', 'block_fn_mentor');
+        $c2->text = get_string('howoften', 'block_fn_mentor');
+        $table->data[] = new html_table_row(array( $c1, $c2));
+
+
+        $c1 = new html_table_cell();
+        $c2 = new html_table_cell();
+
+        $c1->text = (
+            html_writer::tag('table',
+                html_writer::tag('tr',
+                    html_writer::tag('td', 'Teacher').
+                    html_writer::tag('td', $teacheremail('teacheremail', 'teacheremail', '_checkbox', 1) . ' Email').
+                    html_writer::tag('td', $teachersms('teachersms', 'teachersms', '_checkbox', 1) . ' SMS')
+                ).
+                html_writer::tag('tr',
+                    html_writer::tag('td', 'Mentor').
+                    html_writer::tag('td', $mentoremail('mentoremail', 'mentoremail', '_checkbox', 1) . ' Email').
+                    html_writer::tag('td', $mentorsms('mentorsms', 'mentorsms', '_checkbox', 1) . ' SMS')
+                ).
+                html_writer::tag('tr',
+                    html_writer::tag('td', 'Student').
+                    html_writer::tag('td', $studentemail('studentemail', 'studentemail', '_checkbox', 1) . ' Email').
+                    html_writer::tag('td', $studentsms('studentsms', 'studentsms', '_checkbox', 1) . ' SMS')
+                ),
+                array('class'=>'block_fn_mentor_whotosend')
+            )
         );
 
-        $c3->text = (
+        $c2->text = (
             html_writer::tag('p', 'Every ' . block_fn_mentor_textinput('period', 'period', '_textinput', $period) . ' days')
         );
 
-        $table->data[] = new html_table_row(array( $c1, $c2, $c3));
+        $table->data[] = new html_table_row(array( $c1, $c2));
 
         //Apply To Header
         $c1 = new html_table_cell();
-        $c1->colspan = 3;
+        $c1->colspan = 2;
         $c1->header = true;
         $c1->text = "Appended Message (optional)";
         $table->data[] = new html_table_row(array( $c1));
 
         //Apply To Header
         $c1 = new html_table_cell();
-        $c1->colspan = 3;
+        $c1->colspan = 2;
         $c1->style = 'text-align: center;';
 
         $appended_message = '';
@@ -227,13 +240,13 @@ class notification_form extends moodleform {
 
         //Apply To Header
         $c1 = new html_table_cell();
-        $c1->colspan = 3;
+        $c1->colspan = 2;
         $c1->header = true;
         $c1->text = "Apply to";
         $table->data[] = new html_table_row(array( $c1));
 
         $c1 = new html_table_cell();
-        $c1->colspan = 3;
+        $c1->colspan = 2;
 
         $categories = block_fn_mentor_get_course_category_tree();
 

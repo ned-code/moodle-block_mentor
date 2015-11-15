@@ -27,8 +27,6 @@ require_once($CFG->dirroot . '/course/lib.php');
 require_once($CFG->dirroot . '/blocks/fn_mentor/lib.php');
 require_once($CFG->libdir . '/completionlib.php');
 
-global $CFG, $DB, $OUTPUT, $PAGE, $COURSE;
-
 $USINGHTMLEDITOR = false;
 
 $id = required_param('id', PARAM_INT);      // course id

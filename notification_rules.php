@@ -26,8 +26,6 @@ require_once('../../config.php');
 require_once($CFG->dirroot . '/blocks/fn_mentor/lib.php');
 require_once($CFG->dirroot . '/blocks/fn_mentor/notificaton_form.php');
 
-global $CFG, $DB, $OUTPUT, $PAGE, $SITE;
-
 //Parameters
 $menteeid = optional_param('menteeid', NULL, PARAM_INT);
 $courseid = optional_param('courseid', NULL, PARAM_INT);
