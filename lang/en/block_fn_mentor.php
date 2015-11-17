@@ -152,3 +152,4 @@ $string['numofcomplete'] = 'Number of complete activities';
 $string['rule'] = 'Rule';
 $string['email'] = 'Email';
 $string['sms'] = 'Sms';
+$string['notenrolledanycourse'] = 'This student is not enrolled in any courses.';

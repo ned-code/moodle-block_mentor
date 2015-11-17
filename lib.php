@@ -623,72 +623,73 @@ function block_fn_mentor_grade_summary($studentid, $courseid=0) {
         $courses = block_fn_mentor_get_student_courses($studentid);
     }
 
-    foreach ($courses as $id => $value) {
+    if ($courses) {
+        foreach ($courses as $id => $value) {
 
-        $course = $DB->get_record('course', array('id'=>$id),  '*', MUST_EXIST);
+            $course = $DB->get_record('course', array('id' => $id), '*', MUST_EXIST);
 
-        /// Available modules for grading.
-        $mod_available = array(
-            'assign' => '1',
-            'quiz' => '1',
-            'assignment' => '1',
-            'forum' => '1',
-        );
+            /// Available modules for grading.
+            $mod_available = array(
+                'assign' => '1',
+                'quiz' => '1',
+                'assignment' => '1',
+                'forum' => '1',
+            );
 
-        $context = context_course::instance($course->id);
+            $context = context_course::instance($course->id);
 
-        /// Collect modules data
-        $mods = get_course_mods($course->id);
+            /// Collect modules data
+            $mods = get_course_mods($course->id);
 
-        //Skip some mods
-        foreach ($mods as $mod) {
-            if (!isset($mod_available[$mod->modname])) {
-                continue;
-            }
+            //Skip some mods
+            foreach ($mods as $mod) {
+                if (!isset($mod_available[$mod->modname])) {
+                    continue;
+                }
 
-            if ($mod->groupingid) {
-                $sql_grouiping = "SELECT 1
+                if ($mod->groupingid) {
+                    $sql_grouiping = "SELECT 1
                                     FROM {groupings_groups} gg
                               INNER JOIN {groups_members} gm
                                       ON gg.groupid = gm.groupid
                                    WHERE gg.groupingid = ?
                                      AND gm.userid = ?";
-                if (!$DB->record_exists_sql($sql_grouiping, array($mod->groupingid, $studentid))) {
+                    if (!$DB->record_exists_sql($sql_grouiping, array($mod->groupingid, $studentid))) {
+                        continue;
+                    }
+                }
+
+
+                if (!$grade_item = $DB->get_record('grade_items', array('itemtype' => 'mod', 'itemmodule' => $mod->modname, 'iteminstance' => $mod->instance))) {
                     continue;
                 }
-            }
 
+                $grade_total['all_max'] += $grade_item->grademax;
 
-            if (! $grade_item = $DB->get_record('grade_items', array('itemtype'=>'mod', 'itemmodule'=>$mod->modname, 'iteminstance'=>$mod->instance))) {
-                continue;
-            }
+                if ($grade_grade = $DB->get_record('grade_grades', array('itemid' => $grade_item->id, 'userid' => $studentid))) {
 
-            $grade_total['all_max'] += $grade_item->grademax;
-
-            if ($grade_grade = $DB->get_record('grade_grades', array('itemid'=>$grade_item->id, 'userid'=>$studentid))) {
-
-                if ($mod->modname == 'assign') {
-                    if ($assign_grades = $DB->get_records('assign_grades', array('assignment'=>$mod->instance, 'userid'=>$studentid), 'attemptnumber DESC')) {
-                        $assign_grade = reset($assign_grades);
-                        if ($assign_grade->grade >= 0) {
-                            //Graded
-                            $grade_total['attempted_grade'] += $grade_grade->finalgrade;
-                            $grade_total['attempted_max'] += $grade_item->grademax;
+                    if ($mod->modname == 'assign') {
+                        if ($assign_grades = $DB->get_records('assign_grades', array('assignment' => $mod->instance, 'userid' => $studentid), 'attemptnumber DESC')) {
+                            $assign_grade = reset($assign_grades);
+                            if ($assign_grade->grade >= 0) {
+                                //Graded
+                                $grade_total['attempted_grade'] += $grade_grade->finalgrade;
+                                $grade_total['attempted_max'] += $grade_item->grademax;
+                            }
                         }
+                    } else {
+                        //Graded
+                        $grade_total['attempted_grade'] += $grade_grade->finalgrade;
+                        $grade_total['attempted_max'] += $grade_item->grademax;
                     }
+
                 } else {
-                    //Graded
-                    $grade_total['attempted_grade'] += $grade_grade->finalgrade;
-                    $grade_total['attempted_max'] += $grade_item->grademax;
+                    //Ungraded
                 }
-
-            } else {
-                //Ungraded
             }
+
         }
-
     }
-
     if ($grade_total['attempted_max']) {
         $attempted = round(($grade_total['attempted_grade'] / $grade_total['attempted_max']) * 100);
     } else {
@@ -702,8 +703,10 @@ function block_fn_mentor_grade_summary($studentid, $courseid=0) {
 
     $data->attempted = $attempted;
     $data->all = $all;
-    foreach ($courses as $id => $value) {
-        $sqlcourseaverage = "SELECT gg.id,
+
+    if ($courses) {
+        foreach ($courses as $id => $value) {
+            $sqlcourseaverage = "SELECT gg.id,
                                 gg.rawgrademax,
                                 gg.finalgrade
                            FROM {grade_items} gi
@@ -712,11 +715,11 @@ function block_fn_mentor_grade_summary($studentid, $courseid=0) {
                           WHERE gi.itemtype = ?
                             AND gi.courseid = ?
                             AND gg.userid = ?";
-        if ($courseaverage = $DB->get_record_sql($sqlcourseaverage, array('course', $id, $studentid))) {
-            $coursegrades[$id] = ($courseaverage->finalgrade / $courseaverage->rawgrademax)*100;
+            if ($courseaverage = $DB->get_record_sql($sqlcourseaverage, array('course', $id, $studentid))) {
+                $coursegrades[$id] = ($courseaverage->finalgrade / $courseaverage->rawgrademax) * 100;
+            }
         }
     }
-
     if (count($coursegrades)) {
         $data->allcourseaverge = round(array_sum($coursegrades) / count($coursegrades));
     } else {
@@ -775,7 +778,7 @@ function block_fn_mentor_print_grade_summary ($courseid , $studentid) {
     $html .= '</tr>';
     $html .= '<tr>';
     $html .= '<td class="overview-grade-left" valign="middle">'.get_string('currentgrade', 'block_fn_mentor').':</td>';
-    $class = ($grade_summary->percentageofcompleted >= 50) ? 'green' : 'red';
+    $class = ($grade_summary->courseaverage >= 50) ? 'green' : 'red';
     $html .= '<td class="overview-grade-right '.$class.'" valign="middle">'.$grade_summary->courseaverage.'%</td>';
     $html .= '</tr>';
     $html .= '</table>';
@@ -1434,7 +1437,7 @@ function block_fn_mentor_send_notifications($notificationid=null, $output=false)
 
                     $context = context_course::instance($course->id);
 
-                    if ($students = get_role_users($studentroleid, $context)) {
+                    if ($students = get_role_users($studentroleid, $context, false, '', null, true, '', '', '', 'u.suspended=0')) {
                         foreach ($students as $student) {
 
                             $message = "";
