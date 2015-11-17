@@ -1659,8 +1659,12 @@ function block_fn_mentor_group_messages () {
                 $nid = $DB->insert_record('block_fn_mentor_notifica_msg', $rec);
 
                 $messageurl = new moodle_url('/blocks/fn_mentor/notification_message.php', array('id'=>$nid,'key'=>$rec->securitykey));
+
+                //test it out!
+                $new_url = get_tiny_url($messageurl->out(false));
+
                 $smsbody = get_string('progressreportfrom', 'block_fn_mentor', format_string($site->fullname))."\n".
-                           get_string('clickhere', 'block_fn_mentor', $messageurl->out(false));
+                           get_string('clickhere', 'block_fn_mentor', $new_url);
 
                 $sent = 0;
                 if ($to = $DB->get_record('user', array('id' => $group->receiverid))) {
@@ -1717,9 +1721,19 @@ function block_fn_mentor_sms_to_user ($user, $from, $subject, $messagetext, $mes
             $sms_provider = $sms_provider_array[1];
             $user->email = $smsnumber . $sms_provider;
 
-            email_to_user($user, $from, '', strip_tags($messagehtml), '');
+            return email_to_user($user, $from, '', strip_tags($messagehtml), '');
         }
 
     }
-    return true;
+    return false;
+}
+function get_tiny_url($url)  {
+    $ch = curl_init();
+    $timeout = 5;
+    curl_setopt($ch,CURLOPT_URL,'http://tinyurl.com/api-create.php?url='.$url);
+    curl_setopt($ch,CURLOPT_RETURNTRANSFER,1);
+    curl_setopt($ch,CURLOPT_CONNECTTIMEOUT,$timeout);
+    $data = curl_exec($ch);
+    curl_close($ch);
+    return $data;
 }
