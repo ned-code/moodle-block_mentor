@@ -1075,7 +1075,7 @@ function block_fn_mentor_render_notification_rule_table($notification, $number) 
 
     if ($notification->category){
         if ($categories = $DB->get_records_select('course_categories', 'id IN ('.$notification->category.')')) {
-            $html .= '<ul>';
+            $html .= '<ul class="fn-course-category">';
             foreach ($categories as $category) {
                 $html .= '<li>'.$category->name.'</li>';
             }
@@ -1437,9 +1437,11 @@ function block_fn_mentor_send_notifications($notificationid=null, $output=false)
 
                     $context = context_course::instance($course->id);
 
-                    if ($students = get_role_users($studentroleid, $context, false, '', null, true, '', '', '', 'u.suspended=0')) {
+                    if ($students = get_enrolled_users($context, 'mod/assign:submit', 0,'u.*', null, 0, 0, true)) {
                         foreach ($students as $student) {
-
+                            if ($student->suspended) {
+                                continue;
+                            }
                             $message = "";
                             $grade_summary = block_fn_mentor_grade_summary($student->id, $course->id);
                             $lastaccess = 0;
@@ -1609,6 +1611,7 @@ function block_fn_mentor_group_messages () {
                         n.sent
                    FROM {block_fn_mentor_notifica_msg} n
                   WHERE n.sent = 0
+                    AND n.type IN ('mentor', 'student', 'teacher')
                GROUP BY n.receiverid,
                         n.type,
                         n.notificationid,

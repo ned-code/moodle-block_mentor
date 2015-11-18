@@ -153,3 +153,4 @@ $string['rule'] = 'Rule';
 $string['email'] = 'Email';
 $string['sms'] = 'Sms';
 $string['notenrolledanycourse'] = 'This student is not enrolled in any courses.';
+$string['messagesprocessing'] = 'Messages are being processed.<br>Please wait for confirmation.';

@@ -38,6 +38,9 @@ require_capability('block/fn_mentor:createnotificationrule', context_system::ins
 $title = get_string('page_title_assign_mentor', 'block_fn_mentor');
 $heading = $SITE->fullname;
 
+$PAGE->requires->jquery();
+$PAGE->requires->js('/blocks/fn_mentor/js/selection.js');
+
 $PAGE->set_url('/blocks/fn_mentor/notification_send.php');
 $PAGE->set_pagelayout('course');
 $PAGE->set_context(context_system::instance());
@@ -61,7 +64,10 @@ if ($process) {
     echo $OUTPUT->footer();
 } else {
     echo $OUTPUT->header();
+    echo '<span class="fn-send-confirm">';
+    echo '<div id="notice" style="display: none" class="box generalbox notice2">'.get_string('messagesprocessing', 'block_fn_mentor').'<br><img style="margin-left: 60px;" src="'.$OUTPUT->pix_url('email3','block_fn_mentor').'"></div>';
     echo $OUTPUT->confirm(get_string('confirmsend', 'block_fn_mentor'),
         new moodle_url('/blocks/fn_mentor/notification_send.php', array('id' => $id, 'process' => 1)), '/blocks/fn_mentor/notification_rules.php');
+    echo '</span>';
     echo $OUTPUT->footer();
 }
