@@ -63,25 +63,26 @@ function xmldb_block_fn_mentor_upgrade($oldversion) {
         }
 
     }
-    if ($oldversion > 2015101000 && $oldversion <= 2015103000) {
-        $table = new xmldb_table('block_fn_mentor_notifica_msg');
-        $table->add_field("id", XMLDB_TYPE_INTEGER, '11', null, true, true);
-        $table->add_field("notificationid", XMLDB_TYPE_INTEGER, '11');
-        $table->add_field("type", XMLDB_TYPE_CHAR, '255');
-        $table->add_field("receiverid", XMLDB_TYPE_INTEGER, '11');
-        $table->add_field("userid", XMLDB_TYPE_INTEGER, '11');
-        $table->add_field("courseid", XMLDB_TYPE_INTEGER, '11');
-        $table->add_field("message", XMLDB_TYPE_TEXT);
-        $table->add_field("securitykey", XMLDB_TYPE_CHAR, '255');
-        $table->add_field("timecreated", XMLDB_TYPE_INTEGER, '11');
-        $table->add_field('sent', XMLDB_TYPE_INTEGER, '2',true, null,null,'1');
 
-        $table->add_key('id', XMLDB_KEY_PRIMARY, array('id'));
-        $table->add_index('notificationid_ix', XMLDB_INDEX_NOTUNIQUE, array('notificationid'));
+    // Create if not exists !
+    $table = new xmldb_table('block_fn_mentor_notifica_msg');
+    $table->add_field("id", XMLDB_TYPE_INTEGER, '11', null, true, true);
+    $table->add_field("notificationid", XMLDB_TYPE_INTEGER, '11');
+    $table->add_field("type", XMLDB_TYPE_CHAR, '255');
+    $table->add_field("receiverid", XMLDB_TYPE_INTEGER, '11');
+    $table->add_field("userid", XMLDB_TYPE_INTEGER, '11');
+    $table->add_field("courseid", XMLDB_TYPE_INTEGER, '11');
+    $table->add_field("message", XMLDB_TYPE_TEXT);
+    $table->add_field("securitykey", XMLDB_TYPE_CHAR, '255');
+    $table->add_field("timecreated", XMLDB_TYPE_INTEGER, '11');
+    $table->add_field('sent', XMLDB_TYPE_INTEGER, '2',true, null,null,'1');
 
-        if (!$dbman->table_exists($table)) {
-            $dbman->create_table($table);
-        }
+    $table->add_key('id', XMLDB_KEY_PRIMARY, array('id'));
+    $table->add_index('notificationid_ix', XMLDB_INDEX_NOTUNIQUE, array('notificationid'));
+
+    if (!$dbman->table_exists($table)) {
+        $dbman->create_table($table);
     }
+
     return true;
 }
