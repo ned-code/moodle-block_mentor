@@ -41,8 +41,6 @@ $heading = $SITE->fullname;
 $PAGE->requires->jquery();
 $PAGE->requires->js('/blocks/fn_mentor/js/selection.js');
 
-$PAGE->requires->css('/blocks/fn_mentor/css/styles.css');
-
 $PAGE->set_url('/blocks/fn_mentor/notification_send.php');
 $PAGE->set_pagelayout('course');
 $PAGE->set_context(context_system::instance());
@@ -61,27 +59,8 @@ if (($action == 'send') && ($id)) {
 if ($process) {
     $report = block_fn_mentor_send_notifications($notification_rule->id, true);
     echo $OUTPUT->header();
-
-    //echo $OUTPUT->confirm($report, new moodle_url('/blocks/fn_mentor/notification_rules.php'), '/blocks/fn_mentor/notification_rules.php');
-
-    $redirecturl = new moodle_url('/blocks/fn_mentor/notification_rules.php');
-
-    echo '<div class="box generalbox" id="notice">
-          <p>'.$report.'</p>
-          <div class="buttons">
-           <div class="singlebutton">
-              <form action="'.$redirecturl->out().'" method="post">
-                <div>
-                  <input type="hidden" value="'.sesskey().'" name="sesskey"/>
-                  <input class="singlebutton" type="submit" value="'.get_string('continue', 'block_fn_mentor').'"/>
-                </div>
-              </form>
-            </div>
-           </div>
-         </div>';
-
-
-
+    echo $OUTPUT->confirm($report,
+        new moodle_url('/blocks/fn_mentor/notification_rules.php'), '/blocks/fn_mentor/notification_rules.php');
     echo $OUTPUT->footer();
 } else {
     echo $OUTPUT->header();

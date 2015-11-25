@@ -59,14 +59,14 @@ class assign_mentor_form extends moodleform {
 
         $selectmentor->text =  html_writer::tag('div', get_config('block_fn_mentor','mentors'), array('class' => 'object_labels')) .
                                 html_writer::tag('div',
-                                    html_writer::select($mentormenu, '', '', null, array('id' => 'mentor_menu', 'class'=>'ignoredirty')).
-                                    html_writer::select($mentoroptions, '', '', null, array('id' => 'selectmentor', 'class'=>'ignoredirty', 'size' => 20))) .
+                                    html_writer::select($mentormenu, '', '', null, array('id' => 'mentor_menu')).
+                                    html_writer::select($mentoroptions, '', '', null, array('id' => 'selectmentor', 'size' => 20))) .
                                     $assignrolebutton;
 
         $selectmentee = new html_table_cell();
 
         $selectmentee->text =  html_writer::tag('div', get_config('block_fn_mentor','mentees'), array('class' => 'object_labels') ) .
-                                html_writer::tag('div', html_writer::select(array(), '', '', null, array('id' => 'selectmentee', 'class'=>'ignoredirty', 'multiple' => 'multiple', 'size' => 21)));
+                                html_writer::tag('div', html_writer::select(array(), '', '', null, array('id' => 'selectmentee', 'multiple' => 'multiple', 'size' => 21)));
 
 
         $embed = function ($text, $id) {
@@ -101,8 +101,8 @@ class assign_mentor_form extends moodleform {
         $selectstudent = new html_table_cell();
         $selectstudent->text =  html_writer::tag('div', get_string('students', 'block_fn_mentor'), array('class' => 'object_labels') ) .
                           html_writer::tag('div',
-                            html_writer::select($studentmenu, '', '', null, array('id' => 'student_menu', 'class'=>'ignoredirty')).
-                            html_writer::select($studentoptions, '', '', null, array('id' => 'selectstudent', 'class'=>'ignoredirty', 'multiple' => 'multiple', 'size' => 20))).
+                            html_writer::select($studentmenu, '', '', null, array('id' => 'student_menu')).
+                            html_writer::select($studentoptions, '', '', null, array('id' => 'selectstudent', 'multiple' => 'multiple', 'size' => 20))).
                           html_writer::tag('div',
                                        get_string('search', 'block_fn_mentor') .
                                        ' <input type="text" id="student_search" name="student_search">', array('id' => 'student_search_container'));

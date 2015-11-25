@@ -264,11 +264,7 @@ function block_fn_mentor_get_mentees($mentorid, $courseid=0, $studentids = ''){
 function block_fn_mentor_get_mentors($menteeid){
     global $DB, $CFG;
 
-    if (! $mentorroleid = get_config('block_fn_mentor', 'mentor_role_user')){
-        return false;
-    }
-
-    if (! $mentorsysroleid = get_config('block_fn_mentor', 'mentor_role_system')){
+    if (! $mentor_roleid = get_config('block_fn_mentor', 'mentor_role_user')){
         return false;
     }
 
@@ -277,22 +273,17 @@ function block_fn_mentor_get_mentors($menteeid){
                    u.firstname,
                    u.lastname,
                    u.lastaccess
-              FROM {context} ctx
-        INNER JOIN {role_assignments} ra
+              FROM mdl_context AS ctx
+        INNER JOIN mdl_role_assignments AS ra
                 ON ctx.id = ra.contextid
-        INNER JOIN {user} u
+        INNER JOIN mdl_user AS u
                 ON ra.userid = u.id
              WHERE ctx.contextlevel = ?
                AND ra.roleid = ?
                AND ctx.instanceid = ?
-               AND ra.userid IN (SELECT ra2.userid
-                                   FROM {role_assignments} ra2
-                             INNER JOIN {context} ctx2 ON ra2.contextid = ctx2.id
-                                  WHERE ra2.roleid = ?
-                                    AND ctx2.contextlevel = ?)
           ORDER BY u.lastname ASC";
 
-    return $DB->get_records_sql($sql, array(CONTEXT_USER, $mentorroleid, $menteeid, $mentorsysroleid,  CONTEXT_SYSTEM));
+    return $DB->get_records_sql($sql, array(CONTEXT_USER, $mentor_roleid, $menteeid ));
 
 }
 
@@ -321,8 +312,8 @@ function block_fn_mentor_isstudentinanycourse($userid=NULL) {
     }
     $studentrole = get_config('block_fn_mentor', 'studentrole');
     if ($DB->record_exists_sql("SELECT 1
-                                  FROM {context} ctx
-                            INNER JOIN {role_assignments} ra
+                                  FROM mdl_context AS ctx
+                            INNER JOIN mdl_role_assignments AS ra
                                     ON ctx.id = ra.contextid
                                  WHERE ctx.contextlevel = ?
                                    AND ra.roleid = ?
@@ -746,8 +737,8 @@ function block_fn_mentor_grade_summary($studentid, $courseid=0) {
 
         $sqlactivity = "SELECT gi.id,
                            gg.finalgrade
-                      FROM {grade_items} gi
-           LEFT OUTER JOIN {grade_grades} gg
+                      FROM mdl_grade_items AS gi
+           LEFT OUTER JOIN mdl_grade_grades AS gg
                         ON gi.id = gg.itemid
                      WHERE gi.courseid = ?
                        AND gi.itemtype = ?
@@ -1656,7 +1647,7 @@ function block_fn_mentor_group_messages () {
                     $appended_message = '<p>' . $notification->appended_message . '</p>';
                 }
                 $emailbody .= $appended_message . '<hr />';
-                $emailbody .= get_string('automatedmessage', 'block_fn_mentor', format_string($site->fullname));
+                $emailbody .= get_string('authomatedmessage', 'block_fn_mentor', format_string($site->fullname));
 
 
 
@@ -1687,7 +1678,7 @@ function block_fn_mentor_group_messages () {
                             $sent = 1;
                             $notificationreport .= $to->firstname . ' ' . $to->lastname . get_string('emailsent', 'block_fn_mentor') . '<br>';
                         } else {
-                            $notificationreport .= '<span class="fn_mentor_error">'.$to->firstname . ' ' . $to->lastname . get_string('emailerror', 'block_fn_mentor') . '</span>><br>';
+                            $notificationreport .= $to->firstname . ' ' . $to->lastname . get_string('emailerror', 'block_fn_mentor') . '<br>';
                         }
                     }
                     if ($notification->$smssent) {
@@ -1695,7 +1686,7 @@ function block_fn_mentor_group_messages () {
                             $sent = 1;
                             $notificationreport .= $to->firstname . ' ' . $to->lastname . get_string('smssent', 'block_fn_mentor') . '<br>';
                         } else {
-                            $notificationreport .= '<span class="fn_mentor_error">'.$to->firstname . ' ' . $to->lastname . get_string('smserror', 'block_fn_mentor') . '</span>><br>';
+                            $notificationreport .= $to->firstname . ' ' . $to->lastname . get_string('smserror', 'block_fn_mentor') . '<br>';
                         }
                     }
                     $rec->id = $nid;

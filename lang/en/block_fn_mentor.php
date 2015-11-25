@@ -114,7 +114,7 @@ $string['message_header'] = 'Progress Report from <strong>{$a->sitename}</strong
 Student:  <strong>{$a->studentname}</strong> <br />
 Affected Courses: <strong>{$a->coursename}</strong> <br /><br /><hr />';
 $string['linktomentorpage'] = 'Link to online report: <a href="{$a}">{$a}</a>';
-$string['automatedmessage'] = 'This is an automated message from {$a}. Please do not reply to this message';
+$string['authomatedmessage'] = 'This is an authomated message from {$a}. Please do not reply to this message';
 $string['manage_mentors'] = 'Manage Mentors';
 $string['appended_message'] = 'Appended Message';
 $string['notes'] = 'Notes';
@@ -154,4 +154,3 @@ $string['email'] = 'Email';
 $string['sms'] = 'Sms';
 $string['notenrolledanycourse'] = 'This student is not enrolled in any courses.';
 $string['messagesprocessing'] = 'Messages are being processed.<br>Please wait for confirmation.';
-$string['continue'] = 'Continue';
