@@ -1687,15 +1687,16 @@ function block_fn_mentor_group_messages () {
                             $sent = 1;
                             $notificationreport .= $to->firstname . ' ' . $to->lastname . get_string('emailsent', 'block_fn_mentor') . '<br>';
                         } else {
-                            $notificationreport .= '<span class="fn_mentor_error">'.$to->firstname . ' ' . $to->lastname . get_string('emailerror', 'block_fn_mentor') . '</span>><br>';
+                            $notificationreport .= '<span class="fn_mentor_error">'.$to->firstname . ' ' . $to->lastname . get_string('emailerror', 'block_fn_mentor') . '</span><br>';
                         }
                     }
+
                     if ($notification->$smssent) {
                         if (block_fn_mentor_sms_to_user($to, $supportuser, $subject, '', $smsbody)) {
                             $sent = 1;
                             $notificationreport .= $to->firstname . ' ' . $to->lastname . get_string('smssent', 'block_fn_mentor') . '<br>';
                         } else {
-                            $notificationreport .= '<span class="fn_mentor_error">'.$to->firstname . ' ' . $to->lastname . get_string('smserror', 'block_fn_mentor') . '</span>><br>';
+                            $notificationreport .= '<span class="fn_mentor_error">'.$to->firstname . ' ' . $to->lastname . get_string('smserror', 'block_fn_mentor') . '</span><br>';
                         }
                     }
                     $rec->id = $nid;
@@ -1709,7 +1710,6 @@ function block_fn_mentor_group_messages () {
 }
 
 function block_fn_mentor_sms_to_user ($user, $from, $subject, $messagetext, $messagehtml = '') {
-
     global $DB;
 
     $sqlphonenumber = "SELECT t1.shortname, t2.data
@@ -1733,7 +1733,7 @@ function block_fn_mentor_sms_to_user ($user, $from, $subject, $messagetext, $mes
             $sms_provider = $sms_provider_array[1];
             $user->email = $smsnumber . $sms_provider;
 
-            return email_to_user($user, $from, '', strip_tags($messagehtml), '');
+            return email_to_user($user, $from, get_string('notification', 'block_fn_mentor'), strip_tags($messagehtml), '');
         }
 
     }

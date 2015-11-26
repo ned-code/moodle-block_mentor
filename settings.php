@@ -25,7 +25,14 @@
 defined('MOODLE_INTERNAL') || die();
 
 $settings->add(new admin_setting_configtext('block_fn_mentor/blockname', get_string('blockname', 'block_fn_mentor'), '', get_string('pluginname', 'block_fn_mentor')));
-$settings->add(new admin_setting_configtext('block_fn_mentor/pagelayout', get_string('pagelayout', 'block_fn_mentor'), '','course'));
+
+$themeconfig = theme_config::load($CFG->theme);
+$layouts = array();
+foreach (array_keys($themeconfig->layouts) as $layout) {
+    $layouts[$layout] = $layout;
+}
+
+$settings->add(new admin_setting_configselect('block_fn_mentor/pagelayout', get_string('pagelayout', 'block_fn_mentor'), '','course', $layouts));
 
 $settings->add(new admin_setting_configtext('block_fn_mentor/mentor', get_string('wordformentor', 'block_fn_mentor'), '', get_string('mentor', 'block_fn_mentor')));
 $settings->add(new admin_setting_configtext('block_fn_mentor/mentors', get_string('wordformentors', 'block_fn_mentor'), '', get_string('mentors', 'block_fn_mentor')));
