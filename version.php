@@ -24,7 +24,7 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2015112600;
+$plugin->version   = 2015112601;
 $plugin->requires  = 2013051400;
 $plugin->component = 'block_fn_mentor';
 $plugin->cron = 30;

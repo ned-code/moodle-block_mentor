@@ -27,6 +27,7 @@ $string['fn_mentor:myaddinstance'] = 'Add a Mentors Mentees block to my moodle';
 $string['fn_mentor:assignmentor'] = 'Assign mentor';
 $string['fn_mentor:createnotificationrule'] = 'Create notification rule';
 $string['fn_mentor:viewcoursenotes'] = 'View course notes';
+$string['fn_mentor:viewactivitylist'] = 'View activity list';
 $string['pluginname'] = 'Mentors Mentees';
 $string['blockname'] = 'Block name';
 $string['wordformentor'] = 'Word for Mentor';

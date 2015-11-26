@@ -45,10 +45,10 @@ if (!$course = $DB->get_record("course", array("id" => $id))) {
 
 require_login();
 $context = context_course::instance($course->id);
-$istudent = has_capability('mod/assignment:submit', $context, null, false);
+$canview = has_capability('block/fn_mentor:viewactivitylist', $context);
 $PAGE->set_context($context);
 
-if ($istudent) {
+if (!$canview) {
     print_error("Students can not use this page!");
 }
 
