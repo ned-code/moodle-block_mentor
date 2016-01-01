@@ -29,12 +29,16 @@ function block_fn_mentor_get_all_students($filter = ''){
 
     $studentrole = get_config('block_fn_mentor', 'studentrole');
 
+    $params = array(0, 0, $studentrole);
     $wherecondions = '';
 
     if ($filter) {
         $wherecondions .= " AND (u.firstname LIKE '%".$filter."%'
                             OR u.lastname LIKE '%".$filter."%'
                             OR u.email LIKE '%".$filter."%')";
+        $params[] = "%".$filter."%";
+        $params[] = "%".$filter."%";
+        $params[] = "%".$filter."%";
     }
 
     $sql = "SELECT DISTINCT u.id,
@@ -49,7 +53,7 @@ function block_fn_mentor_get_all_students($filter = ''){
                         $wherecondions
                    ORDER BY u.lastname ASC";
 
-    $everyone = $DB->get_records_sql($sql, array(0, 0, $studentrole));
+    $everyone = $DB->get_records_sql($sql, $params);
 
     return $everyone;
 }
@@ -62,13 +66,17 @@ function block_fn_mentor_get_students_without_mentor($filter = ''){
     }
 
     $studentrole = get_config('block_fn_mentor', 'studentrole');
+    $params = array(0, 0, $studentrole);
 
     $wherecondions = '';
 
     if ($filter) {
         $wherecondions .= " AND (u.firstname LIKE '%".$filter."%'
-                        OR u.lastname LIKE '%".$filter."%'
-                        OR u.email LIKE '%".$filter."%')";
+                            OR u.lastname LIKE '%".$filter."%'
+                            OR u.email LIKE '%".$filter."%')";
+        $params[] = "%".$filter."%";
+        $params[] = "%".$filter."%";
+        $params[] = "%".$filter."%";
     }
 
     $sql = "SELECT DISTINCT u.id,
@@ -83,7 +91,7 @@ function block_fn_mentor_get_students_without_mentor($filter = ''){
                         $wherecondions
                    ORDER BY u.lastname ASC";
 
-    $everyone = $DB->get_records_sql($sql, array(0, 0, $studentrole));
+    $everyone = $DB->get_records_sql($sql, $params);
 
     $sql_mentor = "SELECT ra.id,
                           ra.userid AS mentorid,

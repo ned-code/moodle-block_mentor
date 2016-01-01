@@ -44,12 +44,23 @@ $data['message'] = '';
 // PERMISSION.
 if ( has_capability('block/fn_mentor:assignmentor', context_system::instance(), $USER->id)) {
 
+    $studentlist = explode(',', $studentids);
+
+    foreach( $studentlist as $key => $value) {
+        $studentlist[$key] = (int) $value;
+        if( $studentlist[$key] != $value ) {
+            unset($studentlist[$key]);
+        }
+    }
+
+    list($insql, $params) = $DB->get_in_or_equal($studentlist);
+
     switch ($action) {
         case 'add':
             $mentorrole = get_config('block_fn_mentor', 'mentor_role_user');
 
-            $sqlusers = "SELECT u.id FROM {user} u WHERE id IN ($studentids)";
-            $users = $DB->get_records_sql($sqlusers);
+            $sqlusers = "SELECT u.id FROM {user} u WHERE id $insql";
+            $users = $DB->get_records_sql($sqlusers, $params);
 
             if ($mentorrole && $mentorid) {
                 foreach ($users as $user) {
@@ -65,8 +76,8 @@ if ( has_capability('block/fn_mentor:assignmentor', context_system::instance(), 
         case 'remove':
             $mentorrole = get_config('block_fn_mentor', 'mentor_role_user');
 
-            $sqlusers = "SELECT u.id FROM {user} u WHERE id IN ($studentids)";
-            $users = $DB->get_records_sql($sqlusers);
+            $sqlusers = "SELECT u.id FROM {user} u WHERE id $insql";
+            $users = $DB->get_records_sql($sqlusers, $params);
 
             if ($mentorrole && $mentorid) {
                 foreach ($users as $user) {

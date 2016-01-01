@@ -186,7 +186,7 @@ class block_fn_mentor extends block_base {
                                     array('id'=>'sortbyForm', 'name'=>'jump1'));
         }
         // COURSE.
-        if (($isteacher || $isadmin || $ismentor) && $courses) {
+        if (($isteacher || $isadmin || $ismentor) && $courses && ($this->page->course->id == SITEID)) {
             $this->content->text .= html_writer::tag('form',
                                         get_string('course', 'block_fn_mentor') . ' ' .
                                         html_writer::select($coursemenu, 'coursefilter', $courseURL[$coursefilter], null, array('onChange' => 'location=document.jump2.coursefilter.options[document.jump2.coursefilter.selectedIndex].value;')),

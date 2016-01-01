@@ -31,7 +31,7 @@ global $CFG, $DB, $OUTPUT, $PAGE, $COURSE;
 
 $action   = optional_param('action', false, PARAM_TEXT);
 $mentorid = optional_param('mentorid', 0, PARAM_INT);
-$filter = optional_param('filter', '', PARAM_RAW);
+$filter   = optional_param('filter', '', PARAM_TEXT);
 
 confirm_sesskey();
 
