@@ -28,5 +28,5 @@ $plugin->version   = 2015123100;
 $plugin->requires  = 2013051400;
 $plugin->component = 'block_fn_mentor';
 $plugin->cron = 30;
-$plugin->release = '2.9b';
+$plugin->release = '2.9d';
 $plugin->maturity = MATURITY_STABLE;
