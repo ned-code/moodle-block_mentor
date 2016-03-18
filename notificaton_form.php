@@ -149,7 +149,6 @@ class notification_form extends moodleform {
         $mform->addElement('text', 'name', get_string('rule_name', 'block_fn_mentor')); // Add elements to your form
         $mform->setType('name', PARAM_NOTAGS);
 
-
         $table = new html_table();
         $table->attributes['class'] = 'notification';
 
@@ -163,11 +162,11 @@ class notification_form extends moodleform {
         $c1->colspan = 2;
 
         $c1->text = (
-            //html_writer::tag('p', $g1('g1', 'g1', '_checkbox', 1) . ' Grade for all completed activities <G1>') .
+            // html_writer::tag('p', $g1('g1', 'g1', '_checkbox', 1) . ' Grade for all completed activities <G1>') .
             html_writer::tag('p', $g2('g2', 'g2', '_checkbox', 1) . ' Course Grade') .
-            //html_writer::tag('p', $g3('g3', 'g3', '_checkbox', 1) . ' Grade below ' . block_fn_mentor_textinput('g3_value', 'g3_value', '_textinput', $g3_value) . ' % for all completed activities <G3>') .
+            // html_writer::tag('p', $g3('g3', 'g3', '_checkbox', 1) . ' Grade below ' . block_fn_mentor_textinput('g3_value', 'g3_value', '_textinput', $g3_value) . ' % for all completed activities <G3>') .
             html_writer::tag('p', $g4('g4', 'g4', '_checkbox', 1) . ' Course Grade below ' . block_fn_mentor_textinput('g4_value', 'g4_value', '_textinput', $g4_value) . ' %') .
-            //html_writer::tag('p', $g5('g5', 'g5', '_checkbox', 1) . ' Grade above ' . block_fn_mentor_textinput('g5_value', 'g5_value', '_textinput', $g5_value) . ' % for all completed activities <G5>') .
+            // html_writer::tag('p', $g5('g5', 'g5', '_checkbox', 1) . ' Grade above ' . block_fn_mentor_textinput('g5_value', 'g5_value', '_textinput', $g5_value) . ' % for all completed activities <G5>') .
             html_writer::tag('p', $g6('g6', 'g6', '_checkbox', 1) . ' Course Grade above ' . block_fn_mentor_textinput('g6_value', 'g6_value', '_textinput', $g6_value) . ' %') .
             html_writer::tag('p', $n1('n1', 'n1', '_checkbox', 1) . ' No login for ' . block_fn_mentor_textinput('n1_value', 'n1_value', '_textinput', $n1_value) . ' days <N1>') .
             html_writer::tag('p', $n2('n2', 'n2', '_checkbox', 1) . ' No activity for ' . block_fn_mentor_textinput('n2_value', 'n2_value', '_textinput', $n2_value) . ' days <N2>')
@@ -183,7 +182,6 @@ class notification_form extends moodleform {
         $c1->text = get_string('whotosend', 'block_fn_mentor');
         $c2->text = get_string('howoften', 'block_fn_mentor');
         $table->data[] = new html_table_row(array( $c1, $c2));
-
 
         $c1 = new html_table_cell();
         $c2 = new html_table_cell();
@@ -205,7 +203,7 @@ class notification_form extends moodleform {
                     html_writer::tag('td', $studentemail('studentemail', 'studentemail', '_checkbox', 1) . ' Email').
                     html_writer::tag('td', $studentsms('studentsms', 'studentsms', '_checkbox', 1) . ' SMS')
                 ),
-                array('class'=>'block_fn_mentor_whotosend')
+                array('class' => 'block_fn_mentor_whotosend')
             )
         );
 
@@ -215,14 +213,14 @@ class notification_form extends moodleform {
 
         $table->data[] = new html_table_row(array( $c1, $c2));
 
-        //Apply To Header
+        // Apply To Header
         $c1 = new html_table_cell();
         $c1->colspan = 2;
         $c1->header = true;
         $c1->text = "Appended Message (optional)";
         $table->data[] = new html_table_row(array( $c1));
 
-        //Apply To Header
+        // Apply To Header
         $c1 = new html_table_cell();
         $c1->colspan = 2;
         $c1->style = 'text-align: center;';
@@ -237,8 +235,7 @@ class notification_form extends moodleform {
                     '</textarea>';
         $table->data[] = new html_table_row(array( $c1));
 
-
-        //Apply To Header
+        // Apply To Header
         $c1 = new html_table_cell();
         $c1->colspan = 2;
         $c1->header = true;
@@ -250,11 +247,9 @@ class notification_form extends moodleform {
 
         $categories = block_fn_mentor_get_course_category_tree();
 
-
-
         $c1->text = block_fn_mentor_category_tree_form($categories,
-                                       (isset($this->_customdata['category']))?$this->_customdata['category']:'',
-                                       (isset($this->_customdata['course']))?$this->_customdata['course']:'');
+                                       (isset($this->_customdata['category'])) ? $this->_customdata['category'] : '',
+                                       (isset($this->_customdata['course'])) ? $this->_customdata['course'] : '');
         $table->data[] = new html_table_row(array( $c1));
 
         $mform->addElement('static', 'selectors', '', html_writer::table($table));

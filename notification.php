@@ -26,17 +26,17 @@ require_once('../../config.php');
 require_once($CFG->dirroot . '/blocks/fn_mentor/lib.php');
 require_once($CFG->dirroot . '/blocks/fn_mentor/notificaton_form.php');
 
-//Parameters
+// Parameters
 $id       = optional_param('id', 0, PARAM_INT);
 $action   = optional_param('action', 'add', PARAM_TEXT);
 
 require_login();
 
-//PERMISSION
-//require_capability('local/fn_mentor:view', context_system::instance(), $USER->id);
+// PERMISSION
+// require_capability('local/fn_mentor:view', context_system::instance(), $USER->id);
 
 if (($action == 'edit') && ($id)) {
-    $notification_rule = $DB->get_record('block_fn_mentor_notification',array('id'=>$id),'*',MUST_EXIST);
+    $notification_rule = $DB->get_record('block_fn_mentor_notification',array('id' => $id),'*',MUST_EXIST);
 }
 
 $title = get_string('page_title_assign_mentor', 'block_fn_mentor');
@@ -67,12 +67,12 @@ if ($action == 'edit') {
 }
 $parameters['action'] = $action;
 
-$mform = new notification_form(NUll, $parameters, 'post', '', array('id'=>'notification_form', 'class'=>'notification_form'));
+$mform = new notification_form(null, $parameters, 'post', '', array('id' => 'notification_form', 'class' => 'notification_form'));
 
 if ($mform->is_cancelled()) {
 
     redirect(new moodle_url('/blocks/fn_mentor/notification_rules.php'), get_string('successful', 'block_fn_mentor'));
-// Get form data
+    // Get form data
 } else if ($fromform = $mform->get_data()) {
 
     foreach ($_POST as $key => $value) {
@@ -85,15 +85,17 @@ if ($mform->is_cancelled()) {
                 $fromform->course[] = $value;
             }
         } else {
-           $fromform->$key = $value;
+            $fromform->$key = $value;
         }
     }
 
-    if (isset($fromform->category))
+    if (isset($fromform->category)) {
         $fromform->category = implode(',', $fromform->category);
+    }
 
-    if (isset($fromform->course))
+    if (isset($fromform->course)) {
         $fromform->course = implode(',', $fromform->course);
+    }
 
     $rec = new stdClass();
     $rec->timecreated = time();
@@ -106,7 +108,7 @@ if ($mform->is_cancelled()) {
                     'studentemail','studentsms','teacheremail','teachersms','appended_message');
 
     foreach ($fields as $field) {
-        $rec->$field = (isset($fromform->$field)) ? $fromform->$field : NULL;
+        $rec->$field = (isset($fromform->$field)) ? $fromform->$field : null;
     }
 
     if (($action == 'edit') && ($id)) {
@@ -117,19 +119,19 @@ if ($mform->is_cancelled()) {
 
         redirect(new moodle_url('/blocks/fn_mentor/notification_rules.php'), get_string('successful', 'block_fn_mentor'));
 
-    } elseif ($id = $DB->insert_record('block_fn_mentor_notification', $rec)) {
+    } else if ($id = $DB->insert_record('block_fn_mentor_notification', $rec)) {
         redirect(new moodle_url('/blocks/fn_mentor/notification_rules.php'), get_string('successful', 'block_fn_mentor'));
     }
 
 } else {
 
-  $toform = new stdClass();
-  $toform->action = $action;
-  $toform->id = $id;
+    $toform = new stdClass();
+    $toform->action = $action;
+    $toform->id = $id;
 
-  if ($action == 'edit') {
-    $toform->name = $notification_rule->name;
-  }
+    if ($action == 'edit') {
+        $toform->name = $notification_rule->name;
+    }
 }
 echo $OUTPUT->header();
 $mform->set_data($toform);

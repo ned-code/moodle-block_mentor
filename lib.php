@@ -24,7 +24,7 @@
 
 require_once ($CFG->dirroot.'/mod/assignment/lib.php');
 
-function block_fn_mentor_get_all_students($filter = ''){
+function block_fn_mentor_get_all_students($filter = '') {
     global $DB, $CFG;
 
     $studentrole = get_config('block_fn_mentor', 'studentrole');
@@ -58,7 +58,7 @@ function block_fn_mentor_get_all_students($filter = ''){
     return $everyone;
 }
 
-function block_fn_mentor_get_students_without_mentor($filter = ''){
+function block_fn_mentor_get_students_without_mentor($filter = '') {
     global $DB, $CFG;
 
     if (! $mentor_roleid = get_config('block_fn_mentor', 'mentor_role_user')){
@@ -115,7 +115,7 @@ function block_fn_mentor_get_students_without_mentor($filter = ''){
     return $students_without_mentor;
 }
 
-function block_fn_mentor_get_mentors_without_mentee(){
+function block_fn_mentor_get_mentors_without_mentee() {
     global $DB, $CFG;
 
     if (! $mentor_roleid = get_config('block_fn_mentor', 'mentor_role_system')){
@@ -134,7 +134,7 @@ function block_fn_mentor_get_mentors_without_mentee(){
 
     $everyone = $DB->get_records_sql($sql, array(0, 0, $mentor_roleid));
 
-     if (! $mentor_roleid_user = get_config('block_fn_mentor', 'mentor_role_user')){
+    if (! $mentor_roleid_user = get_config('block_fn_mentor', 'mentor_role_user')){
         return false;
     }
 
@@ -160,7 +160,7 @@ function block_fn_mentor_get_mentors_without_mentee(){
     return $mentors_without_mentee;
 }
 
-function block_fn_mentor_get_all_mentees($studentids=''){
+function block_fn_mentor_get_all_mentees($studentids='') {
     global $DB, $CFG;
 
     if (! $mentor_roleid = get_config('block_fn_mentor', 'mentor_role_user')){
@@ -195,7 +195,7 @@ function block_fn_mentor_get_all_mentees($studentids=''){
     return $stu_with_mentor;
 }
 
-function block_fn_mentor_get_all_mentors(){
+function block_fn_mentor_get_all_mentors() {
     global $DB, $CFG;
 
     if (! $mentor_roleid = get_config('block_fn_mentor', 'mentor_role_system')){
@@ -217,7 +217,7 @@ function block_fn_mentor_get_all_mentors(){
     return $everyone;
 }
 
-function block_fn_mentor_get_mentees($mentorid, $courseid=0, $studentids = ''){
+function block_fn_mentor_get_mentees($mentorid, $courseid=0, $studentids = '') {
     global $DB, $CFG;
 
     if (! $mentor_roleid = get_config('block_fn_mentor', 'mentor_role_user')){
@@ -255,7 +255,7 @@ function block_fn_mentor_get_mentees($mentorid, $courseid=0, $studentids = ''){
                AND ctx.contextlevel = ?
           ORDER BY u.lastname ASC";
 
-    $mentees =  $DB->get_records_sql($sql, array($mentor_roleid, $mentorid, CONTEXT_USER));
+    $mentees = $DB->get_records_sql($sql, array($mentor_roleid, $mentorid, CONTEXT_USER));
 
     if ($course_students) {
         $mentees = array_intersect_key($mentees, $course_students);
@@ -269,7 +269,7 @@ function block_fn_mentor_get_mentees($mentorid, $courseid=0, $studentids = ''){
 
 }
 
-function block_fn_mentor_get_mentors($menteeid){
+function block_fn_mentor_get_mentors($menteeid) {
     global $DB, $CFG;
 
     if (! $mentorroleid = get_config('block_fn_mentor', 'mentor_role_user')){
@@ -304,7 +304,7 @@ function block_fn_mentor_get_mentors($menteeid){
 
 }
 
-function block_fn_mentor_isteacherinanycourse($userid=NULL) {
+function block_fn_mentor_isteacherinanycourse($userid=null) {
     global $DB, $CFG, $USER;
 
     if (! $userid) {
@@ -313,7 +313,7 @@ function block_fn_mentor_isteacherinanycourse($userid=NULL) {
     /// If this user is assigned as an editing teacher anywhere then return true
     if ($roles = get_roles_with_capability('moodle/course:update', CAP_ALLOW)) {
         foreach ($roles as $role) {
-            if ($DB->record_exists('role_assignments', array('roleid' =>$role->id, 'userid' => $userid))) {
+            if ($DB->record_exists('role_assignments', array('roleid' => $role->id, 'userid' => $userid))) {
                 return true;
             }
         }
@@ -321,7 +321,7 @@ function block_fn_mentor_isteacherinanycourse($userid=NULL) {
     return false;
 }
 
-function block_fn_mentor_isstudentinanycourse($userid=NULL) {
+function block_fn_mentor_isstudentinanycourse($userid=null) {
     global $DB, $CFG, $USER;
 
     if (! $userid) {
@@ -350,11 +350,11 @@ function block_fn_mentor_has_system_role($userid, $roleid) {
                AND ctx.contextlevel = :contextlevel
                AND ra.userid = :userid";
 
-    return $DB->record_exists_sql($sql, array('rolename'=>$roleid, 'contextlevel'=>CONTEXT_SYSTEM, 'userid'=>$userid));
+    return $DB->record_exists_sql($sql, array('rolename' => $roleid, 'contextlevel' => CONTEXT_SYSTEM, 'userid' => $userid));
 
 }
 
-//Mentees by Mentor
+// Mentees by Mentor
 function block_fn_mentor_get_mentees_by_mentor($courseid=0, $filter='') {
     global $DB, $CFG, $USER;
 
@@ -409,11 +409,11 @@ function block_fn_mentor_render_mentees_by_mentor($data) {
             $grade_summary = block_fn_mentor_grade_summary($mentee->studentid, $coursefilter);
             if (($grade_summary->attempted >= 50) && ($grade_summary->all >= 50)) {
                 $mentee_icon = 'mentee_green.png';
-            } elseif (($grade_summary->attempted >= 50) && ($grade_summary->all < 50)) {
+            } else if (($grade_summary->attempted >= 50) && ($grade_summary->all < 50)) {
                 $mentee_icon = 'mentee_red_green.png';
-            } elseif (($grade_summary->attempted < 50) && ($grade_summary->all >= 50)) {
+            } else if (($grade_summary->attempted < 50) && ($grade_summary->all >= 50)) {
                 $mentee_icon = 'mentee_red_green.png';
-            } elseif (($grade_summary->attempted < 50) && ($grade_summary->all < 50)) {
+            } else if (($grade_summary->attempted < 50) && ($grade_summary->all < 50)) {
                 $mentee_icon = 'mentee_red.png';
             }
             $html .= '<div class="mentee"><img class="mentee-img" src="'.$CFG->wwwroot.'/blocks/fn_mentor/pix/'.$mentee_icon.'"><a href="'.$CFG->wwwroot.'/blocks/fn_mentor/course_overview.php?menteeid='.$mentee->studentid.'" >' .$mentee->firstname . ' ' . $mentee->lastname . '</a></div>';
@@ -422,7 +422,7 @@ function block_fn_mentor_render_mentees_by_mentor($data) {
     return $html;
 }
 
-//Mentors by Mentee
+// Mentors by Mentee
 function block_fn_mentor_get_mentors_by_mentee($courseid=0, $filter='') {
     global $DB, $CFG;
 
@@ -457,14 +457,14 @@ function block_fn_mentor_render_mentors_by_mentee($data) {
     foreach ($data as $mentee) {
 
         $grade_summary = block_fn_mentor_grade_summary($mentee['mentee']->studentid, $coursefilter);
-        //print_r($grade_summary);die;
+        // print_r($grade_summary);die;
         if (($grade_summary->attempted >= 50) && ($grade_summary->all >= 50)) {
             $mentee_icon = 'mentee_green.png';
-        } elseif (($grade_summary->attempted >= 50) && ($grade_summary->all < 50)) {
+        } else if (($grade_summary->attempted >= 50) && ($grade_summary->all < 50)) {
             $mentee_icon = 'mentee_red_green.png';
-        } elseif (($grade_summary->attempted < 50) && ($grade_summary->all >= 50)) {
+        } else if (($grade_summary->attempted < 50) && ($grade_summary->all >= 50)) {
             $mentee_icon = 'mentee_red_green.png';
-        } elseif (($grade_summary->attempted < 50) && ($grade_summary->all < 50)) {
+        } else if (($grade_summary->attempted < 50) && ($grade_summary->all < 50)) {
             $mentee_icon = 'mentee_red.png';
         }
 
@@ -486,7 +486,7 @@ function block_fn_mentor_render_mentees_by_student($menteeid) {
 
     $html = '';
 
-    $mentee = $DB->get_record('user', array('id'=>$menteeid));
+    $mentee = $DB->get_record('user', array('id' => $menteeid));
 
     if ($mentors = block_fn_mentor_get_mentors($menteeid)) {
         $html .= '<div class="mentee">
@@ -524,7 +524,7 @@ function block_fn_mentor_assignment_status($mod, $userid) {
 
         switch ($assignment->assignmenttype) {
             case "upload":
-                if($assignment->var4){ //if var4 enable then assignment can be saved
+                if($assignment->var4){ // if var4 enable then assignment can be saved
                     if(!empty($submission->timemodified)
                             && (empty($submission->data2))
                             && (empty($submission->timemarked))){
@@ -532,13 +532,13 @@ function block_fn_mentor_assignment_status($mod, $userid) {
 
                     }
                     else if(!empty($submission->timemodified)
-                            && ($submission->data2='submitted')
+                            && ($submission->data2 = 'submitted')
                             && empty($submission->timemarked)){
                         return 'submitted';
                     }
                     else if(!empty($submission->timemodified)
-                            && ($submission->data2='submitted')
-                            && ($submission->grade==-1)){
+                            && ($submission->data2 = 'submitted')
+                            && ($submission->grade == -1)){
                         return 'submitted';
 
                     }
@@ -568,7 +568,7 @@ function block_fn_mentor_assignment_status($mod, $userid) {
             return false; // Doesn't exist
         }
 
-        if (!$submission = $DB->get_records('assign_submission', array('assignment'=>$assignment->id, 'userid'=>$userid), 'attemptnumber DESC', '*', 0, 1)) {
+        if (!$submission = $DB->get_records('assign_submission', array('assignment' => $assignment->id, 'userid' => $userid), 'attemptnumber DESC', '*', 0, 1)) {
             return false;
         }else{
             $submission = reset($submission);
@@ -580,10 +580,10 @@ function block_fn_mentor_assignment_status($mod, $userid) {
             $attemptnumber = $submission->attemptnumber - 1;
         }
 
-        if ($submissionisgraded = $DB->get_records('assign_grades', array('assignment'=>$assignment->id, 'userid'=>$userid, 'attemptnumber' => $attemptnumber), 'attemptnumber DESC', '*', 0, 1)) {
+        if ($submissionisgraded = $DB->get_records('assign_grades', array('assignment' => $assignment->id, 'userid' => $userid, 'attemptnumber' => $attemptnumber), 'attemptnumber DESC', '*', 0, 1)) {
             $submissionisgraded = reset($submissionisgraded);
             if ($submissionisgraded->grade > -1){
-              if ($submission->timemodified > $submissionisgraded->timemodified) {
+                if ($submission->timemodified > $submissionisgraded->timemodified) {
                     $graded = false;
                 }else{
                     $graded = true;
@@ -594,7 +594,6 @@ function block_fn_mentor_assignment_status($mod, $userid) {
         }else {
             $graded = false;
         }
-
 
         if ($submission->status == 'draft') {
             if($graded){
@@ -630,9 +629,9 @@ function block_fn_mentor_grade_summary($studentid, $courseid=0) {
     $courses = array();
     $coursegrades = array();
 
-    $grade_total = array('attempted_grade'=>0,
-                         'attempted_max'=>0,
-                         'all_max'=>0);
+    $grade_total = array('attempted_grade' => 0,
+                         'attempted_max' => 0,
+                         'all_max' => 0);
 
     if ($courseid) {
         $courses[$courseid] = $courseid;
@@ -658,7 +657,7 @@ function block_fn_mentor_grade_summary($studentid, $courseid=0) {
             /// Collect modules data
             $mods = get_course_mods($course->id);
 
-            //Skip some mods
+            // Skip some mods
             foreach ($mods as $mod) {
                 if (!isset($mod_available[$mod->modname])) {
                     continue;
@@ -676,7 +675,6 @@ function block_fn_mentor_grade_summary($studentid, $courseid=0) {
                     }
                 }
 
-
                 if (!$grade_item = $DB->get_record('grade_items', array('itemtype' => 'mod', 'itemmodule' => $mod->modname, 'iteminstance' => $mod->instance))) {
                     continue;
                 }
@@ -689,19 +687,19 @@ function block_fn_mentor_grade_summary($studentid, $courseid=0) {
                         if ($assign_grades = $DB->get_records('assign_grades', array('assignment' => $mod->instance, 'userid' => $studentid), 'attemptnumber DESC')) {
                             $assign_grade = reset($assign_grades);
                             if ($assign_grade->grade >= 0) {
-                                //Graded
+                                // Graded
                                 $grade_total['attempted_grade'] += $grade_grade->finalgrade;
                                 $grade_total['attempted_max'] += $grade_item->grademax;
                             }
                         }
                     } else {
-                        //Graded
+                        // Graded
                         $grade_total['attempted_grade'] += $grade_grade->finalgrade;
                         $grade_total['attempted_max'] += $grade_item->grademax;
                     }
 
                 } else {
-                    //Ungraded
+                    // Ungraded
                 }
             }
 
@@ -742,7 +740,6 @@ function block_fn_mentor_grade_summary($studentid, $courseid=0) {
     } else {
         $data->allcourseaverge = 0;
     }
-
 
     if ($courseid) {
 
@@ -805,8 +802,9 @@ function block_fn_mentor_print_grade_summary ($courseid , $studentid) {
 function block_fn_mentor_get_teacher_courses ($teacherid=0) {
     global $CFG, $DB, $USER;
 
-    if (! $teacherid)
+    if (! $teacherid) {
         $teacherid = $USER->id;
+    }
 
     $sql = "SELECT c.id,
                    c.fullname
@@ -828,8 +826,9 @@ function block_fn_mentor_get_teacher_courses ($teacherid=0) {
 function block_fn_mentor_get_student_courses ($studentid=0) {
     global $CFG, $DB, $USER;
 
-    if (! $studentid)
+    if (! $studentid) {
         $studentid = $USER->id;
+    }
 
     $studentrole = get_config('block_fn_mentor', 'studentrole');
 
@@ -886,8 +885,8 @@ function block_fn_mentor_get_course_category_tree($id = 0, $depth = 0) {
         }
         $categoryids[$category->id] = $category;
         if (empty($CFG->maxcategorydepth) || $depth <= $CFG->maxcategorydepth) {
-            list($category->categories, $subcategories) = get_course_category_tree($category->id, $depth+1);
-            foreach ($subcategories as $subid=>$subcat) {
+            list($category->categories, $subcategories) = get_course_category_tree($category->id, $depth + 1);
+            foreach ($subcategories as $subid => $subcat) {
                 $categoryids[$subid] = $subcat;
             }
             $category->courses = array();
@@ -908,7 +907,6 @@ function block_fn_mentor_get_course_category_tree($id = 0, $depth = 0) {
     $ccselect = ", " . context_helper::get_preload_record_columns_sql('ctx');
     $ccjoin = "LEFT JOIN {context} ctx ON (ctx.instanceid = c.id AND ctx.contextlevel = ".CONTEXT_COURSE.")";
 
-
     list($catsql, $catparams) = $DB->get_in_or_equal(array_keys($categoryids));
     $sql = "SELECT
             c.id,c.sortorder,c.visible,c.fullname,c.shortname,c.summary,c.category
@@ -922,7 +920,7 @@ function block_fn_mentor_get_course_category_tree($id = 0, $depth = 0) {
             if ($course->id == SITEID) {
                 continue;
             }
-            //context_instance_preload($course);
+            // context_instance_preload($course);
             context_helper::preload_from_record($course);
             if (!empty($course->visible) || has_capability('moodle/course:viewhiddencourses', context_course::instance($course->id))) {
                 $categoryids[$course->category]->courses[$course->id] = $course;
@@ -981,7 +979,7 @@ function block_fn_mentor_category_tree_form($structures, $categoryids='', $cours
     return $content;
 }
 
-function block_fn_mentor_sub_category_tree_form($structure, $categoryids=NULL, $courseids=NULL) {
+function block_fn_mentor_sub_category_tree_form($structure, $categoryids=null, $courseids=null) {
     $content = "<ul>";
     if ($structure->categories) {
         foreach ($structure->categories as $category) {
@@ -1074,11 +1072,11 @@ function block_fn_mentor_render_notification_rule_table($notification, $number) 
                     <td colspan="3" class="notification_rule_ruleno"><strong>'.get_string('rule', 'block_fn_mentor').' '.$number.':</strong> '.$notification->name.'</td>
                     <td colspan="2" class="notification_rule_button">';
 
-    $html .= block_fn_mentor_single_button_form ('create_new_rule', new moodle_url('/blocks/fn_mentor/notification_send.php', array('id'=>$notification->id, 'action'=>'send', 'sesskey'=>sesskey())), NULL, get_string('run_now', 'block_fn_mentor'));
-    $html .= block_fn_mentor_single_button_form ('create_new_rule', new moodle_url('/blocks/fn_mentor/notification.php', array('id'=>$notification->id, 'action'=>'edit')), NULL, get_string('open', 'block_fn_mentor'));
-    $html .= block_fn_mentor_single_button_form ('create_new_rule', new moodle_url('/blocks/fn_mentor/notification_delete.php', array('id'=>$notification->id, 'action'=>'edit')), NULL, get_string('delete', 'block_fn_mentor'), 'return confirm(\'Do you want to delete record?\')');
+    $html .= block_fn_mentor_single_button_form ('create_new_rule', new moodle_url('/blocks/fn_mentor/notification_send.php', array('id' => $notification->id, 'action' => 'send', 'sesskey' => sesskey())), null, get_string('run_now', 'block_fn_mentor'));
+    $html .= block_fn_mentor_single_button_form ('create_new_rule', new moodle_url('/blocks/fn_mentor/notification.php', array('id' => $notification->id, 'action' => 'edit')), null, get_string('open', 'block_fn_mentor'));
+    $html .= block_fn_mentor_single_button_form ('create_new_rule', new moodle_url('/blocks/fn_mentor/notification_delete.php', array('id' => $notification->id, 'action' => 'edit')), null, get_string('delete', 'block_fn_mentor'), 'return confirm(\'Do you want to delete record?\')');
 
-    $html .='</td>
+    $html .= '</td>
                   </tr>
                   <tr>
                     <th class="notification_c1" nowrap="nowrap">'.get_string('apply_to', 'block_fn_mentor').'</th>
@@ -1183,11 +1181,11 @@ function block_fn_mentor_render_notification_rule_table($notification, $number) 
 function block_fn_mentor_last_activity ($studentid) {
     global $CFG, $DB;
 
-    $last_submission = NULL;
-    $last_attempt = NULL;
-    $last_post = NULL;
+    $last_submission = null;
+    $last_attempt = null;
+    $last_post = null;
 
-    //assign
+    // assign
     $sql_assign = "SELECT s.id,
                           s.timemodified
                      FROM {assign_submission} s
@@ -1197,10 +1195,10 @@ function block_fn_mentor_last_activity ($studentid) {
 
     if ($submissions = $DB->get_records_sql($sql_assign, array($studentid))) {
         $submission = reset($submissions);
-        $last_submission = round(((time() - $submission->timemodified) / (24*60*60)), 0);
+        $last_submission = round(((time() - $submission->timemodified) / (24 * 60 * 60)), 0);
     }
 
-    //quiz
+    // quiz
     $sql_quiz = "SELECT qa.id,
                         qa.timefinish
                    FROM {quiz_attempts} qa
@@ -1210,10 +1208,10 @@ function block_fn_mentor_last_activity ($studentid) {
 
     if ($attempts = $DB->get_records_sql($sql_quiz, array($studentid))) {
         $attempt = reset($attempts);
-        $last_attempt = round(((time() - $attempt->timefinish) / (24*60*60)), 0);
+        $last_attempt = round(((time() - $attempt->timefinish) / (24 * 60 * 60)), 0);
     }
 
-    //forum
+    // forum
     $sql_forum = "SELECT f.id,
                          f.modified
                     FROM {forum_posts} f
@@ -1222,7 +1220,7 @@ function block_fn_mentor_last_activity ($studentid) {
 
     if ($posts = $DB->get_records_sql($sql_forum, array($studentid))) {
         $post = reset($posts);
-        $last_post = round(((time() - $post->modified) / (24*60*60)), 0);
+        $last_post = round(((time() - $post->modified) / (24 * 60 * 60)), 0);
     }
 
     return min($last_submission, $last_attempt, $last_post);
@@ -1237,13 +1235,12 @@ function block_fn_mentor_report_outline_print_row($mod, $instance, $result) {
     echo "<td valign=\"top\">$image</td>";
     echo "<td valign=\"top\" style=\"width:300\">";
 
-    //echo "   <a target=\"_blank\" title=\"$mod->modfullname\"";
-    //echo "   href=\"$CFG->wwwroot/mod/$mod->modname/view.php?id=$mod->id\">".format_string($instance->name,true)."</a></td>";
+    // echo "   <a target=\"_blank\" title=\"$mod->modfullname\"";
+    // echo "   href=\"$CFG->wwwroot/mod/$mod->modname/view.php?id=$mod->id\">".format_string($instance->name,true)."</a></td>";
 
     echo "<a title=\"$mod->modfullname\"  href=\"$CFG->wwwroot/mod/$mod->modname/view.php?id=$mod->id\"
           onclick=\"window.open('$CFG->wwwroot/mod/$mod->modname/view.php?id=$mod->id', '', 'width=800,height=600,toolbar=no,location=no,menubar=no,copyhistory=no,status=no,directories=no,scrollbars=yes,resizable=yes'); return false;\"
           class=\"\" >".format_string($instance->name,true)."</a></td>";
-
 
     echo "<td>&nbsp;&nbsp;&nbsp;</td>";
     echo "<td valign=\"top\">";
@@ -1261,7 +1258,7 @@ function block_fn_mentor_report_outline_print_row($mod, $instance, $result) {
     echo "</tr>";
 }
 
-function block_fn_mentor_format_time($totalsecs, $str=NULL) {
+function block_fn_mentor_format_time($totalsecs, $str=null) {
 
     $totalsecs = abs($totalsecs);
 
@@ -1279,21 +1276,20 @@ function block_fn_mentor_format_time($totalsecs, $str=NULL) {
         $str->years = get_string('years');
     }
 
+    $years     = floor($totalsecs / YEARSECS);
+    $remainder = $totalsecs - ($years * YEARSECS);
+    $days      = floor($remainder / DAYSECS);
+    $remainder = $totalsecs - ($days * DAYSECS);
+    $hours     = floor($remainder / HOURSECS);
+    $remainder = $remainder - ($hours * HOURSECS);
+    $mins      = floor($remainder / MINSECS);
+    $secs      = $remainder - ($mins * MINSECS);
 
-    $years     = floor($totalsecs/YEARSECS);
-    $remainder = $totalsecs - ($years*YEARSECS);
-    $days      = floor($remainder/DAYSECS);
-    $remainder = $totalsecs - ($days*DAYSECS);
-    $hours     = floor($remainder/HOURSECS);
-    $remainder = $remainder - ($hours*HOURSECS);
-    $mins      = floor($remainder/MINSECS);
-    $secs      = $remainder - ($mins*MINSECS);
-
-    $ss = ($secs == 1)  ? $str->sec  : $str->secs;
-    $sm = ($mins == 1)  ? $str->min  : $str->mins;
+    $ss = ($secs == 1) ? $str->sec : $str->secs;
+    $sm = ($mins == 1) ? $str->min : $str->mins;
     $sh = ($hours == 1) ? $str->hour : $str->hours;
-    $sd = ($days == 1)  ? $str->day  : $str->days;
-    $sy = ($years == 1)  ? $str->year  : $str->years;
+    $sd = ($days == 1) ? $str->day : $str->days;
+    $sy = ($years == 1) ? $str->year : $str->years;
 
     $oyears = '';
     $odays = '';
@@ -1301,28 +1297,38 @@ function block_fn_mentor_format_time($totalsecs, $str=NULL) {
     $omins = '';
     $osecs = '';
 
-    if ($years)  $oyears  = $years .' '. $sy;
-    if ($days)  $odays  = $days .' '. $sd;
-    if ($hours) $ohours = $hours .' '. $sh;
-    if ($mins)  $omins  = $mins .' '. $sm;
-    if ($secs)  $osecs  = $secs .' '. $ss;
+    if ($years) {  $oyears  = $years .' '. $sy;
+    }
+    if ($days) {  $odays  = $days .' '. $sd;
+    }
+    if ($hours) { $ohours = $hours .' '. $sh;
+    }
+    if ($mins) {  $omins  = $mins .' '. $sm;
+    }
+    if ($secs) {  $osecs  = $secs .' '. $ss;
+    }
 
-    if ($years) return trim($oyears);
-    if ($days)  return trim($odays);
-    if ($hours) return trim($ohours);
-    if ($mins)  return trim($omins);
-    if ($secs)  return $osecs;
+    if ($years) { return trim($oyears);
+    }
+    if ($days) {  return trim($odays);
+    }
+    if ($hours) { return trim($ohours);
+    }
+    if ($mins) {  return trim($omins);
+    }
+    if ($secs) {  return $osecs;
+    }
     return get_string('now');
 }
 
 function block_fn_mentor_note_print($note, $detail = NOTES_SHOW_FULL) {
     global $CFG, $USER, $DB, $OUTPUT;
 
-    if (!$user = $DB->get_record('user', array('id'=>$note->userid))) {
+    if (!$user = $DB->get_record('user', array('id' => $note->userid))) {
         debugging("User $note->userid not found");
         return;
     }
-    if (!$author = $DB->get_record('user', array('id'=>$note->usermodified))) {
+    if (!$author = $DB->get_record('user', array('id' => $note->usermodified))) {
         debugging("User $note->usermodified not found");
         return;
     }
@@ -1342,7 +1348,7 @@ function block_fn_mentor_note_print($note, $detail = NOTES_SHOW_FULL) {
     if ($detail & NOTES_SHOW_HEAD) {
         echo '<div class="header">';
         echo '<div class="user">';
-        echo $OUTPUT->user_picture($user, array('courseid'=>$note->courseid));
+        echo $OUTPUT->user_picture($user, array('courseid' => $note->courseid));
         echo fullname($user) . '</div>';
         echo '<div class="info">' .
             get_string('bynameondate', 'notes', $authoring) . '</div>';
@@ -1352,7 +1358,7 @@ function block_fn_mentor_note_print($note, $detail = NOTES_SHOW_FULL) {
     // print note content
     if ($detail & NOTES_SHOW_BODY) {
         echo '<div class="content">';
-        echo format_text($note->content, $note->format, array('overflowdiv'=>true));
+        echo format_text($note->content, $note->format, array('overflowdiv' => true));
         echo '</div>';
     }
     echo '</div>';
@@ -1383,7 +1389,7 @@ function block_fn_mentor_send_notifications($notificationid=null, $output=false)
 
             $diff = $now->diff($date1)->format("%a");
 
-            //Check period
+            // Check period
             if (($notification_rule->period > $diff) && !$notificationid) {
                 continue;
             }
@@ -1402,7 +1408,7 @@ function block_fn_mentor_send_notifications($notificationid=null, $output=false)
             $get_courses = function($category, &$courses){
                 if ($category->courses) {
                     foreach ($category->courses as $course) {
-                        $courses[] =  $course->id;
+                        $courses[] = $course->id;
                     }
                 }
                 if ($category->categories) {
@@ -1419,9 +1425,9 @@ function block_fn_mentor_send_notifications($notificationid=null, $output=false)
 
                 foreach ($notification_categories as $categoryid) {
 
-                    if ($parentcat_courses = $DB->get_records('course', array('category'=>$categoryid))) {
+                    if ($parentcat_courses = $DB->get_records('course', array('category' => $categoryid))) {
                         foreach ($parentcat_courses as $cat_course) {
-                            $courses[] =  $cat_course->id;
+                            $courses[] = $cat_course->id;
                         }
                     }
                     if ($category_structure = block_fn_mentor_get_course_category_tree($categoryid)) {
@@ -1429,7 +1435,7 @@ function block_fn_mentor_send_notifications($notificationid=null, $output=false)
 
                             if ($category->courses) {
                                 foreach ($category->courses as $subcat_course) {
-                                    $courses[] =  $subcat_course->id;
+                                    $courses[] = $subcat_course->id;
                                 }
                             }
                             if ($category->categories) {
@@ -1450,7 +1456,7 @@ function block_fn_mentor_send_notifications($notificationid=null, $output=false)
 
             // PREPARE NOTIFICATION FOR EACH COURSES.
             foreach ($courses as $courseid) {
-                if ($course = $DB->get_record('course', array('id'=>$courseid))) {
+                if ($course = $DB->get_record('course', array('id' => $courseid))) {
 
                     $context = context_course::instance($course->id);
 
@@ -1465,22 +1471,21 @@ function block_fn_mentor_send_notifications($notificationid=null, $output=false)
 
                             $notification_message[$student->id][$course->id]['studentname'] = $student->firstname . ' ' . $student->lastname;
 
-
                             if ($notification_rule->g2) {
-                                $message .= '<li>'.get_string('g2_message', 'block_fn_mentor', array('firstname'=>$student->firstname, 'g2'=>$grade_summary->courseaverage)).'</li>';
+                                $message .= '<li>'.get_string('g2_message', 'block_fn_mentor', array('firstname' => $student->firstname, 'g2' => $grade_summary->courseaverage)).'</li>';
                                 $notification_message[$student->id][$course->id]['coursename'] = $course->fullname;
                                 $notification_message[$student->id][$course->id]['message'] = $message;
                             }
                             if ($notification_rule->g4 && $notification_rule->g4_value) {
                                 if ($grade_summary->courseaverage < $notification_rule->g4_value){
-                                    $message .= '<li>'.get_string('g4_message', 'block_fn_mentor', array('firstname'=>$student->firstname, 'g4'=>$grade_summary->courseaverage, 'g4_value'=>$notification_rule->g3_value)).'</li>';
+                                    $message .= '<li>'.get_string('g4_message', 'block_fn_mentor', array('firstname' => $student->firstname, 'g4' => $grade_summary->courseaverage, 'g4_value' => $notification_rule->g3_value)).'</li>';
                                     $notification_message[$student->id][$course->id]['coursename'] = $course->fullname;
                                     $notification_message[$student->id][$course->id]['message'] = $message;
                                 }
                             }
                             if ($notification_rule->g6 && $notification_rule->g6_value) {
                                 if ($grade_summary->courseaverage > $notification_rule->g6_value){
-                                    $message .= '<li>'.get_string('g6_message', 'block_fn_mentor', array('firstname'=>$student->firstname, 'g6'=>$grade_summary->courseaverage, 'g6_value'=>$notification_rule->g6_value)).'</li>';
+                                    $message .= '<li>'.get_string('g6_message', 'block_fn_mentor', array('firstname' => $student->firstname, 'g6' => $grade_summary->courseaverage, 'g6_value' => $notification_rule->g6_value)).'</li>';
                                     $notification_message[$student->id][$course->id]['coursename'] = $course->fullname;
                                     $notification_message[$student->id][$course->id]['message'] = $message;
                                 }
@@ -1488,10 +1493,10 @@ function block_fn_mentor_send_notifications($notificationid=null, $output=false)
 
                             if ($notification_rule->n1 && $notification_rule->n1_value) {
                                 if ($student->lastaccess > 0) {
-                                    $lastaccess = round(((time() - $student->lastaccess) /(24*60*60)), 0);
+                                    $lastaccess = round(((time() - $student->lastaccess) / (24 * 60 * 60)), 0);
                                 }
                                 if ($lastaccess >= $notification_rule->n1_value){
-                                    $message .= '<li>'.get_string('n1_message', 'block_fn_mentor', array('firstname'=>$student->firstname, 'n1'=>$lastaccess)).'</li>';
+                                    $message .= '<li>'.get_string('n1_message', 'block_fn_mentor', array('firstname' => $student->firstname, 'n1' => $lastaccess)).'</li>';
                                     $notification_message[$student->id][$course->id]['coursename'] = $course->fullname;
                                     $notification_message[$student->id][$course->id]['message'] = $message;
                                 }
@@ -1501,7 +1506,7 @@ function block_fn_mentor_send_notifications($notificationid=null, $output=false)
                                 $last_activity = block_fn_mentor_last_activity($student->id);
                                 if (is_numeric($last_activity)) {
                                     if ($last_activity >= $notification_rule->n2_value){
-                                        $message .= '<li>'.get_string('n2_message', 'block_fn_mentor', array('firstname'=>$student->firstname, 'n2'=>$last_activity)).'</li>';
+                                        $message .= '<li>'.get_string('n2_message', 'block_fn_mentor', array('firstname' => $student->firstname, 'n2' => $last_activity)).'</li>';
                                         $notification_message[$student->id][$course->id]['coursename'] = $course->fullname;
                                         $notification_message[$student->id][$course->id]['message'] = $message;
                                     }
@@ -1511,12 +1516,12 @@ function block_fn_mentor_send_notifications($notificationid=null, $output=false)
                     }
                 }
             }
-            ///print_object($notification_message);die;
+            // print_object($notification_message);die;
             // SEND EMAILS FOR EACH RULE.
             foreach ($notification_message as $student_id => $course_messages) {
 
                 // STUDENT.
-                if (!$student = $DB->get_record('user', array('id'=>$student_id))) {
+                if (!$student = $DB->get_record('user', array('id' => $student_id))) {
                     continue;
                 }
 
@@ -1559,7 +1564,7 @@ function block_fn_mentor_send_notifications($notificationid=null, $output=false)
                         }
                     }
 
-                    //STUDENT
+                    // STUDENT
                     if ($notification_rule->studentemail || $notification_rule->studentsms) {
                         $rec = new stdClass();
                         $rec->notificationid = $notification_rule->id;
@@ -1574,7 +1579,7 @@ function block_fn_mentor_send_notifications($notificationid=null, $output=false)
                         $DB->insert_record('block_fn_mentor_notifica_msg', $rec);
                     }
 
-                    //MENTOR
+                    // MENTOR
                     if ($notification_rule->mentoremail || $notification_rule->mentorsms) {
                         $mentors = block_fn_mentor_get_mentors($student_id);
                         foreach ($mentors as $mentor) {
@@ -1666,8 +1671,6 @@ function block_fn_mentor_group_messages () {
                 $emailbody .= $appended_message . '<hr />';
                 $emailbody .= get_string('automatedmessage', 'block_fn_mentor', format_string($site->fullname));
 
-
-
                 $rec = new stdClass();
                 $rec->notificationid = $group->notificationid;
                 $rec->type = 'email';
@@ -1678,9 +1681,9 @@ function block_fn_mentor_group_messages () {
                 $rec->sent = 0;
                 $nid = $DB->insert_record('block_fn_mentor_notifica_msg', $rec);
 
-                $messageurl = new moodle_url('/blocks/fn_mentor/notification_message.php', array('id'=>$nid,'key'=>$rec->securitykey));
+                $messageurl = new moodle_url('/blocks/fn_mentor/notification_message.php', array('id' => $nid,'key' => $rec->securitykey));
 
-                //test it out!
+                // test it out!
                 $new_url = get_tiny_url($messageurl->out(false));
 
                 $smsbody = get_string('progressreportfrom', 'block_fn_mentor', format_string($site->fullname))."\n".
@@ -1747,7 +1750,7 @@ function block_fn_mentor_sms_to_user ($user, $from, $subject, $messagetext, $mes
     }
     return false;
 }
-function get_tiny_url($url)  {
+function get_tiny_url($url) {
     $ch = curl_init();
     $timeout = 5;
     curl_setopt($ch,CURLOPT_URL,'http://tinyurl.com/api-create.php?url='.$url);

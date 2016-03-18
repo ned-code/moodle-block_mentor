@@ -36,7 +36,7 @@ $unsubmitted = optional_param('unsubmitted', '0', PARAM_INT);
 set_current_group($courseid, $group);
 
 if ($courseid) {
-    if (! $course = $DB->get_record('course', array('id'=>$courseid))) {
+    if (! $course = $DB->get_record('course', array('id' => $courseid))) {
         print_error('coursemisconf');
     }
 }else{
@@ -71,7 +71,7 @@ foreach ($students as $key => $value) {
 }
 
 /// Collect modules data
-//get_all_mods($course->id, $mods, $modnames, $modnamesplural, $modnamesused);
+// get_all_mods($course->id, $mods, $modnames, $modnamesplural, $modnamesused);
 $modnames = get_module_types_names();
 $modnamesplural = get_module_types_names(true);
 $modinfo = get_fast_modinfo($course->id);
@@ -87,7 +87,7 @@ $cobject->modnamesused = &$modnamesused;
 $cobject->sections = &$sections;
 
 
-//FIND CURRENT WEEK
+// FIND CURRENT WEEK
 $courseformatoptions = course_get_format($course)->get_format_options();
 $course_numsections = $courseformatoptions['numsections'];
 
@@ -98,20 +98,20 @@ $weekdate += 7200;                 // Add two hours to avoid possible DST proble
 $weekofseconds = 604800;
 $course_enddate = $course->startdate + ($weekofseconds * $course_numsections);
 
-//  Calculate the current week based on today's date and the starting date of the course.
+// Calculate the current week based on today's date and the starting date of the course.
 $currentweek = ($timenow > $course->startdate) ? (int) ((($timenow - $course->startdate) / $weekofseconds) + 1) : 0;
 $currentweek = min($currentweek, $course_numsections);
 
 
 /// Search through all the modules, pulling out grade data
-//$sections = get_all_sections($course->id); // Sort everything the same as the course
+// $sections = get_all_sections($course->id); // Sort everything the same as the course
 $sections = get_fast_modinfo($course->id)->get_section_info_all();
 
-//if ($view == "less"){
-//    $upto = min($currentweek+1, sizeof($sections));
-//}else{
+// if ($view == "less"){
+// $upto = min($currentweek+1, sizeof($sections));
+// }else{
 $upto = sizeof($sections);
-//}
+// }
 
 
 
@@ -121,7 +121,7 @@ for ($i = 0; $i < $upto; $i++) {
         $section = $sections[$i];
         if ($section->sequence) {
             $sectionmods = explode(",", $section->sequence);
-            foreach ($sectionmods as $sectionmod) { //print_r($mods[$sectionmod]);die;
+            foreach ($sectionmods as $sectionmod) { // print_r($mods[$sectionmod]);die;
                 if (empty($mods[$sectionmod])) {
                     continue;
                 }
@@ -138,8 +138,8 @@ for ($i = 0; $i < $upto; $i++) {
                 global $DB;
                 $instance = $DB->get_record($mod->modname, array("id" => $mod->instance));
                 $item = $DB->get_record('grade_items', array("itemtype" => 'mod', "itemmodule" => $mod->modname, "iteminstance" => $mod->instance));
-                //print_r($instance);
-                //print_r($item->gradepass);
+                // print_r($instance);
+                // print_r($item->gradepass);
 
                 $libfile = $CFG->dirroot . '/mod/' . $mod->modname . '/lib.php';
                 if (file_exists($libfile)) {
@@ -168,21 +168,21 @@ for ($i = 0; $i < $upto; $i++) {
 
                                     if($grade = $gradefunction($instance, $key)){
                                         if ($item->gradepass > 0){
-                                            if ($grade[$key]->rawgrade >=$item->gradepass){
-                                                $simplegradebook[$key]['grade'][$i][$mod->id] = 'marked.gif';//passed
-                                                $simplegradebook[$key]['avg'][]=array('grade'=>$grade[$key]->rawgrade, 'grademax'=>$item->grademax);
+                                            if ($grade[$key]->rawgrade >= $item->gradepass){
+                                                $simplegradebook[$key]['grade'][$i][$mod->id] = 'marked.gif';// passed
+                                                $simplegradebook[$key]['avg'][] = array('grade' => $grade[$key]->rawgrade, 'grademax' => $item->grademax);
                                             }else{
-                                                $simplegradebook[$key]['grade'][$i][$mod->id] = 'incomplete.gif';//fail
-                                                $simplegradebook[$key]['avg'][]=array('grade'=>$grade[$key]->rawgrade, 'grademax'=>$item->grademax);
+                                                $simplegradebook[$key]['grade'][$i][$mod->id] = 'incomplete.gif';// fail
+                                                $simplegradebook[$key]['avg'][] = array('grade' => $grade[$key]->rawgrade, 'grademax' => $item->grademax);
                                             }
                                         }else{
-                                            $simplegradebook[$key]['grade'][$i][$mod->id] = 'graded_.gif';//Graded (grade-to-pass is not set)
-                                            $simplegradebook[$key]['avg'][]=array('grade'=>$grade[$key]->rawgrade, 'grademax'=>$item->grademax);
+                                            $simplegradebook[$key]['grade'][$i][$mod->id] = 'graded_.gif';// Graded (grade-to-pass is not set)
+                                            $simplegradebook[$key]['avg'][] = array('grade' => $grade[$key]->rawgrade, 'grademax' => $item->grademax);
                                         }
                                     }else{
                                         $simplegradebook[$key]['grade'][$i][$mod->id] = 'ungraded.gif';
                                         if($unsubmitted){
-                                            $simplegradebook[$key]['avg'][]=array('grade'=>0, 'grademax'=>$item->grademax);
+                                            $simplegradebook[$key]['avg'][] = array('grade' => 0, 'grademax' => $item->grademax);
                                         }
                                     }
                                 } else if ($modstatus = block_fn_mentor_assignment_status($mod, $key, true)){
@@ -191,16 +191,16 @@ for ($i = 0; $i < $upto; $i++) {
                                         case 'submitted':
                                             if($grade = $gradefunction($instance, $key)){
                                                 if ($item->gradepass > 0){
-                                                    if ($grade[$key]->rawgrade >=$item->gradepass){
-                                                        $simplegradebook[$key]['grade'][$i][$mod->id] = 'marked.gif';//passed
-                                                        $simplegradebook[$key]['avg'][]=array('grade'=>$grade[$key]->rawgrade, 'grademax'=>$item->grademax);
+                                                    if ($grade[$key]->rawgrade >= $item->gradepass){
+                                                        $simplegradebook[$key]['grade'][$i][$mod->id] = 'marked.gif';// passed
+                                                        $simplegradebook[$key]['avg'][] = array('grade' => $grade[$key]->rawgrade, 'grademax' => $item->grademax);
                                                     }else{
-                                                        $simplegradebook[$key]['grade'][$i][$mod->id] = 'incomplete.gif';//fail
-                                                        $simplegradebook[$key]['avg'][]=array('grade'=>$grade[$key]->rawgrade, 'grademax'=>$item->grademax);
+                                                        $simplegradebook[$key]['grade'][$i][$mod->id] = 'incomplete.gif';// fail
+                                                        $simplegradebook[$key]['avg'][] = array('grade' => $grade[$key]->rawgrade, 'grademax' => $item->grademax);
                                                     }
                                                 }else{
-                                                    $simplegradebook[$key]['grade'][$i][$mod->id] = 'graded_.gif';//Graded (grade-to-pass is not set)
-                                                    $simplegradebook[$key]['avg'][]=array('grade'=>$grade[$key]->rawgrade, 'grademax'=>$item->grademax);
+                                                    $simplegradebook[$key]['grade'][$i][$mod->id] = 'graded_.gif';// Graded (grade-to-pass is not set)
+                                                    $simplegradebook[$key]['avg'][] = array('grade' => $grade[$key]->rawgrade, 'grademax' => $item->grademax);
                                                 }
                                             }else{
 
@@ -218,7 +218,7 @@ for ($i = 0; $i < $upto; $i++) {
                                 } else {
                                     $simplegradebook[$key]['grade'][$i][$mod->id] = 'ungraded.gif';
                                     if($unsubmitted){
-                                        $simplegradebook[$key]['avg'][]=array('grade'=>0, 'grademax'=>$item->grademax);
+                                        $simplegradebook[$key]['avg'][] = array('grade' => 0, 'grademax' => $item->grademax);
                                     }
                                 }
 
@@ -236,7 +236,7 @@ for ($i = 0; $i < $upto; $i++) {
 
 
 echo '<div class="tablecontainer">';
-//TABLE
+// TABLE
 echo "<table class='simplegradebook'>";
 
 echo "<tr>";
@@ -266,11 +266,11 @@ foreach ($simplegradebook as $studentid => $studentreport) {
     if ($counter % 2 == 0){
         $studentClass = "even";
     } else {
-        $studentClass =  "odd";
+        $studentClass = "odd";
     }
     echo '<tr>';
     echo '<td nowrap="nowrap" class="'.$studentClass.' name"><a target="_blank" href='.$CFG->wwwroot.'/grade/report/user/index.php?userid='.$studentid.'&id='.$course->id.'">'.$studentreport['name'].'</a></td>';
-    //echo $studentreport['courseavg'];
+    // echo $studentreport['courseavg'];
     $gradetot = 0;
     $grademaxtot = 0;
     $avg = 0;
@@ -282,8 +282,8 @@ foreach ($simplegradebook as $studentid => $studentreport) {
         }
 
         if ($grademaxtot){
-            $avg = ($gradetot /  $grademaxtot) * 100;
-            if ( $avg  >= 50){
+            $avg = ($gradetot / $grademaxtot) * 100;
+            if ( $avg >= 50){
                 echo '<td class="green">'.round($avg,0).'</td>';
             }else{
                 echo '<td class="red">'.round($avg,0).'</td>';
@@ -297,9 +297,9 @@ foreach ($simplegradebook as $studentid => $studentreport) {
     }
 
 
-    foreach ($studentreport['grade'] as  $sgrades) {
+    foreach ($studentreport['grade'] as $sgrades) {
         foreach ($sgrades as $sgrade) {
-            //echo '<td>'.$sgrade.'</td>';
+            // echo '<td>'.$sgrade.'</td>';
             echo '<td class="'.$studentClass.' icon">'.'<img src="' . $CFG->wwwroot . '/blocks/fn_marking/pix/'.$sgrade.'" height="16" width="16" alt="">'.'</td>';
         }
     }

@@ -32,7 +32,7 @@ $process = optional_param('process', 0, PARAM_INT);
 require_login();
 confirm_sesskey();
 
-//PERMISSION
+// PERMISSION
 require_capability('block/fn_mentor:createnotificationrule', context_system::instance());
 
 $title = get_string('page_title_assign_mentor', 'block_fn_mentor');
@@ -54,7 +54,7 @@ $PAGE->navbar->add(get_string('notification_rules', 'block_fn_mentor'), new mood
 
 
 if (($action == 'send') && ($id)) {
-    $notification_rule = $DB->get_record('block_fn_mentor_notification',array('id'=>$id),'*',MUST_EXIST);
+    $notification_rule = $DB->get_record('block_fn_mentor_notification',array('id' => $id),'*',MUST_EXIST);
 }
 
 
@@ -62,7 +62,7 @@ if ($process) {
     $report = block_fn_mentor_send_notifications($notification_rule->id, true);
     echo $OUTPUT->header();
 
-    //echo $OUTPUT->confirm($report, new moodle_url('/blocks/fn_mentor/notification_rules.php'), '/blocks/fn_mentor/notification_rules.php');
+    // echo $OUTPUT->confirm($report, new moodle_url('/blocks/fn_mentor/notification_rules.php'), '/blocks/fn_mentor/notification_rules.php');
 
     $redirecturl = new moodle_url('/blocks/fn_mentor/notification_rules.php');
 

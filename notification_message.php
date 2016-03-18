@@ -28,7 +28,7 @@ require_once($CFG->dirroot . '/blocks/fn_mentor/lib.php');
 $id = required_param('id', PARAM_INT);
 $securitykey = required_param('key', PARAM_TEXT);
 
-$msg = $DB->get_record('block_fn_mentor_notifica_msg', array('id'=>$id, 'securitykey'=>$securitykey), '*', MUST_EXIST);
+$msg = $DB->get_record('block_fn_mentor_notifica_msg', array('id' => $id, 'securitykey' => $securitykey), '*', MUST_EXIST);
 
 $title = get_string('page_title_assign_mentor', 'block_fn_mentor');
 $heading = $SITE->fullname;

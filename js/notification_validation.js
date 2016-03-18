@@ -1,8 +1,8 @@
 // a custom onComplete handler to prevent form submits for the demo
 function myOnComplete()
 {
-//alert("The form validates! (normally, it would submit the form here).");
-return true;
+    // alert("The form validates! (normally, it would submit the form here).");
+    return true;
 }
 
 var rules = [];
@@ -25,10 +25,10 @@ function my_custom_function()
     var val = document.getElementById("prime_number").value;
 
     var is_valid_num = false;
-    for (i=0; i<prime_numbers.length; i++)
+    for (i = 0; i < prime_numbers.length; i++)
     {
-        if (prime_numbers[i] == val)
-            is_valid_num = true;
+        if (prime_numbers[i] == val) {
+            is_valid_num = true; }
     }
 
     if (!is_valid_num)

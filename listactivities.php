@@ -33,7 +33,7 @@ $id = required_param('id', PARAM_INT);      // course id
 $menteeid = required_param('menteeid', PARAM_INT);      // user id
 $show = optional_param('show', 'notloggedin', PARAM_ALPHA);
 
-//  Paging options:
+// Paging options:
 $page = optional_param('page', 0, PARAM_INT);
 $perpage = optional_param('perpage', 2, PARAM_INT);
 $PAGE->set_url('/blocks/fn_mentor/listactivities.php', array('id' => $id, 'show' => $show, 'navlevel' => 'top'));
@@ -71,13 +71,13 @@ if ($completion->is_enabled()) {
         $data = $completion->get_data($activity, true, $menteeid, null);
         $completionstate = $data->completionstate;
         $assignment_status = block_fn_mentor_assignment_status($activity, $menteeid);
-        //echo "$completionstate - $activity->name - $activity->completion - $assignment_status<br>";
+        // echo "$completionstate - $activity->name - $activity->completion - $assignment_status<br>";
         if ($completionstate == 0) {
             if (($activity->module == 1)
                     && ($activity->modname == 'assignment' || $activity->modname == 'assign')
                     && ($activity->completion == 2)
                     && $assignment_status) {
-                //grab assignment status
+                // grab assignment status
 
                 if (isset($assignment_status)) {
                     if ($assignment_status == 'saved') {
@@ -91,7 +91,7 @@ if ($completion->is_enabled()) {
             } else {
                 $notattemptedactivities++;
             }
-        } elseif ($completionstate == 1 || $completionstate == 2) {
+        } else if ($completionstate == 1 || $completionstate == 2) {
             if (isset($assignment_status)) {
                 if ($assignment_status == 'saved') {
                     $savedactivities++;
@@ -101,7 +101,7 @@ if ($completion->is_enabled()) {
                     $waitingforgradeactivities++;
                 }
             }
-        } elseif ($completionstate == 3) {
+        } else if ($completionstate == 3) {
             if (($activity->module == 1)
                     && ($activity->modname == 'assignment' || $activity->modname == 'assign')
                     && ($activity->completion == 2)
@@ -184,7 +184,7 @@ if (($show == 'completed' || $show == 'incompleted' || $show == 'draft' || $show
     echo "<tr>";
     echo "<th align='center' width='15%'><strong>Activity type </strong></th>";
     echo "<th align='left' width='67%' style='text-align:left;'><strong>Activity or Resource Name </strong></th>";
-    //echo "<th align='center' width='18%'><strong>Section <strong></th>";
+    // echo "<th align='center' width='18%'><strong>Section <strong></th>";
     echo "</tr>";
 } else {
     echo '<div style="text-align:center; padding:12px;">';
@@ -192,7 +192,7 @@ if (($show == 'completed' || $show == 'incompleted' || $show == 'draft' || $show
     echo "</div>";
 }
 // iterate
-//for ($i = ($page * $perpage); ($i < ($page * $perpage) + $perpage) && ($i < $totalcount); $i++) {
+// for ($i = ($page * $perpage); ($i < ($page * $perpage) + $perpage) && ($i < $totalcount); $i++) {
 
 if ($show == 'completed') {
     if ($activities) {
@@ -332,12 +332,12 @@ else if ($show == 'draft') {
                         if ($assignment_status == 'saved') {
                             echo "<tr><td align='center'>\n";
                             $modtype = $DB->get_field('modules', 'name', array('id' => $activity->module));
-                            //echo ($modtype == 'assign') ? 'assignment' : $modtype;
+                            // echo ($modtype == 'assign') ? 'assignment' : $modtype;
                             $modicon = "<IMG BORDER=0 VALIGN=absmiddle SRC=\"$CFG->wwwroot/mod/$modtype/pix/icon.png\" HEIGHT=\"16\" WIDTH=\"16\" >";
                             echo ($modtype == 'assign') ? 'assignment' : $modtype;
                             echo "</td>\n";
                             echo "<td align='left'><a href='" . $CFG->wwwroot . "/mod/$modtype/view.php?id=$data->coursemoduleid'>$modicon</a><a href='" . $CFG->wwwroot . "/mod/$modtype/view.php?id=$data->coursemoduleid' style=\"padding-left:4px\">" . $activity->name . "</a></td>\n";
-                            //echo "<td align='center'>Section-$activity->section</td></tr>\n";
+                            // echo "<td align='center'>Section-$activity->section</td></tr>\n";
                         }
                     }
                 }
@@ -347,7 +347,7 @@ else if ($show == 'draft') {
 } else {
 
 }
-//}
+// }
 echo"</table>\n";
 
 echo '</td></tr></table>';

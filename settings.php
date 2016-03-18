@@ -48,13 +48,13 @@ foreach ($roles as $role) {
 }
 
 
-if ($mentor_system = $DB->get_record('role', array('shortname'=>'mentor'))) {
+if ($mentor_system = $DB->get_record('role', array('shortname' => 'mentor'))) {
     $mentor_role_system_default = $mentor_system->id;
 } else {
     $mentor_role_system_default = 0;
 }
 
-if ($mentor_user = $DB->get_record('role', array('shortname'=>'mentor_user'))) {
+if ($mentor_user = $DB->get_record('role', array('shortname' => 'mentor_user'))) {
     $mentor_role_user_default = $mentor_user->id;
 } else {
     $mentor_role_user_default = 0;

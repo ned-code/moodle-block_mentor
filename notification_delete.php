@@ -30,9 +30,9 @@ require_login();
 
 require_capability('block/fn_mentor:createnotificationrule', context_system::instance(), $USER->id);
 
-if($record = $DB->get_record('block_fn_mentor_notification', array('id'=>$id))){
+if($record = $DB->get_record('block_fn_mentor_notification', array('id' => $id))){
 
-    $DB->delete_records('block_fn_mentor_notification',  array('id'=>$id));
+    $DB->delete_records('block_fn_mentor_notification',  array('id' => $id));
 
     redirect(new moodle_url('/blocks/fn_mentor/notification_rules.php'), get_string('successful', 'block_fn_mentor'));
 }else{

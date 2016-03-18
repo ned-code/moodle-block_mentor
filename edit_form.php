@@ -8,7 +8,7 @@ class block_fn_mentor_edit_form extends block_edit_form {
 
     protected function specific_definition($mform) {
 
-        //$mform->addElement('header', 'configheader', get_string('blocksettings', 'block_fn_mentor'));
+        // $mform->addElement('header', 'configheader', get_string('blocksettings', 'block_fn_mentor'));
 
         $yesno = array(0 => get_string('no'), 1 => get_string('yes'));
 
