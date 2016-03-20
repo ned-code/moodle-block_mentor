@@ -46,7 +46,7 @@ if ( has_capability('block/fn_mentor:assignmentor', context_system::instance(), 
 
     $studentlist = explode(',', $studentids);
 
-    foreach( $studentlist as $key => $value) {
+    foreach($studentlist as $key => $value) {
         $studentlist[$key] = (int) $value;
         if( $studentlist[$key] != $value ) {
             unset($studentlist[$key]);

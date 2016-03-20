@@ -27,7 +27,6 @@ function xmldb_block_fn_mentor_upgrade($oldversion) {
 
     $dbman = $DB->get_manager();
 
-
     if ($oldversion <= 2015101000) {
         $table = new xmldb_table('block_fn_mentor_notification');
 

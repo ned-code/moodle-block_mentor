@@ -1,4 +1,3 @@
-
 <?php
 // This file is part of Moodle - http://moodle.org/
 //
@@ -43,19 +42,19 @@ $allownotes = get_config('block_fn_mentor', 'allownotes');
 
 if ($allownotes && $ismentor) {
     $allownotes = true;
-} elseif ($isadmin || $isteacher ) {
+} else if ($isadmin || $isteacher ) {
     $allownotes = true;
 } else {
     $allownotes = false;
 }
 
 
-//Find Mentess
+// Find Mentess
 $mentees = array();
 if ($isadmin) {
-   $mentees = block_fn_mentor_get_all_mentees();
-} elseif ($isteacher) {
-    if ($mentees_by_mentor = block_fn_mentor_get_mentees_by_mentor(0, $filter='teacher')) {
+    $mentees = block_fn_mentor_get_all_mentees();
+} else if ($isteacher) {
+    if ($mentees_by_mentor = block_fn_mentor_get_mentees_by_mentor(0, $filter = 'teacher')) {
         foreach ($mentees_by_mentor as $mentee_by_mentor) {
             if ($mentee_by_mentor['mentee']) {
                 foreach ($mentee_by_mentor['mentee'] as $key => $value) {
@@ -64,11 +63,11 @@ if ($isadmin) {
             }
         }
     }
-} elseif ($ismentor) {
+} else if ($ismentor) {
     $mentees = block_fn_mentor_get_mentees($USER->id);
 }
 
-//Pick a mentee if not selected
+// Pick a mentee if not selected
 if (!$menteeid && $mentees) {
     $var = reset($mentees);
     $menteeid = $var->studentid;
@@ -78,7 +77,7 @@ if (($isstudent) && ($USER->id <> $menteeid)  && (!$isteacher && !$isadmin && !$
     print_error('invalidpermission', 'block_fn_mentor');
 }
 
-$mentee = $DB->get_record('user', array('id'=>$menteeid), '*', MUST_EXIST);
+$mentee = $DB->get_record('user', array('id' => $menteeid), '*', MUST_EXIST);
 
 $title = get_string('page_title_assign_mentor', 'block_fn_mentor');
 $heading = $SITE->fullname;
@@ -97,12 +96,12 @@ $PAGE->set_heading($heading);
 $PAGE->set_cacheable(true);
 $PAGE->requires->css('/blocks/fn_mentor/css/styles.css');
 
-$PAGE->navbar->add(get_string('pluginname', 'block_fn_mentor'), new moodle_url('/blocks/fn_mentor/course_overview.php', array('menteeid'=>$menteeid)));
+$PAGE->navbar->add(get_string('pluginname', 'block_fn_mentor'), new moodle_url('/blocks/fn_mentor/course_overview.php', array('menteeid' => $menteeid)));
 
 echo $OUTPUT->header();
 
 echo '<div id="mentee-course-overview-page">';
-//LEFT
+// LEFT
 echo '<div id="mentee-course-overview-left">';
 
 $lastaccess = '';
@@ -128,19 +127,19 @@ $studentmenu = '';
 if ((!$isstudent) || ($isadmin || $ismentor  || $isteacher)) {
     $studentmenu = html_writer::tag('form', '<span>'.get_string('select_student', 'block_fn_mentor').'</span>'.
                                 html_writer::select($student_menu, 'sortby', $student_menu_url[$menteeid], null, array('onChange' => 'location=document.jump1.sortby.options[document.jump1.sortby.selectedIndex].value;')),
-                            array('id'=>'studentFilterForm', 'name'=>'jump1'));
+                            array('id' => 'studentFilterForm', 'name' => 'jump1'));
 
     $studentmenu = '<div class="mentee-course-overview-block-filter"> '.$studentmenu.' </div>';
 }
 
-//BLOCK-1
+// BLOCK-1
 echo $studentmenu.'
       <div class="mentee-course-overview-block">
           <div class="mentee-course-overview-block-title">
               '.get_string('student', 'block_fn_mentor').'
           </div>
           <div class="mentee-course-overview-block-content">'.
-              $OUTPUT->container($OUTPUT->user_picture($mentee, array('courseid'=>$COURSE->id)), "userimage").
+              $OUTPUT->container($OUTPUT->user_picture($mentee, array('courseid' => $COURSE->id)), "userimage").
               $OUTPUT->container('<a  href="'.$CFG->wwwroot.'/user/view.php?id='.$mentee->id.'&course=1"
                                 onclick="window.open(\''.$CFG->wwwroot.'/user/view.php?id='.$mentee->id.'&course=1\', \'\', \'width=800,height=600,toolbar=no,location=no,menubar=no,copyhistory=no,status=no,directories=no,scrollbars=yes,resizable=yes\'); return false;"
                                 class="" >'.fullname($mentee, true).'</a>
@@ -150,8 +149,8 @@ echo $studentmenu.'
           </div>
       </div>';
 
-//COURSES
-if (!$enrolled_courses = enrol_get_all_users_courses($menteeid, 'id,fullname,shortname', NULL, 'fullname ASC')) {
+// COURSES
+if (!$enrolled_courses = enrol_get_all_users_courses($menteeid, 'id,fullname,shortname', null, 'fullname ASC')) {
     $enrolled_courses = array();
 }
 
@@ -187,7 +186,7 @@ echo '<div class="mentee-course-overview-block">
           </div>
       </div>';
 
-//NOTES
+// NOTES
 if ($view = has_capability('block/fn_mentor:viewcoursenotes', context_system::instance()) && $allownotes) {
     echo '<div class="mentee-course-overview-block">
               <div class="mentee-course-overview-block-title">
@@ -202,9 +201,9 @@ if ($view = has_capability('block/fn_mentor:viewcoursenotes', context_system::in
 
 
 
-            //COURSE NOTES
-            if ($courseids && $view) {
-                $sql_notes = "SELECT p.*, c.fullname
+            // COURSE NOTES
+    if ($courseids && $view) {
+        $sql_notes = "SELECT p.*, c.fullname
                                 FROM {post} p
                           INNER JOIN {course} c
                                   ON p.courseid = c.id
@@ -214,25 +213,25 @@ if ($view = has_capability('block/fn_mentor:viewcoursenotes', context_system::in
                                  AND p.publishstate IN ('site', 'public')
                             ORDER BY p.lastmodified DESC";
 
-                if ($notes = $DB->get_records_sql($sql_notes, array($mentee->id),0, 3)) {
-                    foreach ($notes as $note) {
-                        $ccontext = context_course::instance($note->courseid);
-                        $cfullname = format_string($note->fullname, true, array('context' => $ccontext));
-                        $header = '<h3 class="notestitle"><a href="' . $CFG->wwwroot . '/course/view.php?id=' . $note->courseid . '">' . $cfullname . '</a></h3>';
-                        echo $header;
-                        block_fn_mentor_note_print($note, NOTES_SHOW_FULL);
-                    }
-                    //Show all notes  http://localhost/moodle25/notes/index.php?user=127
-                    echo '<a  href="'.$CFG->wwwroot.'/notes/index.php?user='.$mentee->id.'"
+        if ($notes = $DB->get_records_sql($sql_notes, array($mentee->id),0, 3)) {
+            foreach ($notes as $note) {
+                $ccontext = context_course::instance($note->courseid);
+                $cfullname = format_string($note->fullname, true, array('context' => $ccontext));
+                $header = '<h3 class="notestitle"><a href="' . $CFG->wwwroot . '/course/view.php?id=' . $note->courseid . '">' . $cfullname . '</a></h3>';
+                echo $header;
+                block_fn_mentor_note_print($note, NOTES_SHOW_FULL);
+            }
+            // Show all notes  http://localhost/moodle25/notes/index.php?user=127
+            echo '<a  href="'.$CFG->wwwroot.'/notes/index.php?user='.$mentee->id.'"
                                         onclick="window.open(\''.$CFG->wwwroot.'/notes/index.php?user='.$mentee->id.'\', \'\', \'width=800,height=600,toolbar=no,location=no,menubar=no,copyhistory=no,status=no,directories=no,scrollbars=yes,resizable=yes\'); return false;"
                                         class="" >'.get_string('show_all_notes', 'block_fn_mentor').'</a>';
-                } else {
-                    //Add a note  add_a_note
-                    echo '<a  href="'.$CFG->wwwroot.'/notes/index.php?user='.$mentee->id.'"
+        } else {
+            // Add a note  add_a_note
+            echo '<a  href="'.$CFG->wwwroot.'/notes/index.php?user='.$mentee->id.'"
                                         onclick="window.open(\''.$CFG->wwwroot.'/notes/index.php?user='.$mentee->id.'\', \'\', \'width=800,height=600,toolbar=no,location=no,menubar=no,copyhistory=no,status=no,directories=no,scrollbars=yes,resizable=yes\'); return false;"
                                         class="" >'.get_string('add_a_note', 'block_fn_mentor').'</a>';
-                }
-            }
+        }
+    }
 
 
     echo     '</div>
@@ -240,7 +239,7 @@ if ($view = has_capability('block/fn_mentor:viewcoursenotes', context_system::in
 }
 echo '</div>';
 
-//CENTER
+// CENTER
 echo '<div id="mentee-course-overview-center">';
 
 if ($enrolled_courses) {
@@ -254,11 +253,10 @@ if ($enrolled_courses) {
         $course = $DB->get_record('course', array('id' => $enrolled_course->id), '*', MUST_EXIST);
 
         echo '<div class="mentee-course-overview-center_course">';
-        ##################################
 
         $context = context_course::instance($course->id);
 
-        //Count grade to pass activities
+        // Count grade to pass activities
         $sql_grade_to_pass = "SELECT Count(gi.id)
                             FROM {grade_items} gi
                            WHERE gi.courseid = ?
@@ -300,10 +298,10 @@ if ($enrolled_courses) {
                 $completionstate = $data->completionstate;
                 $assignment_status = block_fn_mentor_assignment_status($activity, $menteeid);
 
-                //echo "$activity->name | $completionstate | $assignment_status <br>\n";
-                //COMPLETION_INCOMPLETE
+                // echo "$activity->name | $completionstate | $assignment_status <br>\n";
+                // COMPLETION_INCOMPLETE
                 if ($completionstate == 0) {
-                    //Show activity as complete when conditions are met
+                    // Show activity as complete when conditions are met
                     if (($activity->module == 1)
                         && ($activity->modname == 'assignment' || $activity->modname == 'assign')
                         && ($activity->completion == 2)
@@ -324,8 +322,8 @@ if ($enrolled_courses) {
                     } else {
                         $notattemptedactivities++;
                     }
-                    //COMPLETION_COMPLETE - COMPLETION_COMPLETE_PASS
-                } elseif ($completionstate == 1 || $completionstate == 2) {
+                    // COMPLETION_COMPLETE - COMPLETION_COMPLETE_PASS
+                } else if ($completionstate == 1 || $completionstate == 2) {
                     if (($activity->module == 1)
                         && ($activity->modname == 'assignment' || $activity->modname == 'assign')
                         && ($activity->completion == 2)
@@ -347,9 +345,9 @@ if ($enrolled_courses) {
                         $completedactivities++;
                     }
 
-                    //COMPLETION_COMPLETE_FAIL
-                } elseif ($completionstate == 3) {
-                    //Show activity as complete when conditions are met
+                    // COMPLETION_COMPLETE_FAIL
+                } else if ($completionstate == 3) {
+                    // Show activity as complete when conditions are met
                     if (($activity->module == 1)
                         && ($activity->modname == 'assignment' || $activity->modname == 'assign')
                         && ($activity->completion == 2)
@@ -386,7 +384,7 @@ if ($enrolled_courses) {
             $notattempted = get_string('notattempted', 'block_fn_mentor');
             $waitingforgrade = get_string('waitingforgrade', 'block_fn_mentor');
 
-            //Completed
+            // Completed
             $progress_data->content->items[] = '<a  href="' . $CFG->wwwroot . '/blocks/fn_mentor/listactivities.php?id=' . $course->id . '&menteeid=' . $menteeid . '&show=completed' . '&navlevel=top"
         onclick="window.open(\'' . $CFG->wwwroot . '/blocks/fn_mentor/listactivities.php?id=' . $course->id . '&menteeid=' . $menteeid . '&show=completed' . '&navlevel=top\', \'\', \'width=800,height=600,toolbar=no,location=no,menubar=no,copyhistory=no,status=no,directories=no,scrollbars=yes,resizable=yes\'); return false;"
         class="">' . $completedactivities . ' ' . $completed . '</a>';
@@ -394,7 +392,7 @@ if ($enrolled_courses) {
             $progress_data->content->icons[] = '<img src="' . $CFG->wwwroot . '/blocks/fn_mentor/pix/completed.gif"
                                             class="icon" alt="">';
 
-            //Incomplete
+            // Incomplete
             if ($num_grade_to_pass && $incompletedactivities > 0) {
                 $progress_data->content->items[] = '<a  href="' . $CFG->wwwroot . '/blocks/fn_mentor/listactivities.php?id=' . $course->id . '&menteeid=' . $menteeid . '&show=incompleted' . '&navlevel=top"
             onclick="window.open(\'' . $CFG->wwwroot . '/blocks/fn_mentor/listactivities.php?id=' . $course->id . '&menteeid=' . $menteeid . '&show=incompleted' . '&navlevel=top\', \'\', \'width=800,height=600,toolbar=no,location=no,menubar=no,copyhistory=no,status=no,directories=no,scrollbars=yes,resizable=yes\'); return false;"
@@ -404,7 +402,7 @@ if ($enrolled_courses) {
                                                 class="icon" alt="">';
             }
 
-            //Draft
+            // Draft
             if ($savedactivities > 0) {
                 $progress_data->content->items[] = '<a  href="' . $CFG->wwwroot . '/blocks/fn_mentor/listactivities.php?id=' . $course->id . '&menteeid=' . $menteeid . '&show=draft' . '&navlevel=top"
             onclick="window.open(\'' . $CFG->wwwroot . '/blocks/fn_mentor/listactivities.php?id=' . $course->id . '&menteeid=' . $menteeid . '&show=draft' . '&navlevel=top\', \'\', \'width=800,height=600,toolbar=no,location=no,menubar=no,copyhistory=no,status=no,directories=no,scrollbars=yes,resizable=yes\'); return false;"
@@ -414,7 +412,7 @@ if ($enrolled_courses) {
                                                 class="icon" alt="">';
             }
 
-            //Not Attempted
+            // Not Attempted
             $progress_data->content->items[] = '<a  href="' . $CFG->wwwroot . '/blocks/fn_mentor/listactivities.php?id=' . $course->id . '&menteeid=' . $menteeid . '&show=notattempted' . '&navlevel=top"
         onclick="window.open(\'' . $CFG->wwwroot . '/blocks/fn_mentor/listactivities.php?id=' . $course->id . '&menteeid=' . $menteeid . '&show=notattempted' . '&navlevel=top\', \'\', \'width=800,height=600,toolbar=no,location=no,menubar=no,copyhistory=no,status=no,directories=no,scrollbars=yes,resizable=yes\'); return false;"
         class="">' . $notattemptedactivities . ' ' . $notattempted . '</a>';
@@ -422,7 +420,7 @@ if ($enrolled_courses) {
             $progress_data->content->icons[] = '<img src="' . $CFG->wwwroot . '/blocks/fn_mentor/pix/notattempted.gif"
                                             class="icon" alt="">';
 
-            //Waiting for grade
+            // Waiting for grade
             $progress_data->content->items[] = '<a  href="' . $CFG->wwwroot . '/blocks/fn_mentor/listactivities.php?id=' . $course->id . '&menteeid=' . $menteeid . '&show=waitingforgrade' . '&navlevel=top"
         onclick="window.open(\'' . $CFG->wwwroot . '/blocks/fn_mentor/listactivities.php?id=' . $course->id . '&menteeid=' . $menteeid . '&show=waitingforgrade' . '&navlevel=top\', \'\', \'width=800,height=600,toolbar=no,location=no,menubar=no,copyhistory=no,status=no,directories=no,scrollbars=yes,resizable=yes\'); return false;"
         class="">' . $waitingforgradeactivities . ' ' . $waitingforgrade . '</a>';
@@ -440,19 +438,18 @@ if ($enrolled_courses) {
         }
 
 
-        ##################################
 
 
         echo '<table class="mentee-course-overview-center_table block">';
         echo '<tr>';
-        //1
+        // 1
         echo '<td valign="top" class="mentee-grey-border">';
         echo '<div class="overview-course coursetitle"><a  href="' . $CFG->wwwroot . '/course/view.php?id=' . $enrolled_course->id . '"
     onclick="window.open(\'' . $CFG->wwwroot . '/course/view.php?id=' . $enrolled_course->id . '\', \'\', \'width=800,height=600,toolbar=no,location=no,menubar=no,copyhistory=no,status=no,directories=no,scrollbars=yes,resizable=yes\'); return false;"
     class="" >' . $enrolled_course->fullname . '</a></div>';
         echo '<div class="overview-teacher">';
         echo '<table class="mentee-teacher-table">';
-        //Course teachers
+        // Course teachers
         $sql_techer = "SELECT u.id,
                           u.firstname,
                           u.lastname,
@@ -469,7 +466,7 @@ if ($enrolled_courses) {
         if ($teachers = $DB->get_records_sql($sql_techer, array(50, 3, $course->id))) {
             echo '<tr><td class="mentee-teacher-table-label" valign="top"><span>' . get_string('teacher', 'block_fn_mentor') . ': </span></td><td valign="top">';
             foreach ($teachers as $teacher) {
-                //echo '<a class="mentor-profile" target="_blank" href="'.$CFG->wwwroot.'/user/profile.php?id='.$teacher->id.'">' . $teacher->firstname.' '.$teacher->lastname.'</a> <a href="'.$CFG->wwwroot.'/message/index.php?id='.$teacher->id.'" ><img src="'.$CFG->wwwroot.'/blocks/fn_mentor/pix/email.png"></a><br />';
+                // echo '<a class="mentor-profile" target="_blank" href="'.$CFG->wwwroot.'/user/profile.php?id='.$teacher->id.'">' . $teacher->firstname.' '.$teacher->lastname.'</a> <a href="'.$CFG->wwwroot.'/message/index.php?id='.$teacher->id.'" ><img src="'.$CFG->wwwroot.'/blocks/fn_mentor/pix/email.png"></a><br />';
                 $lastaccess = get_string('lastaccess') . get_string('labelsep', 'langconfig') . block_fn_mentor_format_time(time() - $teacher->lastaccess);
                 echo '<div><a onclick="window.open(\'' . $CFG->wwwroot . '/user/profile.php?id=' . $teacher->id . '\', \'\', \'width=800,height=600,toolbar=no,location=no,menubar=no,copyhistory=no,status=no,directories=no,scrollbars=yes,resizable=yes\'); return false;" href="' . $CFG->wwwroot . '/user/profile.php?id=' . $teacher->id . '">' . $teacher->firstname . ' ' . $teacher->lastname . '</a>
                   <a onclick="window.open(\'' . $CFG->wwwroot . '/message/index.php?id=' . $teacher->id . '\', \'\', \'width=800,height=600,toolbar=no,location=no,menubar=no,copyhistory=no,status=no,directories=no,scrollbars=yes,resizable=yes\'); return false;" href="' . $CFG->wwwroot . '/user/profile.php?id=' . $teacher->id . '"><img src="' . $CFG->wwwroot . '/blocks/fn_mentor/pix/email.png"></a><br />' .
@@ -488,7 +485,7 @@ if ($enrolled_courses) {
             echo '</span></td><td valign="top">';
             foreach ($mentors as $mentor) {
                 $lastaccess = get_string('lastaccess') . get_string('labelsep', 'langconfig') . block_fn_mentor_format_time(time() - $mentor->lastaccess);
-                //echo '<a class="mentor-profile" target="_blank" href="'.$CFG->wwwroot.'/user/profile.php?id='.$mentor->mentorid.'">' . $mentor->firstname.' '.$mentor->lastname.'</a> <a href="'.$CFG->wwwroot.'/message/index.php?id='.$mentor->mentorid.'" ><img src="'.$CFG->wwwroot.'/blocks/fn_mentor/pix/email.png"></a><br />';
+                // echo '<a class="mentor-profile" target="_blank" href="'.$CFG->wwwroot.'/user/profile.php?id='.$mentor->mentorid.'">' . $mentor->firstname.' '.$mentor->lastname.'</a> <a href="'.$CFG->wwwroot.'/message/index.php?id='.$mentor->mentorid.'" ><img src="'.$CFG->wwwroot.'/blocks/fn_mentor/pix/email.png"></a><br />';
                 echo '<div><a onclick="window.open(\'' . $CFG->wwwroot . '/user/profile.php?id=' . $mentor->mentorid . '\', \'\', \'width=620,height=450,toolbar=no,location=no,menubar=no,copyhistory=no,status=no,directories=no,scrollbars=yes,resizable=yes\'); return false;" href="' . $CFG->wwwroot . '/user/profile.php?id=' . $mentor->mentorid . '">' . $mentor->firstname . ' ' . $mentor->lastname . '</a>
                   <a onclick="window.open(\'' . $CFG->wwwroot . '/message/index.php?id=' . $mentor->mentorid . '\', \'\', \'width=620,height=450,toolbar=no,location=no,menubar=no,copyhistory=no,status=no,directories=no,scrollbars=yes,resizable=yes\'); return false;" href="' . $CFG->wwwroot . '/user/profile.php?id=' . $mentor->mentorid . '"><img src="' . $CFG->wwwroot . '/blocks/fn_mentor/pix/email.png"></a><br />' .
                     '<span class="mentee-lastaccess">' . $lastaccess . '</span></div>';
@@ -498,12 +495,12 @@ if ($enrolled_courses) {
         echo '</table>';
         echo '</div>';
         echo '</td>';
-        //2
+        // 2
         echo '<td valign="top" class="mentee-blue-border">';
         echo '<div class="overview-progress blue">Progress</div>';
         echo '<div class="vertical-textd">' . $progress_html . '</div>';
         echo '</td>';
-        //3
+        // 3
         echo '<td valign="top" class="mentee-blue-border">';
         echo '<div class="overview-progress blue">Grade</div>';
         echo block_fn_mentor_print_grade_summary($course->id, $mentee->id);
@@ -512,7 +509,7 @@ if ($enrolled_courses) {
         echo '</tr>';
         echo '</table>';
 
-        echo '</div>'; //mentee-course-overview-center_course
+        echo '</div>'; // mentee-course-overview-center_course
     }
 
 } else {

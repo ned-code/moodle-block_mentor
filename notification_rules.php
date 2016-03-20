@@ -26,19 +26,19 @@ require_once('../../config.php');
 require_once($CFG->dirroot . '/blocks/fn_mentor/lib.php');
 require_once($CFG->dirroot . '/blocks/fn_mentor/notificaton_form.php');
 
-//Parameters
-$menteeid = optional_param('menteeid', NULL, PARAM_INT);
-$courseid = optional_param('courseid', NULL, PARAM_INT);
+// Parameters
+$menteeid = optional_param('menteeid', null, PARAM_INT);
+$courseid = optional_param('courseid', null, PARAM_INT);
 $id       = optional_param('id', 0, PARAM_INT);
 $action   = optional_param('action', 'add', PARAM_TEXT);
 
 require_login();
 
-//PERMISSION
+// PERMISSION
 require_capability('block/fn_mentor:createnotificationrule', context_system::instance());
 
 if (($action == 'edit') && ($id)) {
-    $notification_rule = $DB->get_record('block_fn_mentor_notification',array('id'=>$id),'*',MUST_EXIST);
+    $notification_rule = $DB->get_record('block_fn_mentor_notification',array('id' => $id),'*',MUST_EXIST);
 }
 
 $title = get_string('page_title_assign_mentor', 'block_fn_mentor');
@@ -72,7 +72,7 @@ if ($notification_rules = $DB->get_records('block_fn_mentor_notification')) {
     }
 }
 
-echo block_fn_mentor_single_button_form ('create_new_rule', new moodle_url('/blocks/fn_mentor/notification.php'), NULL, get_string('create_new_rule', 'block_fn_mentor'));
+echo block_fn_mentor_single_button_form ('create_new_rule', new moodle_url('/blocks/fn_mentor/notification.php'), null, get_string('create_new_rule', 'block_fn_mentor'));
 echo '</div>';
 
 

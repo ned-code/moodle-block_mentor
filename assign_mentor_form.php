@@ -46,8 +46,8 @@ class assign_mentor_form extends moodleform {
                         );
         $mentorroleid = get_config('block_fn_mentor', 'mentor_role_system');
         $assignroleurl = new moodle_url($CFG->wwwroot.'/admin/roles/assign.php', array('contextid' => 1, 'roleid' => $mentorroleid));
-        $assignrolebutton =  block_fn_mentor_single_button($assignroleurl->out(), get_string('manage_mentor_role', 'block_fn_mentor'), 'single_button', 'assign_role');
-        $infobutton =  block_fn_mentor_single_button($assignroleurl->out(), get_string('info_about_selected_people', 'block_fn_mentor'), 'single_button', 'assign_role');
+        $assignrolebutton = block_fn_mentor_single_button($assignroleurl->out(), get_string('manage_mentor_role', 'block_fn_mentor'), 'single_button', 'assign_role');
+        $infobutton = block_fn_mentor_single_button($assignroleurl->out(), get_string('info_about_selected_people', 'block_fn_mentor'), 'single_button', 'assign_role');
 
         // MENTOR SELECT.
         $selectmentor = new html_table_cell();
@@ -57,17 +57,16 @@ class assign_mentor_form extends moodleform {
             $mentoroptions[$user->id] = $user->firstname . " " . $user->lastname;
         }
 
-        $selectmentor->text =  html_writer::tag('div', get_config('block_fn_mentor','mentors'), array('class' => 'object_labels')) .
+        $selectmentor->text = html_writer::tag('div', get_config('block_fn_mentor','mentors'), array('class' => 'object_labels')) .
                                 html_writer::tag('div',
-                                    html_writer::select($mentormenu, '', '', null, array('id' => 'mentor_menu', 'class'=>'ignoredirty')).
-                                    html_writer::select($mentoroptions, '', '', null, array('id' => 'selectmentor', 'class'=>'ignoredirty', 'size' => 20))) .
+                                    html_writer::select($mentormenu, '', '', null, array('id' => 'mentor_menu', 'class' => 'ignoredirty')).
+                                    html_writer::select($mentoroptions, '', '', null, array('id' => 'selectmentor', 'class' => 'ignoredirty', 'size' => 20))) .
                                     $assignrolebutton;
 
         $selectmentee = new html_table_cell();
 
-        $selectmentee->text =  html_writer::tag('div', get_config('block_fn_mentor','mentees'), array('class' => 'object_labels') ) .
-                                html_writer::tag('div', html_writer::select(array(), '', '', null, array('id' => 'selectmentee', 'class'=>'ignoredirty', 'multiple' => 'multiple', 'size' => 21)));
-
+        $selectmentee->text = html_writer::tag('div', get_config('block_fn_mentor','mentees'), array('class' => 'object_labels') ) .
+                                html_writer::tag('div', html_writer::select(array(), '', '', null, array('id' => 'selectmentee', 'class' => 'ignoredirty', 'multiple' => 'multiple', 'size' => 21)));
 
         $embed = function ($text, $id) {
             return html_writer::tag('p',
@@ -76,7 +75,6 @@ class assign_mentor_form extends moodleform {
                 ))
             );
         };
-
 
         $centerbuttons = new html_table_cell();
         $centerbuttons->text = (
@@ -99,10 +97,10 @@ class assign_mentor_form extends moodleform {
         }
 
         $selectstudent = new html_table_cell();
-        $selectstudent->text =  html_writer::tag('div', get_string('students', 'block_fn_mentor'), array('class' => 'object_labels') ) .
+        $selectstudent->text = html_writer::tag('div', get_string('students', 'block_fn_mentor'), array('class' => 'object_labels') ) .
                           html_writer::tag('div',
-                            html_writer::select($studentmenu, '', '', null, array('id' => 'student_menu', 'class'=>'ignoredirty')).
-                            html_writer::select($studentoptions, '', '', null, array('id' => 'selectstudent', 'class'=>'ignoredirty', 'multiple' => 'multiple', 'size' => 20))).
+                            html_writer::select($studentmenu, '', '', null, array('id' => 'student_menu', 'class' => 'ignoredirty')).
+                            html_writer::select($studentoptions, '', '', null, array('id' => 'selectstudent', 'class' => 'ignoredirty', 'multiple' => 'multiple', 'size' => 20))).
                           html_writer::tag('div',
                                        get_string('search', 'block_fn_mentor') .
                                        ' <input type="text" id="student_search" name="student_search">', array('id' => 'student_search_container'));

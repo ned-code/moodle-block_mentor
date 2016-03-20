@@ -81,7 +81,7 @@ echo '<div id="LoadingImage" style="display: none"><img src="'.$CFG->wwwroot.'/p
 $form = new assign_mentor_form(null, array(
     'mentors' => $mentors,
     'students' => $students
-),'post', '', array('id'=>'assignmentorform'));
+),'post', '', array('id' => 'assignmentorform'));
 
 if ($form->is_cancelled()) {
     redirect(new moodle_url('/course/view.php?id=' . $courseid));

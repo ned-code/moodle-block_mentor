@@ -55,7 +55,6 @@ class block_fn_mentor extends block_base {
         $isteacher = block_fn_mentor_isteacherinanycourse($USER->id);
         $isstudent = block_fn_mentor_isstudentinanycourse($USER->id);
 
-
         $strmentor = get_config('block_fn_mentor', 'mentor');
         $strmentors = get_config('block_fn_mentor', 'mentors');
         $strmentee = get_config('block_fn_mentor', 'mentee');
@@ -66,18 +65,18 @@ class block_fn_mentor extends block_base {
             $maxnumberofmentees = 15;
         }
 
-        //Additional user filter according to user type
+        // Additional user filter according to user type
         $filter = '';
         if ($isadmin) {
             $filter = 'admin';
             $this->title = $strmentors . ' - ' . $strmentees;
-        } elseif ($isteacher) {
+        } else if ($isteacher) {
             $filter = 'teacher';
             $this->title = $strmentors . ' - ' . $strmentees;
-        } elseif ($ismentor) {
+        } else if ($ismentor) {
             $filter = 'mentor';
             $this->title = 'My ' . $strmentees;
-        } elseif ($isstudent) {
+        } else if ($isstudent) {
             $filter = 'student';
             $this->title = 'My ' . $strmentors;
         }
@@ -90,7 +89,6 @@ class block_fn_mentor extends block_base {
             $this->content = '';
             return $this->content;
         }
-
 
         $this->content = new stdClass();
         $this->content->items = array();
@@ -113,7 +111,7 @@ class block_fn_mentor extends block_base {
             'mentor' => $CFG->wwwroot.'/'.$indexphp.'?coursefilter='.$coursefilter.'&sortby=mentor',
             'mentee' => $CFG->wwwroot.'/'.$indexphp.'?coursefilter='.$coursefilter.'&sortby=mentee'
         );
-        $sortmenu= array(
+        $sortmenu = array(
             $sortbyURL['mentor'] => get_config('block_fn_mentor', 'mentor'),
             $sortbyURL['mentee'] => get_config('block_fn_mentor', 'mentee')
         );
@@ -138,19 +136,19 @@ class block_fn_mentor extends block_base {
                     $coursemenu[$courseURL[$course->id]] = $course->fullname;
                 }
             }
-        // COURSES - TEACHER
-        } elseif ($isteacher) {
+            // COURSES - TEACHER
+        } else if ($isteacher) {
             if ($courses = block_fn_mentor_get_teacher_courses()) {
                 foreach ($courses as $course) {
                     $courseURL[$course->id] = $CFG->wwwroot.'/'.$indexphp.'?coursefilter='.$course->id.'&sortby='.$sortby.'&showall='.$showall;
                     $coursemenu[$courseURL[$course->id]] = $course->fullname;
                 }
             }
-        // COURSES - TEACHER
-        } elseif ($ismentor) {
+            // COURSES - TEACHER
+        } else if ($ismentor) {
             if ($students = block_fn_mentor_get_mentees_by_mentor(0, $filter)) {
                 $students = reset($students);
-                $student_ids =  implode(",", array_keys($students['mentee']));
+                $student_ids = implode(",", array_keys($students['mentee']));
 
                 if ($student_ids) {
                     $sql = "SELECT DISTINCT c.id,
@@ -183,14 +181,14 @@ class block_fn_mentor extends block_base {
             $this->content->text .= html_writer::tag('form',
                                         get_string('sortby', 'block_fn_mentor') . ' ' .
                                         html_writer::select($sortmenu, 'sortby', $sortbyURL[$sortby], null, array('onChange' => 'location=document.jump1.sortby.options[document.jump1.sortby.selectedIndex].value;')),
-                                    array('id'=>'sortbyForm', 'name'=>'jump1'));
+                                    array('id' => 'sortbyForm', 'name' => 'jump1'));
         }
         // COURSE.
         if (($isteacher || $isadmin || $ismentor) && $courses && ($this->page->course->id == SITEID)) {
             $this->content->text .= html_writer::tag('form',
                                         get_string('course', 'block_fn_mentor') . ' ' .
                                         html_writer::select($coursemenu, 'coursefilter', $courseURL[$coursefilter], null, array('onChange' => 'location=document.jump2.coursefilter.options[document.jump2.coursefilter.selectedIndex].value;')),
-                                    array('id'=>'courseForm', 'name'=>'jump2'));
+                                    array('id' => 'courseForm', 'name' => 'jump2'));
             $this->content->text .= '</div>';
         }
 
@@ -201,7 +199,7 @@ class block_fn_mentor extends block_base {
             $number_of_mentees = 0;
 
             if ($sortby == 'mentor') {
-                $visible_mentees =  block_fn_mentor_get_mentees_by_mentor($coursefilter, $filter);
+                $visible_mentees = block_fn_mentor_get_mentees_by_mentor($coursefilter, $filter);
                 foreach ($visible_mentees as $visible_mentee) {
                     $number_of_mentees += sizeof($visible_mentee['mentee']);
                 }
@@ -221,7 +219,7 @@ class block_fn_mentor extends block_base {
             }
 
             if ($sortby == 'mentee') {
-                $visible_mentees =  block_fn_mentor_get_mentors_by_mentee($coursefilter, $filter);
+                $visible_mentees = block_fn_mentor_get_mentors_by_mentee($coursefilter, $filter);
                 $number_of_mentees += sizeof($visible_mentees);
 
                 if (($number_of_mentees > $maxnumberofmentees) && (!$showall)) {
