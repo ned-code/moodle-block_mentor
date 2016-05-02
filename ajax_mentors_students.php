@@ -15,11 +15,9 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Strings for component 'block_fn_mentor', language 'en'
- *
- * @package   block_fn_mentor
- * @copyright Michael Gardener <mgardener@cissq.com>
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package    block_ned_mentor
+ * @copyright  Michael Gardener <mgardener@cissq.com>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 define('AJAX_SCRIPT', true);
@@ -35,7 +33,7 @@ $filter   = optional_param('filter', '', PARAM_TEXT);
 
 confirm_sesskey();
 
-require_login();
+require_login(null, false);
 $records = null;
 $data = array();
 $selectoptions = array();
@@ -49,27 +47,27 @@ $idfield = array(
 );
 
 // PERMISSION.
-if ( has_capability('block/fn_mentor:assignmentor', context_system::instance(), $USER->id)) {
+if ( has_capability('block/ned_mentor:assignmentor', context_system::instance(), $USER->id)) {
 
     switch ($action) {
         case 'all_mentors':
-            $records = block_fn_mentor_get_all_mentors();
+            $records = block_ned_mentor_get_all_mentors();
             break;
 
         case 'mentors_without_mentee':
-            $records = block_fn_mentor_get_mentors_without_mentee();
+            $records = block_ned_mentor_get_mentors_without_mentee();
             break;
 
         case 'all_students':
-            $records = block_fn_mentor_get_all_students($filter);
+            $records = block_ned_mentor_get_all_students($filter);
             break;
 
         case 'students_without_mentor':
-            $records = block_fn_mentor_get_students_without_mentor($filter);
+            $records = block_ned_mentor_get_students_without_mentor($filter);
             break;
 
         case 'get_mentees':
-            $records = block_fn_mentor_get_mentees($mentorid);
+            $records = block_ned_mentor_get_mentees($mentorid);
             break;
     }
 
@@ -84,12 +82,12 @@ if ( has_capability('block/fn_mentor:assignmentor', context_system::instance(), 
         $data['message'] = '';
     } else {
         $data['success'] = true;
-        $data['message'] = get_string('not_found', 'block_fn_mentor');
+        $data['message'] = get_string('not_found', 'block_ned_mentor');
     }
 
 } else {
     $data['success'] = false;
-    $data['message'] = get_string('permission_error', 'block_fn_mentor');
+    $data['message'] = get_string('permission_error', 'block_ned_mentor');
 }
 
 $data['options'] = $selectoptions;

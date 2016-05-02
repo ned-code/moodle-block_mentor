@@ -15,11 +15,9 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Strings for component 'block_fn_mentor', language 'en'
- *
- * @package   block_fn_mentor
- * @copyright Michael Gardener <mgardener@cissq.com>
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package    block_ned_mentor
+ * @copyright  Michael Gardener <mgardener@cissq.com>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 define('AJAX_SCRIPT', true);
@@ -35,20 +33,20 @@ $studentids = optional_param('studentids', null, PARAM_RAW);
 
 confirm_sesskey();
 
-require_login();
+require_login(null, false);
 
 $data = array();
 $data['success'] = true;
 $data['message'] = '';
 
 // PERMISSION.
-if ( has_capability('block/fn_mentor:assignmentor', context_system::instance(), $USER->id)) {
+if ( has_capability('block/ned_mentor:assignmentor', context_system::instance(), $USER->id)) {
 
     $studentlist = explode(',', $studentids);
 
-    foreach($studentlist as $key => $value) {
+    foreach ($studentlist as $key => $value) {
         $studentlist[$key] = (int) $value;
-        if( $studentlist[$key] != $value ) {
+        if ( $studentlist[$key] != $value ) {
             unset($studentlist[$key]);
         }
     }
@@ -57,7 +55,7 @@ if ( has_capability('block/fn_mentor:assignmentor', context_system::instance(), 
 
     switch ($action) {
         case 'add':
-            $mentorrole = get_config('block_fn_mentor', 'mentor_role_user');
+            $mentorrole = get_config('block_ned_mentor', 'mentor_role_user');
 
             $sqlusers = "SELECT u.id FROM {user} u WHERE id $insql";
             $users = $DB->get_records_sql($sqlusers, $params);
@@ -74,7 +72,7 @@ if ( has_capability('block/fn_mentor:assignmentor', context_system::instance(), 
             break;
 
         case 'remove':
-            $mentorrole = get_config('block_fn_mentor', 'mentor_role_user');
+            $mentorrole = get_config('block_ned_mentor', 'mentor_role_user');
 
             $sqlusers = "SELECT u.id FROM {user} u WHERE id $insql";
             $users = $DB->get_records_sql($sqlusers, $params);
@@ -93,6 +91,6 @@ if ( has_capability('block/fn_mentor:assignmentor', context_system::instance(), 
 
 } else {
     $data['success'] = false;
-    $data['message'] = get_string('permission_error', 'block_fn_mentor');
+    $data['message'] = get_string('permission_error', 'block_ned_mentor');
 }
 echo json_encode($data);

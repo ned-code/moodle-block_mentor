@@ -1,13 +1,11 @@
-// a custom onComplete handler to prevent form submits for the demo
-function myOnComplete()
-{
-    // alert("The form validates! (normally, it would submit the form here).");
+// Aa custom onComplete handler to prevent form submits for the demo.
+function myOnComplete() {
     return true;
 }
 
 var rules = [];
 
-// standard form fields
+// Standard form fields.
 rules.push("required,name, Rule name is required.");
 rules.push("digits_only, g4_value, This field may only contain digits.");
 rules.push("digits_only, g6_value, This field may only contain digits.");
@@ -16,9 +14,8 @@ rules.push("digits_only, n2_value, This field may only contain digits.");
 rules.push("required, period, This field may only contain digits.");
 rules.push("digits_only, period, This field may only contain digits.");
 
-// a custom validation function.
-function my_custom_function()
-{
+// A custom validation function.
+function my_custom_function() {
     var prime_nums_str = "1|2|3|5|7|11|13|17|19|23|29|31|37|41|43|47|53|59|61|67|71|73|79|83|89|97";
     var prime_numbers = prime_nums_str.split("|");
 

@@ -15,73 +15,68 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Strings for component 'block_fn_mentor', language 'en'
- *
- * @package   block_fn_mentor
- * @copyright Michael Gardener <mgardener@cissq.com>
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package    block_ned_mentor
+ * @copyright  Michael Gardener <mgardener@cissq.com>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 require_once('../../config.php');
-require_once($CFG->dirroot . '/blocks/fn_mentor/lib.php');
-require_once($CFG->dirroot . '/blocks/fn_mentor/notificaton_form.php');
+require_once($CFG->dirroot . '/blocks/ned_mentor/lib.php');
+require_once($CFG->dirroot . '/blocks/ned_mentor/notificaton_form.php');
 
-// Parameters
+// Parameters.
 $id       = optional_param('id', 0, PARAM_INT);
 $action   = optional_param('action', 'add', PARAM_TEXT);
 
-require_login();
+require_login(null, false);
 
-// PERMISSION
-// require_capability('local/fn_mentor:view', context_system::instance(), $USER->id);
+// PERMISSION.
+require_capability('block/ned_mentor:createnotificationrule', context_system::instance(), $USER->id);
 
 if (($action == 'edit') && ($id)) {
-    $notification_rule = $DB->get_record('block_fn_mentor_notification',array('id' => $id),'*',MUST_EXIST);
+    $notificationrule = $DB->get_record('block_ned_mentor_notific', array('id' => $id), '*', MUST_EXIST);
 }
 
-$title = get_string('page_title_assign_mentor', 'block_fn_mentor');
+$title = get_string('page_title_assign_mentor', 'block_ned_mentor');
 $heading = $SITE->fullname;
 
-$PAGE->set_url('/blocks/fn_mentor/notification.php');
+$PAGE->set_url('/blocks/ned_mentor/notification.php');
 $PAGE->set_pagelayout('course');
 $PAGE->set_context(context_system::instance());
 $PAGE->set_title($title);
 $PAGE->set_heading($heading);
 $PAGE->set_cacheable(true);
 
-$PAGE->requires->css('/blocks/fn_mentor/css/styles.css');
+$PAGE->requires->css('/blocks/ned_mentor/css/styles.css');
 
 $PAGE->requires->jquery();
-$PAGE->requires->js('/blocks/fn_mentor/js/selection.js');
-$PAGE->requires->js('/blocks/fn_mentor/js/jquery.rsv-2.5.1.js');
-$PAGE->requires->js('/blocks/fn_mentor/js/notification_validation.js');
+$PAGE->requires->js('/blocks/ned_mentor/js/selection.js');
+$PAGE->requires->js('/blocks/ned_mentor/js/jquery.rsv-2.5.1.js');
+$PAGE->requires->js('/blocks/ned_mentor/js/notification_validation.js');
 
-$PAGE->navbar->add(get_string('pluginname', 'block_fn_mentor'), new moodle_url('/blocks/fn_mentor/course_overview.php'));
-$PAGE->navbar->add(get_string('notification', 'block_fn_mentor'), new moodle_url('/blocks/fn_mentor/notification.php'));
-
+$PAGE->navbar->add(get_string('pluginname', 'block_ned_mentor'), new moodle_url('/blocks/ned_mentor/course_overview.php'));
+$PAGE->navbar->add(get_string('notification', 'block_ned_mentor'), new moodle_url('/blocks/ned_mentor/notification.php'));
 
 $parameters = array();
 
 if ($action == 'edit') {
-    $parameters = (array) $notification_rule;
+    $parameters = (array) $notificationrule;
 }
 $parameters['action'] = $action;
 
 $mform = new notification_form(null, $parameters, 'post', '', array('id' => 'notification_form', 'class' => 'notification_form'));
 
 if ($mform->is_cancelled()) {
-
-    redirect(new moodle_url('/blocks/fn_mentor/notification_rules.php'), get_string('successful', 'block_fn_mentor'));
-    // Get form data
+    redirect(new moodle_url('/blocks/ned_mentor/notification_rules.php'), get_string('successful', 'block_ned_mentor'));
 } else if ($fromform = $mform->get_data()) {
 
     foreach ($_POST as $key => $value) {
-        if (strpos($key,"category_") === 0) {
-            if ($value <> '0'){
+        if (strpos($key, "category_") === 0) {
+            if (isset($value)) {
                 $fromform->category[] = $value;
             }
-        } else if (strpos($key,"course_") === 0) {
-            if ($value <> '0'){
+        } else if (strpos($key, "course_") === 0) {
+            if ($value <> '0') {
                 $fromform->course[] = $value;
             }
         } else {
@@ -102,10 +97,11 @@ if ($mform->is_cancelled()) {
     $rec->timemodified = time();
     $rec->user = $USER->id;
 
-    $fields = array('name','category','course','g1','g2','g3','g3_value',
-                    'g4','g4_value','g5', 'g5_value','g6','g6_value',
-                    'n1','n1_value','n2','n2_value','period','mentoremail','mentorsms',
-                    'studentemail','studentsms','teacheremail','teachersms','appended_message');
+    $fields = array('name', 'category', 'course', 'g1', 'g2', 'g3', 'g3_value',
+        'g4', 'g4_value', 'g5', 'g5_value', 'g6', 'g6_value',
+        'n1', 'n1_value', 'n2', 'n2_value', 'period', 'mentoremail', 'mentorsms',
+        'studentemail', 'studentsms', 'teacheremail', 'teachersms', 'appended_message'
+    );
 
     foreach ($fields as $field) {
         $rec->$field = (isset($fromform->$field)) ? $fromform->$field : null;
@@ -115,12 +111,12 @@ if ($mform->is_cancelled()) {
         $rec->id = $id;
         $rec->timemodified = time();
 
-        $DB->update_record('block_fn_mentor_notification', $rec);
+        $DB->update_record('block_ned_mentor_notific', $rec);
 
-        redirect(new moodle_url('/blocks/fn_mentor/notification_rules.php'), get_string('successful', 'block_fn_mentor'));
+        redirect(new moodle_url('/blocks/ned_mentor/notification_rules.php'), get_string('successful', 'block_ned_mentor'));
 
-    } else if ($id = $DB->insert_record('block_fn_mentor_notification', $rec)) {
-        redirect(new moodle_url('/blocks/fn_mentor/notification_rules.php'), get_string('successful', 'block_fn_mentor'));
+    } else if ($id = $DB->insert_record('block_ned_mentor_notific', $rec)) {
+        redirect(new moodle_url('/blocks/ned_mentor/notification_rules.php'), get_string('successful', 'block_ned_mentor'));
     }
 
 } else {
@@ -130,7 +126,7 @@ if ($mform->is_cancelled()) {
     $toform->id = $id;
 
     if ($action == 'edit') {
-        $toform->name = $notification_rule->name;
+        $toform->name = $notificationrule->name;
     }
 }
 echo $OUTPUT->header();

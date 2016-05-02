@@ -22,13 +22,16 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-$string['fn_mentor:addinstance'] = 'Add a Mentors Mentees block';
-$string['fn_mentor:myaddinstance'] = 'Add a Mentors Mentees block to my moodle';
-$string['fn_mentor:assignmentor'] = 'Assign mentor';
-$string['fn_mentor:createnotificationrule'] = 'Create notification rule';
-$string['fn_mentor:viewcoursenotes'] = 'View course notes';
-$string['fn_mentor:viewactivitylist'] = 'View activity list';
-$string['pluginname'] = 'Mentors Mentees';
+$string['ned_mentor:addinstance'] = 'Add a NED Mentor Manager block';
+$string['ned_mentor:myaddinstance'] = 'Add a NED Mentor Manager block to my moodle';
+$string['ned_mentor:assignmentor'] = 'Assign mentor';
+$string['ned_mentor:createnotificationrule'] = 'Create notification rule';
+$string['ned_mentor:viewcoursenotes'] = 'View course notes';
+$string['ned_mentor:viewactivitylist'] = 'View activity list';
+$string['ned_mentor:manageall'] = 'Manage all';
+$string['ned_mentor:viewblock'] = 'View block';
+$string['pluginname'] = 'NED Mentor Manager';
+$string['blocktitle'] = 'Mentor Manager';
 $string['blockname'] = 'Block name';
 $string['wordformentor'] = 'Word for Mentor';
 $string['wordformentee'] = 'Word for Mentee';
@@ -80,6 +83,8 @@ $string['when_to_send'] = 'When to send';
 $string['who_to_send'] = 'Who to send it to';
 $string['how_often'] = 'How often';
 $string['completed'] = 'Completed';
+$string['completedsuccessful'] = 'Completed - successful';
+$string['completedunsuccessful'] = 'Completed - unsuccessful';
 $string['completed2'] = 'Completed - successful';
 $string['title:completed'] = 'Completed';
 $string['breadcrumb:activitiescompleted'] = 'Activities Completed';
@@ -156,3 +161,15 @@ $string['sms'] = 'Sms';
 $string['notenrolledanycourse'] = 'This student is not enrolled in any courses.';
 $string['messagesprocessing'] = 'Messages are being processed.<br>Please wait for confirmation.';
 $string['continue'] = 'Continue';
+$string['coursecategories'] = 'Course categories';
+$string['coursecategoriesincluded'] = 'Course categories included';
+$string['selectcategories'] = 'Select categories';
+$string['successful'] = 'Successful';
+$string['allcategories'] = 'All Categories';
+$string['markinmanagerscoursecats'] = 'Mentor Manager - Course Categories';
+$string['markinmanagerscoursecatsdesc'] = 'Selected the course categories that will be processed by the
+Mentor Manager block on the Moodle frontpage and dashboard.';
+$string['progress'] = 'Progress';
+$string['grade'] = 'Grade';
+$string['completionnotenabled'] = '<p>Completion tracking is not enabled in this course.</p>';
+$string['mentee_without_course'] = 'Show mentees without courses';

@@ -2,7 +2,7 @@ $(document).ready(function() {
 
     var sesskey = $("input[name=sesskey]:hidden").val();
 
-    // MENU SELECTION ACTIONS
+    // MENU SELECTION ACTIONS.
     $('select#mentor_menu').change(function() {
         $("#LoadingImage").show();
         var mentor_menu = $('select#mentor_menu').val();
@@ -21,7 +21,7 @@ $(document).ready(function() {
                 var success = data.success;
                 var message = data.message;
                 var options = data.options;
-                // var seat = data.seat;
+
                 if (success === true) {
                     $('select#selectmentor').empty();
                     $('select#selectmentee').empty();
@@ -29,8 +29,6 @@ $(document).ready(function() {
                         $('select#selectmentor').append($("<option></option>").val(this['id']).html(this['label']));
                     });
                     loadStudents(sesskey, '');
-                } else {
-                    // alert(message);
                 }
             }
         });
@@ -62,7 +60,7 @@ $(document).ready(function() {
                 var success = data.success;
                 var message = data.message;
                 var options = data.options;
-                // var seat = data.seat;
+
                 if (success === true) {
                     $('select#selectmentee').empty();
                     $.each(options, function () {
@@ -87,12 +85,11 @@ $(document).ready(function() {
             var mentorid = $('select#selectmentor').val();
             var studentids = "0";
             if (mentorid > 0) {
-                // alert ("Mentor id : "+mentorid);
-                // alert ("Action : "+action);
+
                 items.each(function() {
                     studentids = studentids + ',' + $(this).val();
                 });
-                // alert ("studentids : "+studentids);
+
                 assignMentor (sesskey, mentorid, studentids, action)
             }
             items.appendTo(to);
@@ -105,7 +102,7 @@ $(document).ready(function() {
     $("#remove_button").click(move(mentees, students, ':selected', 'remove'));
     $("#remove_all").click(move(mentees, students, '*', 'remove'));
 
-    // SEARCH INPUT
+    // SEARCH INPUT.
     $("#student_search").keyup(function() {
         if($(this).val().length > 2) {
             loadStudents (sesskey, $(this).val());
@@ -120,40 +117,38 @@ $(document).ready(function() {
 
     $('input[type=checkbox]').each(toggleSub);
 
-    // Nested course category selections
-    $('input[type=checkbox]').click(function () {
-        $(this).parent().find('li input[type=checkbox]').prop('checked', $(this).is(':checked'));
-        $(this).parent().find('li input[type=checkbox]').attr('disabled', $(this).is(':checked'));
+    // Nested course category selections.
+    $("input[type=checkbox]").click(function () {
+        $(this).parent().find("li input[type=checkbox]").prop("checked", $(this).is(":checked"));
+        $(this).parent().find("li input[type=checkbox]").attr("disabled", $(this).is(":checked"));
         var sibs = false;
-        $(this).closest('ul').children('li').each(function () {
-            if($('input[type=checkbox]', this).is(':checked')) { sibs = true; }
-        })
-        $(this).parents('ul').prev().prop('checked', sibs);
+        $(this).closest("ul").children("li").each(function () {
+            if($("input[type=checkbox]", this).is(":checked")) { sibs = true; }
+        });
+        $(this).parents("ul").prev().prop("checked", sibs);
     });
 
-    $('#page-blocks-fn_mentor-notification_send .fn-send-confirm input[value=Continue]').click(function () {
-        // $('#page-blocks-fn_mentor-notification_send .fn-send-confirm #notice p').html('Messages are being processed.<br>Please wait for confirmation.<br><img style="margin-left: 60px;" src="'+M.cfg.wwwroot+'/blocks/fn_mentor/pix/email3.gif">');
-        $('#page-blocks-fn_mentor-notification_send .fn-send-confirm div#notice').hide();
-        $('#page-blocks-fn_mentor-notification_send .fn-send-confirm div.notice2').show();
+    $('#page-blocks-ned_mentor-notification_send .fn-send-confirm input[value=Continue]').click(function () {
+        $('#page-blocks-ned_mentor-notification_send .fn-send-confirm div#notice').hide();
+        $('#page-blocks-ned_mentor-notification_send .fn-send-confirm div.notice2').show();
         $(this).closest("form").submit();
     });
 
-})
+});
 
 function toggleSub () {
-    if ($(this).is(':checked')) {
-        $(this).parent().find('li input[type=checkbox]').prop('checked', $(this).is(':checked'));
-        $(this).parent().find('li input[type=checkbox]').attr('disabled', $(this).is(':checked'));
+    if ($(this).is(":checked")) {
+        $(this).parent().find("li input[type=checkbox]").prop("checked", $(this).is(":checked"));
+        $(this).parent().find("li input[type=checkbox]").attr("disabled", $(this).is(":checked"));
         var sibs = false;
-        $(this).closest('ul').children('li').each(function () {
-            if ($('input[type=checkbox]', this).is(':checked')) { sibs = true; }
-        })
-        $(this).parents('ul').prev().prop('checked', sibs);
+        $(this).closest("ul").children("li").each(function () {
+            if ($("input[type=checkbox]", this).is(":checked")) { sibs = true; }
+        });
+        $(this).parents("ul").prev().prop("checked", sibs);
     }
 }
 
 function loadStudents (sesskey, filter) {
-    // alert("loading students");
     $("#LoadingImage").show();
     var student_menu = $('select#student_menu').val();
     $.ajax({
@@ -175,10 +170,8 @@ function loadStudents (sesskey, filter) {
                     $('select#selectstudent').append($("<option></option>").val(this['id']).html(this['label']));
                 });
                 $('select#selectmentee option').each(function() {
-                    // alert($(this).val());
                     $('select#selectstudent option[value="' + $(this).val() + '"]').remove();
                 });
-
             }
         }
     });
@@ -186,7 +179,6 @@ function loadStudents (sesskey, filter) {
 }
 
 function assignMentor (sesskey, mentorid, studentids, action) {
-    // alert("loading students");
     $("#LoadingImage").show();
     var student_menu = $('select#student_menu').val();
     $.ajax({

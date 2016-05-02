@@ -15,20 +15,18 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Strings for component 'block_fn_mentor', language 'en'
- *
- * @package   block_fn_mentor
- * @copyright Michael Gardener <mgardener@cissq.com>
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package    block_ned_mentor
+ * @copyright  Michael Gardener <mgardener@cissq.com>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-function xmldb_block_fn_mentor_upgrade($oldversion) {
+function xmldb_block_ned_mentor_upgrade($oldversion) {
     global $CFG, $DB;
 
     $dbman = $DB->get_manager();
 
     if ($oldversion <= 2015101000) {
-        $table = new xmldb_table('block_fn_mentor_notification');
+        $table = new xmldb_table('block_ned_mentor_notific');
 
         $field = new xmldb_field('mentoremail');
         if (!$dbman->field_exists($table, $field)) {
@@ -64,7 +62,7 @@ function xmldb_block_fn_mentor_upgrade($oldversion) {
     }
 
     // Create if not exists !
-    $table = new xmldb_table('block_fn_mentor_notifica_msg');
+    $table = new xmldb_table('block_ned_mentor_notific_msg');
     $table->add_field("id", XMLDB_TYPE_INTEGER, '11', null, true, true);
     $table->add_field("notificationid", XMLDB_TYPE_INTEGER, '11');
     $table->add_field("type", XMLDB_TYPE_CHAR, '255');
@@ -74,7 +72,7 @@ function xmldb_block_fn_mentor_upgrade($oldversion) {
     $table->add_field("message", XMLDB_TYPE_TEXT);
     $table->add_field("securitykey", XMLDB_TYPE_CHAR, '255');
     $table->add_field("timecreated", XMLDB_TYPE_INTEGER, '11');
-    $table->add_field('sent', XMLDB_TYPE_INTEGER, '2',true, null,null,'1');
+    $table->add_field('sent', XMLDB_TYPE_INTEGER, '2', true, null, null, '1');
 
     $table->add_key('id', XMLDB_KEY_PRIMARY, array('id'));
     $table->add_index('notificationid_ix', XMLDB_INDEX_NOTUNIQUE, array('notificationid'));

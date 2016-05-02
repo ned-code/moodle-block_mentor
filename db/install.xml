@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<XMLDB PATH="blocks/fn_mentor/db" VERSION="20151110" COMMENT="XMLDB file for Moodle blocks/fn_mentor"
+<XMLDB PATH="blocks/ned_mentor/db" VERSION="20151110" COMMENT="XMLDB file for Moodle blocks/ned_mentor"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
 >
   <TABLES>
-    <TABLE NAME="block_fn_mentor_notification" COMMENT="block_fn_mentor_notification table retrofitted from MySQL">
+    <TABLE NAME="block_ned_mentor_notific" COMMENT="block_ned_mentor_notific table retrofitted from MySQL">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="18" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="name" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false"/>
@@ -41,7 +41,7 @@
         <KEY NAME="id" TYPE="primary" FIELDS="id"/>
       </KEYS>
     </TABLE>
-    <TABLE NAME="block_fn_mentor_notifica_msg" COMMENT="block_fn_mentor_notifica_msg table retrofitted from MySQL">
+    <TABLE NAME="block_ned_mentor_notific_msg" COMMENT="block_ned_mentor_notific_msg table retrofitted from MySQL">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="18" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="notificationid" TYPE="int" LENGTH="18" NOTNULL="false" SEQUENCE="false"/>

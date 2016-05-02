@@ -15,27 +15,25 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Strings for component 'block_fn_mentor', language 'en'
- *
- * @package   block_fn_mentor
- * @copyright Michael Gardener <mgardener@cissq.com>
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package    block_ned_mentor
+ * @copyright  Michael Gardener <mgardener@cissq.com>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 require_once('../../config.php');
 
 $id = optional_param('id', 0, PARAM_INT);
 
-require_login();
+require_login(null, false);
 
-require_capability('block/fn_mentor:createnotificationrule', context_system::instance(), $USER->id);
+require_capability('block/ned_mentor:createnotificationrule', context_system::instance(), $USER->id);
 
-if($record = $DB->get_record('block_fn_mentor_notification', array('id' => $id))){
+if ($record = $DB->get_record('block_ned_mentor_notific', array('id' => $id))) {
 
-    $DB->delete_records('block_fn_mentor_notification',  array('id' => $id));
+    $DB->delete_records('block_ned_mentor_notific',  array('id' => $id));
 
-    redirect(new moodle_url('/blocks/fn_mentor/notification_rules.php'), get_string('successful', 'block_fn_mentor'));
-}else{
+    redirect(new moodle_url('/blocks/ned_mentor/notification_rules.php'), get_string('successful', 'block_ned_mentor'));
+} else {
     echo $OUTPUT->header();
     echo 'Not found';
     echo $OUTPUT->footer();
