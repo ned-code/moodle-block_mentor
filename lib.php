@@ -1975,11 +1975,15 @@ function block_ned_mentor_activity_progress($course, $menteeid) {
     $progressdata->content->items = array();
     $progressdata->content->icons = array();
     $progressdata->content->footer = '';
+    $progressdata->completed = 0;
+    $progressdata->total = 0;
+    $progressdata->percentage = 0;
     $completedactivities = 0;
     $incompletedactivities = 0;
     $savedactivities = 0;
     $notattemptedactivities = 0;
     $waitingforgradeactivities = 0;
+
 
     $completion = new completion_info($course);
     $activities = $completion->get_activities();
@@ -2134,6 +2138,22 @@ function block_ned_mentor_activity_progress($course, $menteeid) {
 
         $progressdata->content->icons[] = '<img src="' . $CFG->wwwroot .
             '/blocks/ned_mentor/pix/unmarked.gif" class="icon" alt="">';
+
+        $progressdata->completed = $completedactivities + $incompletedactivities;
+        $progressdata->total = $completedactivities + $incompletedactivities+$savedactivities+$notattemptedactivities+$waitingforgradeactivities;
+
+        $sql = "SELECT gg.id,
+                       gg.rawgrademax,
+                       gg.finalgrade
+                  FROM {grade_items} gi
+                  JOIN {grade_grades} gg
+                    ON gi.id = gg.itemid
+                 WHERE gi.itemtype = ?
+                   AND gi.courseid = ?
+                   AND gg.userid = ?";
+        if ($courseaverage = $DB->get_record_sql($sql, array('course', $course->id, $menteeid))) {
+            $progressdata->percentage = ($courseaverage->finalgrade / $courseaverage->rawgrademax) * 100;
+        }
 
     } else {
         $progressdata->content->items[] = get_string('completionnotenabled', 'block_ned_mentor');

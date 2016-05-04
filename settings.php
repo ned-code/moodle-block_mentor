@@ -167,3 +167,38 @@ $settings->add(
         '<a class="btn" href="'.$coursecaturl->out().'">'.get_string('selectcategories', 'block_ned_mentor').'</a>'
     )
 );
+
+$settings->add(
+    new admin_setting_configcheckbox(
+        'block_ned_mentor/showallstudents',
+        get_string('showallstudents', 'block_ned_mentor'),
+        '',
+        '1'
+    )
+);
+$settings->add(
+    new admin_setting_configcheckbox(
+        'block_ned_mentor/showsitegroups',
+        get_string('showsitegroups', 'block_ned_mentor'),
+        '',
+        '0'
+    )
+);
+$settings->add(
+    new admin_setting_configcheckbox(
+        'block_ned_mentor/showgradestatus',
+        get_string('showgradestatus', 'block_ned_mentor'),
+        '',
+        '1'
+    )
+);
+
+$settings->add(
+    new admin_setting_configtext(
+        'block_ned_mentor/passinggrade',
+        get_string('passinggrade', 'block_ned_mentor'),
+        '',
+        '50',
+        PARAM_INT
+    )
+);

@@ -116,6 +116,11 @@ $studentmenu = array();
 $studentmenuurl = array();
 
 
+if($showallstudents = get_config('block_ned_mentor', 'showallstudents')) {
+    $studentmenuurl[0] = $CFG->wwwroot . '/blocks/ned_mentor/all_students.php';
+    $studentmenu[$studentmenuurl[0]] = get_string('allstudents', 'block_ned_mentor');
+}
+
 if ($mentees) {
     foreach ($mentees as $mentee) {
         $studentmenuurl[$mentee->studentid] = $CFG->wwwroot.'/blocks/ned_mentor/course_overview.php?menteeid='.$mentee->studentid;
@@ -156,7 +161,7 @@ echo $studentmenuhtml.'
     '</div></div>';
 
 // COURSES.
-if (!$enrolledcourses = enrol_get_all_users_courses($menteeid, 'id,fullname,shortname', null, 'fullname ASC')) {
+if (!$enrolledcourses = enrol_get_all_users_courses($menteeid, false, 'id,fullname,shortname', 'fullname ASC')) {
     $enrolledcourses = array();
 }
 

@@ -22,7 +22,7 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2016042100;
+$plugin->version   = 2016050403;
 $plugin->requires  = 2013051400;
 $plugin->component = 'block_ned_mentor';
 $plugin->cron = 30;

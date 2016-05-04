@@ -170,6 +170,11 @@ if ($isadmin) {
     $mentees = block_ned_mentor_get_mentees($USER->id);
 }
 
+if($showallstudents = get_config('block_ned_mentor', 'showallstudents')) {
+    $studentmenuurl[0] = $CFG->wwwroot . '/blocks/ned_mentor/all_students.php';
+    $studentmenuoptions[$studentmenuurl[0]] = get_string('allstudents', 'block_ned_mentor');
+}
+
 if ($mentees) {
     foreach ($mentees as $mentee) {
         $studentmenuurl[$mentee->studentid] = $CFG->wwwroot.'/blocks/ned_mentor/course_overview_single.php?menteeid='.

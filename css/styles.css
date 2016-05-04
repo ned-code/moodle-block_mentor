@@ -74,16 +74,19 @@
     top: 50% !important;
     width: 66px;
 }
+#page-blocks-ned_mentor-all_students #mentee-course-overview-page,
 #page-blocks-ned_mentor-course_overview #mentee-course-overview-page,
 #page-blocks-ned_mentor-course_overview_single #mentee-course-overview-page {
     display: block;
     overflow: hidden;
     max-width: 1200px;
 }
+#page-blocks-ned_mentor-all_students #region-main div#mentee-course-overview-page,
 #page-blocks-ned_mentor-course_overview #region-main div#mentee-course-overview-page,
 #page-blocks-ned_mentor-course_overview_single #region-main div#mentee-course-overview-page {
     margin: auto;
 }
+#page-blocks-ned_mentor-all_students #mentee-course-overview-left,
 #page-blocks-ned_mentor-course_overview #mentee-course-overview-left,
 #page-blocks-ned_mentor-course_overview_single #mentee-course-overview-left {
     display: block;
@@ -91,6 +94,7 @@
     width: 23%;
     float: left;
 }
+#page-blocks-ned_mentor-all_students #mentee-course-overview-center,
 #page-blocks-ned_mentor-course_overview #mentee-course-overview-center,
 #page-blocks-ned_mentor-course_overview_single #mentee-course-overview-center {
     display: block;
@@ -99,6 +103,7 @@
     float: right;
     padding-top: 18px;
 }
+#page-blocks-ned_mentor-all_students #mentee-course-overview-center-single,
 #page-blocks-ned_mentor-course_overview #mentee-course-overview-center-single,
 #page-blocks-ned_mentor-course_overview_single #mentee-course-overview-center-single {
     display: block;
@@ -107,6 +112,7 @@
     float: right;
     margin-top: 18px;
 }
+#page-blocks-ned_mentor-all_students .mentee-course-overview-block,
 #page-blocks-ned_mentor-course_overview .mentee-course-overview-block,
 #page-blocks-ned_mentor-course_overview_single .mentee-course-overview-block {
     display: block;
@@ -114,6 +120,7 @@
     border: 1px solid #787878;
     margin-bottom: 20px;
 }
+#page-blocks-ned_mentor-all_students .mentee-course-overview-block-title,
 #page-blocks-ned_mentor-course_overview .mentee-course-overview-block-title,
 #page-blocks-ned_mentor-course_overview_single .mentee-course-overview-block-title {
     font-size: 16px;
@@ -123,6 +130,7 @@
     color: white;
     overflow: hidden;
 }
+#page-blocks-ned_mentor-all_students .mentee-course-overview-block-content,
 #page-blocks-ned_mentor-course_overview .mentee-course-overview-block-content,
 #page-blocks-ned_mentor-course_overview_single .mentee-course-overview-block-content {
     padding: 10px;
@@ -657,4 +665,31 @@
 }
 #page-blocks-ned_mentor-notification_send .ned_mentor_error {
     color: red;
+}
+#page-blocks-ned_mentor-all_students table.course-completion {
+    border-collapse: collapse;
+    margin-left: 5px;
+}
+#page-blocks-ned_mentor-all_students table.course-completion td {
+    border: 1px solid #787878;
+    padding: 5px 10px;
+}
+#page-blocks-ned_mentor-all_students table.course-completion th{
+    padding: 10px 10px 0 10px;
+}
+#page-blocks-ned_mentor-all_students .mentee-course-overview-block-filter {
+    text-align: right;
+}
+#page-blocks-ned_mentor-all_students .mentee-course-overview-block-filter span {
+    margin-right: 10px;
+}
+#page-blocks-ned_mentor-all_students  th.header-grey {
+    background-color: #ddd;
+    border: 1px solid #787878;
+}
+#page-blocks-ned_mentor-all_students .failed {
+    background-color: #FFCDCF;
+}
+#page-blocks-ned_mentor-all_students .passed {
+    background-color: #CEFECE;
 }
