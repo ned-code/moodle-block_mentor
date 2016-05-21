@@ -255,14 +255,15 @@ class block_ned_mentor extends block_base {
                 ),
                 array('id' => 'courseForm', 'name' => 'jump2')
             );
-            $this->content->text .= '</div>';
         }
+
+        $this->content->text .= '</div>';
 
         if (($isstudent) && (!$isteacher && !$isadmin && !$ismentor)) {
             $this->content->text .= block_ned_mentor_render_mentees_by_student($USER->id);
         } else {
             $numberofmentees = 0;
-            
+
             if ($sortby == 'mentor') {
                 $visiblementees = block_ned_mentor_get_mentees_by_mentor($coursefilter, $filter);
                 foreach ($visiblementees as $visiblementee) {
@@ -280,6 +281,7 @@ class block_ned_mentor extends block_base {
                         '<a href="'.$CFG->wwwroot.'/'.$indexphp.'?sortby='.$sortby.'&coursefilter='.$coursefilter.'&showall=1">'.
                         get_string('show_all', 'block_ned_mentor').'</a></div>';
 
+                    $this->content->text .= '</div>';
                 } else {
                     $this->content->text .= block_ned_mentor_render_mentees_by_mentor($visiblementees, $showunenrolledstudents);
                 }
@@ -298,7 +300,8 @@ class block_ned_mentor extends block_base {
                     $this->content->text .= '<div class="mentee-block-menu"><img class="mentee-img" src="'.
                         $OUTPUT->pix_url('i/navigationitem').'">'.
                         '<a href="'.$CFG->wwwroot.'/'.$indexphp.'?sortby='.$sortby.'&coursefilter='.$coursefilter.
-                        '&showall=1">'.get_string('show_all', 'block_ned_mentor').'</a></div></div>';
+                        '&showall=1">'.get_string('show_all', 'block_ned_mentor').'</a></div>';
+                    $this->content->text .= '</div>';
                 } else {
                     $this->content->text .= block_ned_mentor_render_mentors_by_mentee($visiblementees);
                 }

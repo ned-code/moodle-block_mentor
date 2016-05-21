@@ -32,8 +32,9 @@ class block_ned_mentor_edit_form extends block_edit_form {
         $mform->addElement('select', 'config_show_mentor_sort', get_string('show_mentor_sort', 'block_ned_mentor'), $yesno);
         $mform->setDefault('config_show_mentor_sort', 0);
 
-        $mform->addElement('select', 'config_show_mentee_without_course', get_string('mentee_without_course', 'block_ned_mentor'), $yesno);
+        $mform->addElement('select', 'config_show_mentee_without_course',
+            get_string('mentee_without_course', 'block_ned_mentor'), $yesno
+        );
         $mform->setDefault('config_show_mentee_without_course', 0);
     }
-
 }

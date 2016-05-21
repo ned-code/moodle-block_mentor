@@ -96,11 +96,16 @@ if ($mform->is_cancelled()) {
     $rec->timecreated = time();
     $rec->timemodified = time();
     $rec->user = $USER->id;
+    $rec->studentappendedmsg = $fromform->studentappendedmsg['text'];
+    $rec->mentorappendedmsg = $fromform->mentorappendedmsg['text'];
+    $rec->teacherappendedmsg = $fromform->teacherappendedmsg['text'];
 
     $fields = array('name', 'category', 'course', 'g1', 'g2', 'g3', 'g3_value',
         'g4', 'g4_value', 'g5', 'g5_value', 'g6', 'g6_value',
         'n1', 'n1_value', 'n2', 'n2_value', 'period', 'mentoremail', 'mentorsms',
-        'studentemail', 'studentsms', 'teacheremail', 'teachersms', 'appended_message'
+        'studentemail', 'studentsms', 'teacheremail', 'teachersms',
+        'studentmsgenabled', 'mentormsgenabled','teachermsgenabled',
+        'studentgreeting', 'mentorgreeting', 'teachergreeting'
     );
 
     foreach ($fields as $field) {
@@ -127,6 +132,9 @@ if ($mform->is_cancelled()) {
 
     if ($action == 'edit') {
         $toform->name = $notificationrule->name;
+        $toform->studentappendedmsg['text'] = $notificationrule->studentappendedmsg;
+        $toform->mentorappendedmsg['text'] = $notificationrule->mentorappendedmsg;
+        $toform->teacherappendedmsg['text'] = $notificationrule->teacherappendedmsg;
     }
 }
 echo $OUTPUT->header();

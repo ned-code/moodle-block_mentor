@@ -20,11 +20,18 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die();
+namespace block_ned_mentor\task;
 
-$plugin->version   = 2016052100;
-$plugin->requires  = 2013051400;
-$plugin->component = 'block_ned_mentor';
-$plugin->cron = 30;
-$plugin->release = '2.9d';
-$plugin->maturity = MATURITY_STABLE;
+
+class update_alluser_report extends \core\task\scheduled_task {
+
+    public function get_name() {
+        return get_string('pluginname', 'block_ned_mentor');
+    }
+
+    public function execute() {
+        global $CFG;
+        require_once($CFG->dirroot . '/blocks/ned_mentor/lib.php');
+        block_ned_mentor_generate_report();
+    }
+}

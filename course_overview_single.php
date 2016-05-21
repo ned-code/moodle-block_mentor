@@ -170,7 +170,7 @@ if ($isadmin) {
     $mentees = block_ned_mentor_get_mentees($USER->id);
 }
 
-if($showallstudents = get_config('block_ned_mentor', 'showallstudents')) {
+if ($showallstudents = get_config('block_ned_mentor', 'showallstudents')) {
     $studentmenuurl[0] = $CFG->wwwroot . '/blocks/ned_mentor/all_students.php';
     $studentmenuoptions[$studentmenuurl[0]] = get_string('allstudents', 'block_ned_mentor');
 }
@@ -378,14 +378,41 @@ if ($navpage == 'overview') {
     echo '</div>';
     echo '</td>';
     // Progress.
-    echo '<td valign="top" class="mentee-blue-border">';
-    echo '<div class="overview-progress blue">'.get_string('progress', 'block_ned_mentor').'</div>';
-    echo '<div class="vertical-textd">'.$progress.'</div>';
+    echo '<td valign="top" style="height: 100%;" class="mentee-blue-border">';
+
+
+    echo '<table style="height: 100%; width: 100%;">';
+    echo '<tr>';
+    echo '<td class="overview-progress blue">';
+    echo get_string('progress', 'block_ned_mentor');
+    echo '</td>';
+    echo '</tr>';
+    echo '<tr>';
+    echo '<td class="vertical-textd" valign="middle">';
+    echo $progress;
+    echo '</td>';
+    echo '</tr>';
+    echo '</table>';
+
+
+
     echo '</td>';
     // Grade.
-    echo '<td valign="top" class="mentee-blue-border">';
-    echo '<div class="overview-progress blue">'.get_string('grade', 'block_ned_mentor').'</div>';
+    echo '<td valign="top" style="height: 100%;" class="mentee-blue-border">';
+
+    echo '<table style="height: 100%; width: 100%;">';
+    echo '<tr>';
+    echo '<td class="overview-progress blue">';
+    echo get_string('grade', 'block_ned_mentor');
+    echo '</td>';
+    echo '</tr>';
+    echo '<tr>';
+    echo '<td class="vertical-textd" valign="middle">';
     echo block_ned_mentor_print_grade_summary ($course->id , $menteeuser->id);
+    echo '</td>';
+    echo '</tr>';
+    echo '</table>';
+
     echo '</td>';
 
     echo '</tr>';
@@ -401,7 +428,7 @@ if ($navpage == 'overview') {
     echo '</tr>';
     echo '<tr>';
     echo '<td class="white mentee-blue-border" align="middle">';
-    
+
     // Array of functions to call for grading purposes for modules.
     $modgradesarray = array(
         'assign' => 'assign.submissions.fn.php',

@@ -116,7 +116,7 @@ $studentmenu = array();
 $studentmenuurl = array();
 
 
-if($showallstudents = get_config('block_ned_mentor', 'showallstudents')) {
+if ($showallstudents = get_config('block_ned_mentor', 'showallstudents')) {
     $studentmenuurl[0] = $CFG->wwwroot . '/blocks/ned_mentor/all_students.php';
     $studentmenu[$studentmenuurl[0]] = get_string('allstudents', 'block_ned_mentor');
 }
@@ -409,14 +409,59 @@ if ($enrolledcourses) {
         echo '</div>';
         echo '</td>';
         // Progress.
-        echo '<td valign="top" class="mentee-blue-border">';
-        echo '<div class="overview-progress blue">'.get_string('progress', 'block_ned_mentor').'</div>';
-        echo '<div class="vertical-textd">' . $progresshtml . '</div>';
+        $completedcourseclass = '';
+        if ($progressdata->timecompleted) {
+            $completedcourseclass = 'completed';
+        }
+        echo '<td valign="top" style="height: 100%;" class="mentee-blue-border">';
+
+        echo '<table style="height: 100%; width: 100%;">';
+        echo '<tr>';
+        echo '<td class="overview-progress blue">';
+        echo get_string('progress', 'block_ned_mentor');
+        echo '</td>';
+        echo '</tr>';
+
+        echo '<tr>';
+        if ($progressdata->timecompleted) {
+            echo '<td class="vertical-textd completed" valign="middle">';
+            echo get_string('completedon', 'block_ned_mentor', date('d M Y', $progressdata->timecompleted));
+        } else {
+            echo '<td class="vertical-textd" valign="middle">';
+            echo $progresshtml;
+        }
+        echo '</td>';
+        echo '</tr>';
+
+        echo '</table>';
+
         echo '</td>';
         // Grade.
-        echo '<td valign="top" class="mentee-blue-border">';
-        echo '<div class="overview-progress blue">'.get_string('grade', 'block_ned_mentor').'</div>';
-        echo block_ned_mentor_print_grade_summary($course->id, $menteeuser->id);
+        echo '<td valign="top" style="height: 100%;" class="mentee-blue-border '.$completedcourseclass.'">';
+
+        echo '<table style="height: 100%; width: 100%;">';
+
+        echo '<tr>';
+        echo '<td class="overview-progress blue">';
+        echo get_string('grade', 'block_ned_mentor');
+        echo '</td>';
+        echo '</tr>';
+
+        echo '<tr>';
+        if ($progressdata->timecompleted) {
+            echo '<td class="vertical-textd completed" valign="middle">';
+            $gradesummary = block_ned_mentor_grade_summary($menteeuser->id, $course->id);
+            echo '<div class="overview-grade-completed green">'.$gradesummary->courseaverage.'%</div>';
+        } else {
+            echo '<td class="vertical-textd" valign="middle">';
+            echo block_ned_mentor_print_grade_summary($course->id, $menteeuser->id);
+        }
+        echo '</td>';
+        echo '</tr>';
+
+        echo '</table>';
+
+
         echo '</td>';
 
         echo '</tr>';

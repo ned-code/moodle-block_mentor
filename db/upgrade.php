@@ -21,9 +21,29 @@
  */
 
 function xmldb_block_ned_mentor_upgrade($oldversion) {
-    global $CFG, $DB;
+    global $DB;
 
     $dbman = $DB->get_manager();
+
+    // Create if not exists !
+    $table = new xmldb_table('block_ned_mentor_notific_msg');
+    $table->add_field("id", XMLDB_TYPE_INTEGER, '11', null, true, true);
+    $table->add_field("notificationid", XMLDB_TYPE_INTEGER, '11');
+    $table->add_field("type", XMLDB_TYPE_CHAR, '255');
+    $table->add_field("receiverid", XMLDB_TYPE_INTEGER, '11');
+    $table->add_field("userid", XMLDB_TYPE_INTEGER, '11');
+    $table->add_field("courseid", XMLDB_TYPE_INTEGER, '11');
+    $table->add_field("message", XMLDB_TYPE_TEXT);
+    $table->add_field("securitykey", XMLDB_TYPE_CHAR, '255');
+    $table->add_field("timecreated", XMLDB_TYPE_INTEGER, '11');
+    $table->add_field('sent', XMLDB_TYPE_INTEGER, '2', true, null, null, '1');
+
+    $table->add_key('id', XMLDB_KEY_PRIMARY, array('id'));
+    $table->add_index('notificationid_ix', XMLDB_INDEX_NOTUNIQUE, array('notificationid'));
+
+    if (!$dbman->table_exists($table)) {
+        $dbman->create_table($table);
+    }
 
     if ($oldversion <= 2015101000) {
         $table = new xmldb_table('block_ned_mentor_notific');
@@ -58,27 +78,88 @@ function xmldb_block_ned_mentor_upgrade($oldversion) {
             $field->set_attributes(XMLDB_TYPE_INTEGER, '2', null, null, null, 0, 'appended_message');
             $dbman->add_field($table, $field);
         }
-
     }
 
-    // Create if not exists !
-    $table = new xmldb_table('block_ned_mentor_notific_msg');
-    $table->add_field("id", XMLDB_TYPE_INTEGER, '11', null, true, true);
-    $table->add_field("notificationid", XMLDB_TYPE_INTEGER, '11');
-    $table->add_field("type", XMLDB_TYPE_CHAR, '255');
-    $table->add_field("receiverid", XMLDB_TYPE_INTEGER, '11');
-    $table->add_field("userid", XMLDB_TYPE_INTEGER, '11');
-    $table->add_field("courseid", XMLDB_TYPE_INTEGER, '11');
-    $table->add_field("message", XMLDB_TYPE_TEXT);
-    $table->add_field("securitykey", XMLDB_TYPE_CHAR, '255');
-    $table->add_field("timecreated", XMLDB_TYPE_INTEGER, '11');
-    $table->add_field('sent', XMLDB_TYPE_INTEGER, '2', true, null, null, '1');
+    if ($oldversion <= 2016050800) {
+        $table = new xmldb_table('block_ned_mentor_report_data');
+        $table->add_field("id", XMLDB_TYPE_INTEGER, '11', null, true, true);
+        $table->add_field("userid", XMLDB_TYPE_INTEGER, '11');
+        $table->add_field("courseid", XMLDB_TYPE_INTEGER, '11');
+        $table->add_field("groups", XMLDB_TYPE_TEXT);
+        $table->add_field("mentors", XMLDB_TYPE_TEXT);
+        $table->add_field("completionrate", XMLDB_TYPE_NUMBER, '10,2');
+        $table->add_field("passinggrade", XMLDB_TYPE_NUMBER, '10,2');
+        $table->add_field("timemodified", XMLDB_TYPE_INTEGER, '11', null, null, null, '0');
+        $table->add_field('deleted', XMLDB_TYPE_INTEGER, '2', true, null, null, '0');
 
-    $table->add_key('id', XMLDB_KEY_PRIMARY, array('id'));
-    $table->add_index('notificationid_ix', XMLDB_INDEX_NOTUNIQUE, array('notificationid'));
+        $table->add_key('id', XMLDB_KEY_PRIMARY, array('id'));
+        $table->add_index('use_ix', XMLDB_INDEX_NOTUNIQUE, array('userid'));
+        $table->add_index('cour_ix', XMLDB_INDEX_NOTUNIQUE, array('courseid'));
 
-    if (!$dbman->table_exists($table)) {
-        $dbman->create_table($table);
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+
+        $table = new xmldb_table('block_ned_mentor_report_pvt');
+        $table->add_field("id", XMLDB_TYPE_INTEGER, '11', null, true, true);
+        $table->add_field("userid", XMLDB_TYPE_INTEGER, '11');
+        $table->add_field("groups", XMLDB_TYPE_TEXT);
+        $table->add_field("mentors", XMLDB_TYPE_TEXT);
+
+        $table->add_key('id', XMLDB_KEY_PRIMARY, array('id'));
+        $table->add_index('use_ix', XMLDB_INDEX_NOTUNIQUE, array('userid'));
+
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+    }
+
+    if ($oldversion <= 2016051700) {
+        $table = new xmldb_table('block_ned_mentor_report_pvt');
+        $field = new xmldb_field('courses', XMLDB_TYPE_TEXT);
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+    }
+
+    if ($oldversion <= 2016051701) {
+        $table = new xmldb_table('block_ned_mentor_notific');
+        $field = new xmldb_field('studentmsgenabled', XMLDB_TYPE_INTEGER, '4', null, null, null, '0');
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+        $field = new xmldb_field('mentormsgenabled', XMLDB_TYPE_INTEGER, '4', null, null, null, '0');
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+        $field = new xmldb_field('teachermsgenabled', XMLDB_TYPE_INTEGER, '4', null, null, null, '0');
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+        $field = new xmldb_field('studentappendedmsg', XMLDB_TYPE_TEXT);
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+        $field = new xmldb_field('mentorappendedmsg', XMLDB_TYPE_TEXT);
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+        $field = new xmldb_field('teacherappendedmsg', XMLDB_TYPE_TEXT);
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+        $field = new xmldb_field('studentgreeting', XMLDB_TYPE_CHAR, '20', null, null, null);
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+        $field = new xmldb_field('mentorgreeting', XMLDB_TYPE_CHAR, '20', null, null, null);
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+        $field = new xmldb_field('teachergreeting', XMLDB_TYPE_CHAR, '20', null, null, null);
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
     }
 
     return true;

@@ -20,11 +20,14 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die();
-
-$plugin->version   = 2016052100;
-$plugin->requires  = 2013051400;
-$plugin->component = 'block_ned_mentor';
-$plugin->cron = 30;
-$plugin->release = '2.9d';
-$plugin->maturity = MATURITY_STABLE;
+$tasks = array(
+    array(
+        'classname' => 'block_ned_mentor\task\update_alluser_report',
+        'blocking' => 0,
+        'minute' => '0',
+        'hour' => '0',
+        'day' => '*',
+        'dayofweek' => '*',
+        'month' => '*'
+    )
+);

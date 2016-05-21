@@ -25,10 +25,18 @@ require_once($CFG->dirroot . '/blocks/ned_mentor/lib.php');
 require_once($CFG->dirroot . '/lib/coursecatlib.php');
 require_once($CFG->dirroot . '/notes/lib.php');
 
-$categoryid = optional_param('categoryid', 0, PARAM_INT);
-$groupid = optional_param('groupid', 0, PARAM_INT);
+// Paging options.
+$page      = optional_param('page', 0, PARAM_INT);
+$perpage   = optional_param('perpage', 100, PARAM_INT);
+$sort      = optional_param('sort', 'lastname', PARAM_ALPHANUM);
+$dir       = optional_param('dir', 'ASC', PARAM_ALPHA);
+// Filters.
+$categoryid       = optional_param('categoryid', 0, PARAM_INT);
+$groupid          = optional_param('groupid', 0, PARAM_INT);
 $completionstatus = optional_param('completionstatus', 0, PARAM_INT);
-$gradepassing = optional_param('gradepassing', 0, PARAM_INT);
+$gradepassing     = optional_param('gradepassing', 0, PARAM_INT);
+$show             = optional_param('show', 0, PARAM_INT);
+$mentor           = optional_param('mentor', 0, PARAM_INT);
 
 require_login(null, false);
 
@@ -37,6 +45,21 @@ $isadmin   = has_capability('block/ned_mentor:manageall', context_system::instan
 $ismentor  = block_ned_mentor_has_system_role($USER->id, get_config('block_ned_mentor', 'mentor_role_system'));
 $isteacher = block_ned_mentor_isteacherinanycourse($USER->id);
 $isstudent = block_ned_mentor_isstudentinanycourse($USER->id);
+
+$menuurl = new moodle_url('/blocks/ned_mentor/all_students.php',
+    array(
+        'page' => $page,
+        'perpage' => $perpage,
+        'sort' => $sort,
+        'dir' => $dir,
+        'categoryid' => $categoryid,
+        'groupid' => $groupid,
+        'completionstatus' => $completionstatus,
+        'gradepassing' => $gradepassing,
+        'show' => $show,
+        'mentor' => $mentor
+    )
+);
 
 // Find Mentees.
 $mentees = array();
@@ -66,26 +89,19 @@ if ($categoryid) {
 $groupmembers = false;
 if ($groupid) {
     $selectedgroup = groups_get_group($groupid, 'id, courseid, name, enrolmentkey', MUST_EXIST);
-    $groupmembers = groups_get_members($groupid, $fields = 'u.*', $sort = 'lastname ASC');
-}
-if ($mentees) {
-    foreach ($mentees as $key => $mentee) {
-        if ($groupmembers !== false) {
-            if (!isset($groupmembers[$mentee->studentid])) {
-                unset($mentees[$key]);
-            }
-        }
-    }
+    $groupmembers = groups_get_members($groupid, $fields = 'u.*', 'lastname ASC');
 }
 
-if (($isstudent) && ($USER->id <> $menteeid)  && (!$isteacher && !$isadmin && !$ismentor)) {
+if (($isstudent) && (!$isteacher && !$isadmin && !$ismentor)) {
     print_error('invalidpermission', 'block_ned_mentor');
 }
 
 $title = get_string('page_title_assign_mentor', 'block_ned_mentor');
 $heading = $SITE->fullname;
 
-$PAGE->set_url('/blocks/ned_mentor/all_students.php');
+$thispageurl = new moodle_url('/blocks/ned_mentor/all_students.php');
+
+$PAGE->set_url($thispageurl);
 if ($pagelayout = get_config('block_ned_mentor', 'pagelayout')) {
     $PAGE->set_pagelayout($pagelayout);
 } else {
@@ -152,15 +168,8 @@ if ((!$isstudent) || ($isadmin || $ismentor  || $isteacher)) {
 // Course category.
 $categorymenu = array();
 $categorymenuurl = array();
-
-$categoryurl = new moodle_url('/blocks/ned_mentor/all_students.php',
-    array(
-        'categoryid' => 0,
-        'groupid' => $groupid,
-        'completionstatus' => $completionstatus,
-        'gradepassing' => $gradepassing
-    )
-);
+$categoryurl = clone $menuurl;
+$categoryurl->param('categoryid', 0);
 $categorymenuurl[0] = $categoryurl->out(false);
 $categorymenu[$categorymenuurl[0]] = get_string('all', 'block_ned_mentor');
 
@@ -181,21 +190,13 @@ $categorymenuhtml = html_writer::tag('form',
 );
 $categorymenuhtml = html_writer::div($categorymenuhtml, 'mentee-course-overview-block-filter');
 
-
 // Group menu.
 $groupmenuhtml = '';
 if ($showsitegroups) {
     $groupmenu = array();
     $groupmenuurl = array();
-
-    $groupurl = new moodle_url('/blocks/ned_mentor/all_students.php',
-        array(
-            'categoryid' => $categoryid,
-            'groupid' => 0,
-            'completionstatus' => $completionstatus,
-            'gradepassing' => $gradepassing
-        )
-    );
+    $groupurl = clone $menuurl;
+    $groupurl->param('groupid', 0);
     $groupmenuurl[0] = $groupurl->out(false);
     $groupmenu[$groupmenuurl[0]] = get_string('allgroups', 'block_ned_mentor');
 
@@ -221,23 +222,15 @@ if ($showsitegroups) {
 $completionstatusmenu = array();
 $completionstatusmenuurl = array();
 
-$completionstatusurl = new moodle_url('/blocks/ned_mentor/all_students.php',
-    array(
-        'categoryid' => $categoryid,
-        'groupid' => $groupid,
-        'completionstatus' => 0,
-        'gradepassing' => $gradepassing
-    )
-);
-
 $completionstatuses = array(
     0 => 'All',
     1 => '0%',
     2 => '1-49%',
-    3 => '50-74%',
-    4 => '74-99%',
+    3 => '50-75%',
+    4 => '75-99%',
     5 => '100%'
 );
+$completionstatusurl = clone $menuurl;
 if ($completionstatuses) {
     foreach ($completionstatuses as $key => $completionstatuslabel) {
         $completionstatusurl->param('completionstatus', $key);
@@ -264,20 +257,12 @@ if ($showgradestatus) {
     $gradepassingmenu = array();
     $gradepassingmenuurl = array();
 
-    $gradepassingurl = new moodle_url('/blocks/ned_mentor/all_students.php',
-        array(
-            'categoryid' => $categoryid,
-            'groupid' => $groupid,
-            'completionstatus' => $completionstatus,
-            'gradepassing' => 0
-        )
-    );
-
     $gradepassinoptions = array(
         0 => 'All',
         1 => 'Passing',
         2 => 'Failing'
     );
+    $gradepassingurl = clone $menuurl;
     if ($gradepassinoptions) {
         foreach ($gradepassinoptions as $key => $gradepassinglabel) {
             $gradepassingurl->param('gradepassing', $key);
@@ -298,6 +283,110 @@ if ($showgradestatus) {
     $gradepassingmenuhtml = html_writer::div($gradepassingmenuhtml, 'mentee-course-overview-block-filter');
 }
 
+// Perpage.
+$perpagemenu = array();
+$perpagemenuurl = array();
+
+$perpageoptions = array(
+    10 => '10',
+    20 => '20',
+    50 => '50',
+    100 => '100',
+    250 => '250',
+    500 => '500',
+    1000 => '1000',
+    5000 => '5000',
+);
+$perpageurl = clone $menuurl;
+if ($perpageoptions) {
+    foreach ($perpageoptions as $key => $perpagelabel) {
+        $perpageurl->param('perpage', $key);
+        $perpagemenuurl[$key] = $perpageurl->out(false);
+        $perpagemenu[$perpagemenuurl[$key]] = $perpagelabel;
+    }
+}
+$perpagemenuhtml = html_writer::tag('form',
+    html_writer::span(get_string('show', 'block_ned_mentor')) .
+    html_writer::select(
+        $perpagemenu, 'perpage', $perpagemenuurl[$perpage], null,
+        array('onChange' => 'location=document.jumpperpage.perpage'.
+            '.options[document.jumpperpage.perpage.selectedIndex].value;'
+        )
+    ),
+    array('id' => 'perpagemenuform', 'name' => 'jumpperpage')
+);
+$perpagemenuhtml = html_writer::div($perpagemenuhtml, 'mentee-course-overview-block-filter');
+
+// Show menu.
+if ($isadmin) {
+    $showmenu = array();
+    $showmenuurl = array();
+
+    $showoptions = array(
+        0 => get_string('allstudents', 'block_ned_mentor'),
+        1 => get_string('studentswithmentors', 'block_ned_mentor'),
+        2 => get_string('studentswithoutmentors', 'block_ned_mentor')
+    );
+    $showurl = clone $menuurl;
+    if ($showoptions) {
+        foreach ($showoptions as $key => $showlabel) {
+            $showurl->param('show', $key);
+            $showmenuurl[$key] = $showurl->out(false);
+            $showmenu[$showmenuurl[$key]] = $showlabel;
+        }
+    }
+    $showmenuhtml = html_writer::tag('form',
+        html_writer::span(get_string('show', 'block_ned_mentor')) .
+        html_writer::select(
+            $showmenu, 'show', $showmenuurl[$show], null,
+            array('onChange' => 'location=document.jumpshow.show' .
+                '.options[document.jumpshow.show.selectedIndex].value;'
+            )
+        ),
+        array('id' => 'showmenuform', 'name' => 'jumpshow')
+    );
+    $showmenuhtml = html_writer::div($showmenuhtml, 'mentee-course-overview-block-filter');
+} else {
+    $showmenuhtml = '';
+}
+
+// Mentor menu.
+if (($show == 1)  && $isadmin) {
+    $mentormenu = array();
+    $mentormenuurl = array();
+
+    $mentoroptions = array(
+        0 => get_string('allmentors', 'block_ned_mentor'),
+    );
+    if ($allmentors = block_ned_mentor_get_all_mentors()) {
+        foreach ($allmentors as $mntor) {
+            $mentoroptions[$mntor->id] = $mntor->firstname . ' ' . $mntor->lastname;
+        }
+    }
+    $mentorurl = clone $menuurl;
+    if ($mentoroptions) {
+        foreach ($mentoroptions as $key => $mentorlabel) {
+            $mentorurl->param('mentor', $key);
+            $mentormenuurl[$key] = $mentorurl->out(false);
+            $mentormenu[$mentormenuurl[$key]] = $mentorlabel;
+        }
+    }
+    $mentormenuhtml = html_writer::tag('form',
+        html_writer::span(get_string('mentor', 'block_ned_mentor')) .
+        html_writer::select(
+            $mentormenu, 'mentor', $mentormenuurl[$mentor], null,
+            array('onChange' => 'location=document.jumpmentor.mentor' .
+                '.options[document.jumpmentor.mentor.selectedIndex].value;'
+            )
+        ),
+        array('id' => 'mentormenuform', 'name' => 'jumpmentor')
+    );
+    $mentormenuhtml = html_writer::div($mentormenuhtml, 'mentee-course-overview-block-filter');
+} else {
+    $mentormenuhtml = '';
+}
+
+
 // Block.
 echo $studentmenuhtml;
 echo html_writer::div(
@@ -306,76 +395,235 @@ echo html_writer::div(
         'mentee-course-overview-block-title'
     ).
     html_writer::div(
+        $showmenuhtml.
+        $mentormenuhtml.
         $categorymenuhtml.
         $groupmenuhtml.
         $completionstatusmenuhtml.
-        $gradepassingmenuhtml,
+        $gradepassingmenuhtml.
+        $perpagemenuhtml,
         'mentee-course-overview-block-content'
     ),
     'mentee-course-overview-block'
 );
-echo html_writer::end_div(); // Mentee course overview left.
 
 
+$inprogress = get_config('block_ned_mentor', 'inprogress');
+$reportdate = get_config('block_ned_mentor', 'reportdate');
 
-$table = new html_table();
-$table->attributes = array('class' => 'course-completion');
-$table->head = array('');
+$generatebutton = html_writer::div(
+    get_string('inprogress', 'block_ned_mentor'),
+    'inprogress-msg'
+);
 
-if ($groupid) {
-    $table->head[] = '';
-}
-
-foreach ($courses as $course) {
-    if ($categorycourses !== false) {
-        if (!isset($categorycourses[$course->id])) {
-            continue;
-        }
-    }
-    $headcell = new html_table_cell("<a onclick=\"window.open('".
-        $CFG->wwwroot."/course/view.php?id=".$course->id.
-        "', '', 'width=800,height=600,toolbar=no,location=no,menubar=no,copyhistory=no,status=no,".
-        "directories=no,scrollbars=yes,resizable=yes'); return false;\" href=\"".
-        $CFG->wwwroot."/course/view.php?id=".$course->id."\">".
-        html_writer::span($course->shortname, 'completion-activityname')."</a>"
-    );
-    $headcell->attributes = array('class' => 'header header-grey');
-    $table->head[] = $headcell;
-}
-foreach ($mentees as $mentee) {
-    $row = new html_table_row();
-    $row->cells[] = new html_table_cell(
-        html_writer::link(
-            new moodle_url('/blocks/ned_mentor/course_overview.php', array('menteeid' => $mentee->studentid)),
-            $mentee->firstname.' '.$mentee->lastname
+if (!$inprogress || ((time() - $reportdate) > 10 * 60)) {
+    $generatebutton = $OUTPUT->render(
+        new single_button(
+            new moodle_url('/blocks/ned_mentor/update_all_students_data.php'),
+            get_string('generatenewlist', 'block_ned_mentor')
         )
     );
+}
+echo html_writer::div(
+    html_writer::div(
+        get_string('allstudentdataupdateinfo', 'block_ned_mentor', date('m/d/Y H:i', $reportdate)),
+        'mentee-update-report-data-text'
+    ).
+    $generatebutton,
+    'mentee-course-overview-block',
+    array('id' => 'mentee-update-report-data')
+);
 
-    if ($groupid) {
-        $row->cells[] = new html_table_cell($selectedgroup->name);
+
+
+echo html_writer::end_div(); // Mentee course overview left.
+
+// Find report courses.
+$reportcourses = array();
+if ($reportpvt = $DB->get_records('block_ned_mentor_report_pvt', null, '', '*', 0, 1)) {
+    $reportpvt = reset($reportpvt);
+    foreach ($reportpvt as $index => $item) {
+        if (strpos($index, 'completion') === 0) {
+            $reportcourseid = (int)str_replace('completion', '', $index);
+            if ($categorycourses !== false) {
+                if (!isset($categorycourses[$reportcourseid])) {
+                    continue;
+                }
+            }
+            $reportcourses[$reportcourseid] = $reportcourseid;
+        }
     }
-    $completionstatusecounter = array(0 => 0, 1 => 0, 2 => 0, 3 => 0, 4 => 0, 5 => 0);
-    $gradepassingcounter = array(0 => 0, 1 => 0, 2 => 0);
-    foreach ($courses as $course) {
-        if ($categorycourses !== false) {
-            if (!isset($categorycourses[$course->id])) {
-                continue;
+}
+
+// Data column.
+$datacolumns = array(
+    'id' => 'r.id',
+    'name' => 'CONCAT(u.firstname, \' \', u.lastname)',
+    'groups' => 'r.groups',
+    'courses' => 'r.courses',
+    'mentors' => 'r.mentors',
+    'lastname' => 'u.lastname'
+);
+
+foreach ($reportcourses as $reportcourse) {
+    $datacolumns['completion'.$reportcourse] = 'r.completion'.$reportcourse;
+    $datacolumns['passing'.$reportcourse] = 'r.passing'.$reportcourse;
+}
+
+// Filter.
+$where = '';
+if (($show == 1) && $isadmin) {
+    $where .= " AND {$datacolumns['mentors']} <> '' ";
+}
+if (($show == 2) && $isadmin) {
+    $where .= " AND {$datacolumns['mentors']} = '' ";
+}
+if ($mentor  && $isadmin) {
+    $where .= " AND  FIND_IN_SET($mentor,{$datacolumns['mentors']})";
+}
+if ($groupid) {
+    $where .= " AND  FIND_IN_SET($groupid,{$datacolumns['groups']})";
+}
+
+if ($completionstatus && $gradepassing) {
+    $completionstatusfilter = array();
+    if ($completionstatus == 1) {
+        foreach ($reportcourses as $reportcourse) {
+            if ($gradecompletion = $DB->get_record('course_completion_criteria',
+                array('course' => $reportcourse,
+                    'criteriatype' => COMPLETION_CRITERIA_TYPE_GRADE
+                )
+            )) {
+                $gradecompletionpercentage = $gradecompletion->gradepass;
+            } else {
+                $gradecompletionpercentage = $passinggrade;
+            }
+
+            if ($gradepassing == 1) {
+                $completionstatusfilter[] = '(r.completion'.$reportcourse.'=0 AND r.passing'.
+                    $reportcourse.'>='.$gradecompletionpercentage.')';
+            } else {
+                $completionstatusfilter[] = '(r.completion'.$reportcourse.'=0 AND r.passing'.
+                    $reportcourse.'<'.$gradecompletionpercentage.')';
             }
         }
-        $cell = new html_table_cell();
-        $cell->attributes = array('class' => 'passed');
-        $progress = '';
-        $progressdata = block_ned_mentor_activity_progress($course, $mentee->studentid);
-        $progressdata->completed;
-        $progressdata->total;
-        $percentageofcompletion = 0;
-
-        if ($progressdata->total) {
-            $percentageofcompletion = ($progressdata->completed / $progressdata->total) * 100;
+        $where .= " AND (".implode(' OR ', $completionstatusfilter).")";
+    } else if ($completionstatus == 2) {
+        foreach ($reportcourses as $reportcourse) {
+            if ($gradecompletion = $DB->get_record('course_completion_criteria',
+                array('course' => $reportcourse,
+                    'criteriatype' => COMPLETION_CRITERIA_TYPE_GRADE
+                )
+            )) {
+                $gradecompletionpercentage = $gradecompletion->gradepass;
+            } else {
+                $gradecompletionpercentage = $passinggrade;
+            }
+            if ($gradepassing == 1) {
+                $completionstatusfilter[] = '(r.completion'.$reportcourse.'>0 AND r.completion'.
+                    $reportcourse.'<50 AND r.passing'.$reportcourse.'>='.$gradecompletionpercentage.')';
+            } else {
+                $completionstatusfilter[] = '(r.completion'.$reportcourse.'>0 AND r.completion'.
+                    $reportcourse.'<50 AND r.passing'.$reportcourse.'<'.$gradecompletionpercentage.')';
+            }
         }
+        $where .= " AND (".implode(' OR ', $completionstatusfilter).")";
+    } else if ($completionstatus == 3) {
+        foreach ($reportcourses as $reportcourse) {
+            if ($gradecompletion = $DB->get_record('course_completion_criteria',
+                array('course' => $reportcourse,
+                    'criteriatype' => COMPLETION_CRITERIA_TYPE_GRADE
+                )
+            )) {
+                $gradecompletionpercentage = $gradecompletion->gradepass;
+            } else {
+                $gradecompletionpercentage = $passinggrade;
+            }
 
+            if ($gradepassing == 1) {
+                $completionstatusfilter[] = '(r.completion'.$reportcourse.'>=50 AND r.completion'.
+                    $reportcourse.'<75 AND r.passing'.$reportcourse.'>='.$gradecompletionpercentage.')';
+            } else {
+                $completionstatusfilter[] = '(r.completion'.$reportcourse.'>=50 AND r.completion'.
+                    $reportcourse.'<75 AND r.passing'.$reportcourse.'<'.$gradecompletionpercentage.')';
+            }
+        }
+        $where .= " AND (".implode(' OR ', $completionstatusfilter).")";
+    } else if ($completionstatus == 4) {
+        foreach ($reportcourses as $reportcourse) {
+            if ($gradecompletion = $DB->get_record('course_completion_criteria',
+                array('course' => $reportcourse,
+                    'criteriatype' => COMPLETION_CRITERIA_TYPE_GRADE
+                )
+            )) {
+                $gradecompletionpercentage = $gradecompletion->gradepass;
+            } else {
+                $gradecompletionpercentage = $passinggrade;
+            }
+            if ($gradepassing == 1) {
+                $completionstatusfilter[] = '(r.completion'.$reportcourse.'>=75 AND r.completion'.
+                    $reportcourse.'<100 AND r.passing'.$reportcourse.'>='.$gradecompletionpercentage.')';
+            } else {
+                $completionstatusfilter[] = '(r.completion'.$reportcourse.'>=75 AND r.completion'.
+                    $reportcourse.'<100 AND r.passing'.$reportcourse.'<'.$gradecompletionpercentage.')';
+            }
+        }
+        $where .= " AND (".implode(' OR ', $completionstatusfilter).")";
+    } else if ($completionstatus == 5) {
+        foreach ($reportcourses as $reportcourse) {
+            if ($gradecompletion = $DB->get_record('course_completion_criteria',
+                array('course' => $reportcourse,
+                    'criteriatype' => COMPLETION_CRITERIA_TYPE_GRADE
+                )
+            )) {
+                $gradecompletionpercentage = $gradecompletion->gradepass;
+            } else {
+                $gradecompletionpercentage = $passinggrade;
+            }
+
+            if ($gradepassing == 1) {
+                $completionstatusfilter[] = '(r.completion'.$reportcourse.'=100 AND r.passing'.
+                    $reportcourse.'>='.$gradecompletionpercentage.')';
+            } else {
+                $completionstatusfilter[] = '(r.completion'.$reportcourse.'=100 AND r.passing'.
+                    $reportcourse.'<'.$gradecompletionpercentage.')';
+            }
+        }
+        $where .= " AND (".implode(' OR ', $completionstatusfilter).")";
+    }
+} else if ($completionstatus) {
+    $completionstatusfilter = array();
+    if ($completionstatus == 1) {
+        foreach ($reportcourses as $reportcourse) {
+            $completionstatusfilter[] = 'r.completion'.$reportcourse.'=0';
+        }
+        $where .= " AND (".implode(' OR ', $completionstatusfilter).")";
+    } else if ($completionstatus == 2) {
+        foreach ($reportcourses as $reportcourse) {
+            $completionstatusfilter[] = '(r.completion'.$reportcourse.'>0 AND r.completion'.$reportcourse.'<50)';
+        }
+        $where .= " AND (".implode(' OR ', $completionstatusfilter).")";
+    } else if ($completionstatus == 3) {
+        foreach ($reportcourses as $reportcourse) {
+            $completionstatusfilter[] = '(r.completion'.$reportcourse.'>=50 AND r.completion'.$reportcourse.'<75)';
+        }
+        $where .= " AND (".implode(' OR ', $completionstatusfilter).")";
+    } else if ($completionstatus == 4) {
+        foreach ($reportcourses as $reportcourse) {
+            $completionstatusfilter[] = '(r.completion'.$reportcourse.'>=75 AND r.completion'.$reportcourse.'<100)';
+        }
+        $where .= " AND (".implode(' OR ', $completionstatusfilter).")";
+    } else if ($completionstatus == 5) {
+        foreach ($reportcourses as $reportcourse) {
+            $completionstatusfilter[] = 'r.completion'.$reportcourse.'=100';
+        }
+        $where .= " AND (".implode(' OR ', $completionstatusfilter).")";
+    }
+} else if ($gradepassing) {
+    $gradepassingfilter = array();
+    foreach ($reportcourses as $reportcourse) {
         if ($gradecompletion = $DB->get_record('course_completion_criteria',
-            array('course' => $course->id,
+            array('course' => $reportcourse,
                 'criteriatype' => COMPLETION_CRITERIA_TYPE_GRADE
             )
         )) {
@@ -383,88 +631,267 @@ foreach ($mentees as $mentee) {
         } else {
             $gradecompletionpercentage = $passinggrade;
         }
-
-        if (is_enrolled(context_course::instance($course->id), $mentee->studentid)) {
-            if ($percentageofcompletion == 100) {
-                ++$completionstatusecounter[5];
-                if (($completionstatus == 5) || ($completionstatus == 0)) {
-                    $cell = new html_table_cell('<img src="' . $OUTPUT->pix_url('completed_100', 'block_ned_mentor') . '" />');
-                }
-            } else if ($percentageofcompletion >= 75) {
-                ++$completionstatusecounter[4];
-                if (($completionstatus == 4) || ($completionstatus == 0)) {
-                    $cell = new html_table_cell('<img src="' . $OUTPUT->pix_url('completed_75', 'block_ned_mentor') . '" />');
-                }
-            } else if ($percentageofcompletion >= 50) {
-                ++$completionstatusecounter[3];
-                if (($completionstatus == 3) || ($completionstatus == 0)) {
-                    $cell = new html_table_cell('<img src="' . $OUTPUT->pix_url('completed_50', 'block_ned_mentor') . '" />');
-                }
-            } else if ($percentageofcompletion > 0) {
-                ++$completionstatusecounter[2];
-                if (($completionstatus == 2) || ($completionstatus == 0)) {
-                    $cell = new html_table_cell('<img src="' . $OUTPUT->pix_url('completed_25', 'block_ned_mentor') . '" />');
-                }
-            } else if ($percentageofcompletion == 0) {
-                ++$completionstatusecounter[1];
-                if (($completionstatus == 1) || ($completionstatus == 0)) {
-                    $cell = new html_table_cell('<img src="' . $OUTPUT->pix_url('completed_00', 'block_ned_mentor') . '" />');
-                }
-            } else {
-                ++$completionstatusecounter[0];
-                $cell = new html_table_cell('');
-            }
-            if ($showgradestatus) {
-                if ($gradecompletionpercentage <= $progressdata->percentage) {
-                    ++$gradepassingcounter[1];
-                    if ($gradepassing == 2) {
-                        $cell = new html_table_cell('');
-                    } else {
-                        $cell->attributes = array('class' => 'passed ' . $gradecompletionpercentage);
-                    }
-                } else {
-                    ++$gradepassingcounter[2];
-                    if ($gradepassing == 1) {
-                        $cell = new html_table_cell('');
-                    } else {
-                        $cell->attributes = array('class' => 'failed ' . $gradecompletionpercentage);
-                    }
-                }
-            }
-            if ($percentageofcompletion == 0) {
-                $cell->attributes = array('class' => '');
-            }
+        if ($gradepassing == 1) {
+            $gradepassingfilter[] = 'r.passing' . $reportcourse . '>=' . $gradecompletionpercentage;
         } else {
-            $cell = new html_table_cell('');
-        }
-        $row->cells[] = $cell;
-    }
-
-    if ($completionstatus) {
-        if ($completionstatusecounter[$completionstatus] > 0) {
-            if ($gradepassing) {
-                if ($gradepassingcounter[$gradepassing] > 0) {
-                    $table->data[] = $row;
-                }
-            } else {
-                $table->data[] = $row;
-            }
-        }
-    } else {
-        if ($gradepassing) {
-            if ($gradepassingcounter[$gradepassing] > 0) {
-                $table->data[] = $row;
-            }
-        } else {
-            $table->data[] = $row;
+            $gradepassingfilter[] = 'r.passing' . $reportcourse . '<' . $gradecompletionpercentage;
         }
     }
-
-
+    $where .= " AND (".implode(' OR ', $gradepassingfilter).")";
 
 }
 
-// Content.
-echo html_writer::div(html_writer::table($table), '', array('id' => 'mentee-course-overview-center'));
+// Sort.
+$order = '';
+$sortcourseid = 0;
+if ($sort) {
+    $sort = ($dir == 'CLEAR') ? 'name' : $sort;
+    $dir = ($dir == 'CLEAR') ? 'ASC' : $dir;
+    $order = " ORDER BY $datacolumns[$sort] $dir";
+    if (strpos($sort, 'completion') === 0) {
+        $sortcourseid = (int)str_replace('completion', '', $sort);
+        $where .= " AND  FIND_IN_SET($sortcourseid,{$datacolumns['courses']})";
+    }
+}
+
+// Count records for paging.
+$countsql = "SELECT COUNT(1)
+               FROM {block_ned_mentor_report_pvt} r
+         INNER JOIN {user} u
+                 ON r.userid = u.id
+              WHERE 0 = 0
+                    $where";
+$totalcount = $DB->count_records_sql($countsql);
+
+// Table columns.
+$columns = array(
+    'name'
+);
+if (isset($selectedgroup)) {
+    $columns[] = 'group';
+}
+foreach ($reportcourses as $reportcourse) {
+    $columns[] = 'completion'.$reportcourse;
+}
+
+$sql = "SELECT r.*,
+               CONCAT(u.firstname, ' ', u.lastname) name,
+               u.firstname,
+               u.lastname
+          FROM {block_ned_mentor_report_pvt} r
+    INNER JOIN {user} u
+            ON r.userid = u.id
+         WHERE 0 = 0
+               $where
+               $order";
+
+foreach ($columns as $column) {
+    $string[$column] = '';
+    if (strpos($column, 'completion') === 0) {
+        $cid = (int)str_replace('completion', '', $column);
+        $columncourse = $DB->get_record('course', array('id' => $cid));
+        $string[$column] = html_writer::span($columncourse->shortname, 'completion-activityname');
+    } else {
+        $string[$column] = get_string($column, 'block_ned_mentor');
+    }
+
+    if ($sort != $column) {
+        $columnicon = "";
+        $columndir = "ASC";
+        $columnicon = "<img class='iconsort' src=\"" . $OUTPUT->pix_url('sort_inactive', 'block_ned_mentor') . "\" alt=\"\" />";
+    } else {
+        if ($dir == 'ASC') {
+            $columndir = 'DESC';
+            $columnicon = "<img class='iconsort' src=\"" . $OUTPUT->pix_url('sort_asc', 'block_ned_mentor') . "\" alt=\"\" />";
+        } else if ($dir == 'DESC') {
+            $columndir = 'CLEAR';
+            $columnicon = "<img class='iconsort' src=\"" . $OUTPUT->pix_url('sort_desc', 'block_ned_mentor') . "\" alt=\"\" />";
+        } else {
+            $columndir = 'ASC';
+            $columnicon = "<img class='iconsort' src=\"" . $OUTPUT->pix_url('sort_inactive', 'block_ned_mentor') . "\" alt=\"\" />";
+        }
+    }
+
+    $sorturl = clone $menuurl;
+    $sorturl->param('perpage', $perpage);
+    $sorturl->param('sort', $column);
+    $sorturl->param('dir', $columndir);
+
+    if (strpos($column, 'completion') === 0) {
+        $$column = $string[$column].html_writer::link($sorturl->out(false), $columnicon);
+    } else if (($column == 'name') || ($column == 'group')) {
+        $$column = '';
+    } else {
+        $$column = html_writer::link($sorturl->out(false), $string[$column]).$columnicon;
+    }
+}
+
+
+$table = new html_table();
+$table->attributes = array('class' => 'course-completion');
+
+$table->head = array();
+foreach ($columns as $column) {
+    if (strpos($column, 'completion') === 0) {
+        $cid = (int)str_replace('completion', '', $column);
+        $headcell = new html_table_cell("<a class='sort-course-link' onclick=\"window.open('".
+            $CFG->wwwroot."/course/view.php?id=".$cid.
+            "', '', 'width=800,height=600,toolbar=no,location=no,menubar=no,copyhistory=no,status=no,".
+            "directories=no,scrollbars=yes,resizable=yes'); return false;\" href=\"".
+            $CFG->wwwroot."/course/view.php?id=".$cid."\">".
+            $$column."</a>"
+        );
+        if ($sortcourseid == $cid) {
+            $headcell->attributes = array('class' => 'header header-yellow');
+        } else {
+            $headcell->attributes = array('class' => 'header header-grey');
+        }
+
+        $table->head[$column] = $headcell;
+    } else {
+        $table->head[$column] = $$column;
+    }
+}
+
+
+$tablerows = $DB->get_records_sql($sql, null, $page * $perpage, $perpage);
+
+$counter = ($page * $perpage);
+
+foreach ($tablerows as $tablerow) {
+    $row = new html_table_row();
+    $actionlinks = '';
+    foreach ($columns as $column) {
+        $varname = 'cell'.$column;
+
+        switch ($column) {
+            case 'rowcount':
+                $$varname = ++$counter;
+                break;
+            case 'group':
+                if (isset($selectedgroup)) {
+                    $$varname = new html_table_cell($selectedgroup->name);
+                } else {
+                    $$varname = '';
+                }
+                break;
+            case 'name':
+                $$varname = new html_table_cell(
+                    html_writer::link(
+                        new moodle_url('/blocks/ned_mentor/course_overview.php', array('menteeid' => $tablerow->userid)),
+                        $tablerow->$column
+                    )
+                );
+                break;
+            case 'timecreated':
+            case 'timemodified':
+                $$varname = '-';
+                if ($tablerow->$column > 0) {
+                    $$varname = new html_table_cell(date("m/d/Y g:i A", $tablerow->$column));
+                }
+                break;
+            default:
+                if (strpos($column, 'completion') === 0) {
+                    $cid = (int)str_replace('completion', '', $column);
+                    if ($gradecompletion = $DB->get_record('course_completion_criteria',
+                        array('course' => $cid,
+                            'criteriatype' => COMPLETION_CRITERIA_TYPE_GRADE
+                        )
+                    )) {
+                        $gradecompletionpercentage = $gradecompletion->gradepass;
+                    } else {
+                        $gradecompletionpercentage = $passinggrade;
+                    }
+
+                    $cell = new html_table_cell('');
+
+                    if ($tablerow->$column == 100) {
+                        if (($completionstatus == 5) || ($completionstatus == 0)) {
+                            $cell = new html_table_cell('<img src="' .
+                                $OUTPUT->pix_url('completed_100', 'block_ned_mentor') . '" />');
+                        }
+                    } else if ($tablerow->$column >= 75) {
+                        if (($completionstatus == 4) || ($completionstatus == 0)) {
+                            $cell = new html_table_cell('<img src="' .
+                                $OUTPUT->pix_url('completed_75', 'block_ned_mentor') . '" />');
+                        }
+                    } else if ($tablerow->$column >= 50) {
+                        if (($completionstatus == 3) || ($completionstatus == 0)) {
+                            $cell = new html_table_cell('<img src="' .
+                                $OUTPUT->pix_url('completed_50', 'block_ned_mentor') . '" />');
+                        }
+                    } else if ($tablerow->$column > 0) {
+                        if (($completionstatus == 2) || ($completionstatus == 0)) {
+                            $cell = new html_table_cell('<img src="' .
+                                $OUTPUT->pix_url('completed_25', 'block_ned_mentor') . '" />');
+                        }
+                    } else if ($tablerow->$column == 0) {
+                        if (($completionstatus == 1) || ($completionstatus == 0)) {
+                            $cell = new html_table_cell('<img src="' .
+                                $OUTPUT->pix_url('completed_00', 'block_ned_mentor') . '" />');
+                        }
+                    }
+
+                    $varpassing = 'passing'.$cid;
+                    if ($showgradestatus && ($tablerow->$varpassing > -1)) {
+
+                        if ($gradecompletionpercentage <= $tablerow->$varpassing) {
+                            if ((($gradepassing == 1) || ($gradepassing == 0)) && ($cell->text <> '')) {
+                                $cell->attributes = array('class' => 'passed ' . $gradecompletionpercentage);
+                            }
+                        } else {
+                            if ((($gradepassing == 2) || ($gradepassing == 0)) && ($cell->text <> '')) {
+                                $cell->attributes = array('class' => 'failed ' . $gradecompletionpercentage);
+                            }
+                        }
+
+                        if ($gradecompletionpercentage <= $tablerow->$varpassing) {
+                            if ($gradepassing == 2) {
+                                $cell->text = '';
+                            }
+                        } else {
+                            if ($gradepassing == 1) {
+                                $cell->text = '';
+                            }
+                        }
+                    }
+                    $$varname = $cell;
+                } else {
+                    $$varname = new html_table_cell($tablerow->$column);
+                }
+        }
+    }
+
+    $row->cells = array();
+    foreach ($columns as $column) {
+        $varname = 'cell' . $column;
+        $row->cells[$column] = $$varname;
+    }
+    $table->data[] = $row;
+
+}
+
+
+$pagingurl = new moodle_url('/blocks/ned_mentor/all_students.php',
+    array(
+        'page' => $page,
+        'perpage' => $perpage,
+        'sort' => $sort,
+        'dir' => $dir,
+        'categoryid' => $categoryid,
+        'groupid' => $groupid,
+        'completionstatus' => $completionstatus,
+        'gradepassing' => $gradepassing
+    )
+);
+$pagingbar = new paging_bar($totalcount, $page, $perpage, $pagingurl, 'page');
+
+
+echo html_writer::div(
+    html_writer::table($table).$OUTPUT->render($pagingbar),
+    '',
+    array('id' => 'mentee-course-overview-center')
+);
+
 echo html_writer::end_div(); // Mentee course overview page.
 echo $OUTPUT->footer();

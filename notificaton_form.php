@@ -138,6 +138,43 @@ class notification_form extends moodleform {
             }
         }
 
+        $studentmsgenabled = 'block_ned_mentor_checkbox';
+        if (isset($this->_customdata['studentmsgenabled'])) {
+            if ($this->_customdata['studentmsgenabled']) {
+                $studentmsgenabled = 'block_ned_mentor_checkbox_checked';
+            }
+        }
+
+        $mentormsgenabled = 'block_ned_mentor_checkbox';
+        if (isset($this->_customdata['mentormsgenabled'])) {
+            if ($this->_customdata['mentormsgenabled']) {
+                $mentormsgenabled = 'block_ned_mentor_checkbox_checked';
+            }
+        }
+
+        $teachermsgenabled = 'block_ned_mentor_checkbox';
+        if (isset($this->_customdata['teachermsgenabled'])) {
+            if ($this->_customdata['teachermsgenabled']) {
+                $teachermsgenabled = 'block_ned_mentor_checkbox_checked';
+            }
+        }
+
+
+        $studentgreeting = '';
+        if (isset($this->_customdata['studentgreeting'])) {
+            $studentgreeting = $this->_customdata['studentgreeting'];
+        }
+
+        $mentorgreeting = '';
+        if (isset($this->_customdata['mentorgreeting'])) {
+            $mentorgreeting = $this->_customdata['mentorgreeting'];
+        }
+
+        $teachergreeting = '';
+        if (isset($this->_customdata['teachergreeting'])) {
+            $teachergreeting = $this->_customdata['teachergreeting'];
+        }
+
         $mform->addElement('hidden', 'id', '');
         $mform->setType('id', PARAM_INT);
 
@@ -147,20 +184,15 @@ class notification_form extends moodleform {
         $mform->addElement('text', 'name', get_string('rule_name', 'block_ned_mentor'));
         $mform->setType('name', PARAM_NOTAGS);
 
-        $table = new html_table();
-        $table->attributes['class'] = 'notification';
+        $mform->addElement('html', '<table class="notification">');
+        $mform->addElement('html', '<tr>');
+        $mform->addElement('html', '<th colspan="2">'.get_string('whentosend', 'block_ned_mentor').'</th>');
+        $mform->addElement('html', '</tr>');
 
-        $c1 = new html_table_cell();
-        $c1->colspan = 2;
-        $c1->header = true;
-        $c1->text = get_string('whentosend', 'block_ned_mentor');
-        $table->data[] = new html_table_row(array( $c1));
-
-        $c1 = new html_table_cell();
-        $c1->colspan = 2;
-
-        $c1->text = (
-            html_writer::tag('p', $g2('g2', 'g2', '_checkbox', 1) . ' Course Grade') .
+        $mform->addElement('html', '<tr>');
+        $mform->addElement('html', '<td colspan="2">');
+        $mform->addElement('html',  html_writer::tag('p', $g2('g2', 'g2', '_checkbox', 1) . ' '.
+                get_string('anycoursegrade', 'block_ned_mentor')) .
             html_writer::tag('p', $g4('g4', 'g4', '_checkbox', 1) . ' Course Grade below ' .
                 block_ned_mentor_textinput('g4_value', 'g4_value', '_textinput', $g4value) . ' %'
             ) .
@@ -174,88 +206,137 @@ class notification_form extends moodleform {
                 block_ned_mentor_textinput('n2_value', 'n2_value', '_textinput', $n2value) . ' days <N2>'
             )
         );
+        $mform->addElement('html', '</td>');
+        $mform->addElement('html', '</tr>');
 
-        $table->data[] = new html_table_row(array( $c1));
+        $mform->addElement('html', '<tr>');
+        $mform->addElement('html', '<th>');
+        $mform->addElement('html', get_string('whotosend', 'block_ned_mentor'));
+        $mform->addElement('html', '</th>');
+        $mform->addElement('html', '<th>');
+        $mform->addElement('html', get_string('howoften', 'block_ned_mentor'));
+        $mform->addElement('html', '</th>');
+        $mform->addElement('html', '</tr>');
 
-        // Second row.
-        $c1 = new html_table_cell();
-        $c2 = new html_table_cell();
-        $c1->header = true;
-        $c2->header = true;
-        $c1->text = get_string('whotosend', 'block_ned_mentor');
-        $c2->text = get_string('howoften', 'block_ned_mentor');
-        $table->data[] = new html_table_row(array( $c1, $c2));
-
-        $c1 = new html_table_cell();
-        $c2 = new html_table_cell();
-
-        $c1->text = (
-            html_writer::tag('table',
-                html_writer::tag('tr',
-                    html_writer::tag('td', 'Teacher').
-                    html_writer::tag('td', $teacheremail('teacheremail', 'teacheremail', '_checkbox', 1) . ' Email').
-                    html_writer::tag('td', $teachersms('teachersms', 'teachersms', '_checkbox', 1) . ' SMS')
-                ).
-                html_writer::tag('tr',
-                    html_writer::tag('td', 'Mentor').
-                    html_writer::tag('td', $mentoremail('mentoremail', 'mentoremail', '_checkbox', 1) . ' Email').
-                    html_writer::tag('td', $mentorsms('mentorsms', 'mentorsms', '_checkbox', 1) . ' SMS')
-                ).
-                html_writer::tag('tr',
-                    html_writer::tag('td', 'Student').
-                    html_writer::tag('td', $studentemail('studentemail', 'studentemail', '_checkbox', 1) . ' Email').
-                    html_writer::tag('td', $studentsms('studentsms', 'studentsms', '_checkbox', 1) . ' SMS')
-                ),
-                array('class' => 'block_ned_mentor_whotosend')
-            )
+        $mform->addElement('html', '<tr>');
+        $mform->addElement('html', '<td>');
+        $mform->addElement('html', html_writer::tag('table',
+            html_writer::tag('tr',
+                html_writer::tag('td', 'Teacher').
+                html_writer::tag('td', $teacheremail('teacheremail', 'teacheremail', '_checkbox', 1) . ' Email').
+                html_writer::tag('td', $teachersms('teachersms', 'teachersms', '_checkbox', 1) . ' SMS')
+            ).
+            html_writer::tag('tr',
+                html_writer::tag('td', 'Mentor').
+                html_writer::tag('td', $mentoremail('mentoremail', 'mentoremail', '_checkbox', 1) . ' Email').
+                html_writer::tag('td', $mentorsms('mentorsms', 'mentorsms', '_checkbox', 1) . ' SMS')
+            ).
+            html_writer::tag('tr',
+                html_writer::tag('td', 'Student').
+                html_writer::tag('td', $studentemail('studentemail', 'studentemail', '_checkbox', 1) . ' Email').
+                html_writer::tag('td', $studentsms('studentsms', 'studentsms', '_checkbox', 1) . ' SMS')
+            ),
+            array('class' => 'block_ned_mentor_whotosend')
+        ));
+        $mform->addElement('html', '</td>');
+        $mform->addElement('html', '<td>');
+        $mform->addElement('html', html_writer::tag(
+            'p',
+            'Every ' . block_ned_mentor_textinput('period', 'period', '_textinput', $period) . ' days')
         );
+        $mform->addElement('html', '</td>');
+        $mform->addElement('html', '</tr>');
 
-        $c2->text = (
-            html_writer::tag('p', 'Every ' . block_ned_mentor_textinput('period', 'period', '_textinput', $period) . ' days')
+        $greetingoptions = array(
+            'firstname' => get_string('firstname', 'block_ned_mentor'),
+            'rolename' => get_string('rolename', 'block_ned_mentor'),
+            'sirmadam' => get_string('sirmadam', 'block_ned_mentor'),
         );
+        
+        
+        // Student.
+        $mform->addElement('html', '<tr>');
+        $mform->addElement('html', '<th colspan="2">');
+        $mform->addElement('html', $studentmsgenabled('studentmsgenabled', 'studentmsgenabled', '_checkbox', 1).' '.
+            get_string('studentappendedmsg', 'block_ned_mentor'));
+        $mform->addElement('html', '</th>');
+        $mform->addElement('html', '</tr>');
+        $mform->addElement('html', '<tr>');
+        $mform->addElement('html', '<td colspan="2">');
+        $mform->addElement('html', '<p style="text-align:left;">'.
+            get_string('dear', 'block_ned_mentor'). ' '.
+            html_writer::select(
+                $greetingoptions, 'studentgreeting', $studentgreeting, ''
+            ).'</p>');
+        $mform->addElement('editor', 'studentappendedmsg', '');
+        $mform->setType('studentappendedmsg', PARAM_RAW);
+        $mform->addElement('html', '</td>');
+        $mform->addElement('html', '</tr>');
 
-        $table->data[] = new html_table_row(array( $c1, $c2));
 
-        // Apply To Header.
-        $c1 = new html_table_cell();
-        $c1->colspan = 2;
-        $c1->header = true;
-        $c1->text = "Appended Message (optional)";
-        $table->data[] = new html_table_row(array( $c1));
+        // Mentor.
+        $mform->addElement('html', '<tr>');
+        $mform->addElement('html', '<th colspan="2">');
+        $mform->addElement('html', $mentormsgenabled('mentormsgenabled', 'mentormsgenabled', '_checkbox', 1).' '.
+            get_string('mentorappendedmsg', 'block_ned_mentor'));
+        $mform->addElement('html', '</th>');
+        $mform->addElement('html', '</tr>');
+        $mform->addElement('html', '<tr>');
+        $mform->addElement('html', '<td colspan="2">');
+        $mform->addElement('html', '<p style="text-align:left;">'.
+            get_string('dear', 'block_ned_mentor'). ' '.
+            html_writer::select(
+                $greetingoptions, 'mentorgreeting', $mentorgreeting, ''
+            ).'</p>');
+        $mform->addElement('editor', 'mentorappendedmsg', '');
+        $mform->setType('mentorappendedmsg', PARAM_RAW);
+        $mform->addElement('html', '</td>');
+        $mform->addElement('html', '</tr>');
 
-        // Apply To Header.
-        $c1 = new html_table_cell();
-        $c1->colspan = 2;
-        $c1->style = 'text-align: center;';
 
-        $appendedmessage = '';
-        if (isset($this->_customdata['appended_message'])) {
-            $appendedmessage = $this->_customdata['appended_message'];
-        }
+        // Teacher.
+        $mform->addElement('html', '<tr>');
+        $mform->addElement('html', '<th colspan="2">');
+        $mform->addElement('html', $teachermsgenabled('teachermsgenabled', 'teachermsgenabled', '_checkbox', 1).' '.
+            get_string('teacherappendedmsg', 'block_ned_mentor'));
+        $mform->addElement('html', '</th>');
+        $mform->addElement('html', '</tr>');
+        $mform->addElement('html', '<tr>');
+        $mform->addElement('html', '<td colspan="2">');
+        $mform->addElement('html', '<p style="text-align:left;">'.
+            get_string('dear', 'block_ned_mentor'). ' '.
+            html_writer::select(
+                $greetingoptions, 'teachergreeting', $teachergreeting, ''
+            ).'</p>');
+        $mform->addElement('editor', 'teacherappendedmsg', '');
+        $mform->setType('teacherappendedmsg', PARAM_RAW);
+        $mform->addElement('html', '</td>');
+        $mform->addElement('html', '</tr>');
 
-        $c1->text = '<textarea name="appended_message" rows="6" cols="80">' .
-                        $appendedmessage .
-                    '</textarea>';
-        $table->data[] = new html_table_row(array( $c1));
 
-        // Apply To Header.
-        $c1 = new html_table_cell();
-        $c1->colspan = 2;
-        $c1->header = true;
-        $c1->text = "Apply to";
-        $table->data[] = new html_table_row(array( $c1));
 
-        $c1 = new html_table_cell();
-        $c1->colspan = 2;
+
+
+
+
+
+        $mform->addElement('html', '<tr>');
+        $mform->addElement('html', '<th colspan="2">');
+        $mform->addElement('html', get_string('applyto', 'block_ned_mentor'));
+        $mform->addElement('html', '</th>');
+        $mform->addElement('html', '</tr>');
 
         $categories = block_ned_mentor_get_course_category_tree();
+        $mform->addElement('html', '<tr>');
+        $mform->addElement('html', '<td colspan="2">');
+        $mform->addElement('html', block_ned_mentor_category_tree_form($categories,
+            (isset($this->_customdata['category'])) ? $this->_customdata['category'] : '',
+            (isset($this->_customdata['course'])) ? $this->_customdata['course'] : ''));
+        $mform->addElement('html', '</td>');
+        $mform->addElement('html', '</tr>');
 
-        $c1->text = block_ned_mentor_category_tree_form($categories,
-                                       (isset($this->_customdata['category'])) ? $this->_customdata['category'] : '',
-                                       (isset($this->_customdata['course'])) ? $this->_customdata['course'] : '');
-        $table->data[] = new html_table_row(array( $c1));
+        $mform->addElement('html', '</table>');
 
-        $mform->addElement('static', 'selectors', '', html_writer::table($table));
 
         $this->add_action_buttons();
 

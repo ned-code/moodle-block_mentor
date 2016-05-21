@@ -21,6 +21,7 @@
  */
 
 require_once($CFG->dirroot.'/mod/assignment/lib.php');
+require_once($CFG->dirroot.'/lib/completionlib.php');
 
 function block_ned_mentor_get_all_students($filter = '') {
     global $DB, $CFG;
@@ -288,7 +289,7 @@ function block_ned_mentor_get_mentors($menteeid) {
     }
 
     $sql = "SELECT ra.id,
-                   ra.userid AS mentorid,
+                   ra.userid mentorid,
                    u.firstname,
                    u.lastname,
                    u.lastaccess
@@ -417,13 +418,15 @@ function block_ned_mentor_render_mentees_by_mentor($data, $show) {
             $mentor['mentor']->firstname . ' ' . $mentor['mentor']->lastname.'</a> </strong></div>';
         foreach ($mentor['mentee'] as $mentee) {
             $gradesummary = block_ned_mentor_grade_summary($mentee->studentid, $coursefilter);
-            if (($gradesummary->attempted >= 50) && ($gradesummary->all >= 50)) {
+            if ($gradesummary->timecompleted && $coursefilter) {
+                $menteeicon = 'complete_bullet.png';
+            } else if (($gradesummary->passed > 0) && ($gradesummary->failed == 0)) {
                 $menteeicon = 'mentee_green.png';
-            } else if (($gradesummary->attempted >= 50) && ($gradesummary->all < 50)) {
+            } else if (($gradesummary->passed > 0) && ($gradesummary->failed > 0)) {
                 $menteeicon = 'mentee_red_green.png';
-            } else if (($gradesummary->attempted < 50) && ($gradesummary->all >= 50)) {
-                $menteeicon = 'mentee_red_green.png';
-            } else if (($gradesummary->attempted < 50) && ($gradesummary->all < 50)) {
+            } else if (($gradesummary->passed == 0) && ($gradesummary->failed > 0)) {
+                $menteeicon = 'mentee_red.png';
+            } else if (($gradesummary->passed == 0) && ($gradesummary->failed == 0)) {
                 $menteeicon = 'mentee_red.png';
             }
             if (!$show && !$mentee->enrolled) {
@@ -479,16 +482,17 @@ function block_ned_mentor_render_mentors_by_mentee($data) {
     foreach ($data as $mentee) {
 
         $gradesummary = block_ned_mentor_grade_summary($mentee['mentee']->studentid, $coursefilter);
-        if (($gradesummary->attempted >= 50) && ($gradesummary->all >= 50)) {
+        if ($gradesummary->timecompleted && $coursefilter) {
+            $menteeicon = 'complete_bullet.png';
+        } else if (($gradesummary->passed > 0) && ($gradesummary->failed == 0)) {
             $menteeicon = 'mentee_green.png';
-        } else if (($gradesummary->attempted >= 50) && ($gradesummary->all < 50)) {
+        } else if (($gradesummary->passed > 0) && ($gradesummary->failed > 0)) {
             $menteeicon = 'mentee_red_green.png';
-        } else if (($gradesummary->attempted < 50) && ($gradesummary->all >= 50)) {
-            $menteeicon = 'mentee_red_green.png';
-        } else if (($gradesummary->attempted < 50) && ($gradesummary->all < 50)) {
+        } else if (($gradesummary->passed == 0) && ($gradesummary->failed > 0)) {
+            $menteeicon = 'mentee_red.png';
+        } else if (($gradesummary->passed == 0) && ($gradesummary->failed == 0)) {
             $menteeicon = 'mentee_red.png';
         }
-
         $html .= '<div class="mentee"><strong><img class="mentor-img" src="'.
             $CFG->wwwroot.'/blocks/ned_mentor/pix/'.$menteeicon.'"><a href="'.
             $CFG->wwwroot.'/blocks/ned_mentor/course_overview.php?menteeid='.$mentee['mentee']->studentid.'" >' .
@@ -653,6 +657,9 @@ function block_ned_mentor_grade_summary($studentid, $courseid=0) {
     $data = new stdClass();
     $courses = array();
     $coursegrades = array();
+    if (! $passinggrade = get_config('block_ned_mentor', 'passinggrade')) {
+        $passinggrade = 50;
+    }
 
     $gradetotal = array('attempted_grade' => 0,
                          'attempted_max' => 0,
@@ -741,6 +748,9 @@ function block_ned_mentor_grade_summary($studentid, $courseid=0) {
 
     $data->attempted = $attempted;
     $data->all = $all;
+    $data->passed = 0;
+    $data->failed = 0;
+    $data->timecompleted = 0;
 
     if ($courses) {
         foreach ($courses as $id => $value) {
@@ -755,6 +765,17 @@ function block_ned_mentor_grade_summary($studentid, $courseid=0) {
                             AND gg.userid = ?";
             if ($courseaverage = $DB->get_record_sql($sqlcourseaverage, array('course', $id, $studentid))) {
                 $coursegrades[$id] = ($courseaverage->finalgrade / $courseaverage->rawgrademax) * 100;
+
+                if ($coursegrades[$id] >= $passinggrade) {
+                    $data->passed++;
+                } else {
+                    $data->failed++;
+                }
+            }
+            $info = new completion_info($cor = $DB->get_record('course', array('id' => $id)));
+            if ($iscomplete = $info->is_course_complete($studentid)) {
+                $ccompletion = $DB->get_record('course_completions', array('userid' => $studentid, 'course' => $id));
+                $data->timecompleted = $ccompletion->timecompleted;
             }
         }
     }
@@ -1183,7 +1204,7 @@ function block_ned_mentor_render_notification_rule_table($notification, $number)
     $html = '';
     $html .= '<table class="notification_rule" cellspacing="0">
                  <tr>
-                    <td colspan="3" class="notification_rule_ruleno"><strong>'.
+                    <td colspan="2" class="notification_rule_ruleno"><strong>'.
         get_string('rule', 'block_ned_mentor').' '.$number.':</strong> '.$notification->name.'</td>
                     <td colspan="2" class="notification_rule_button">';
 
@@ -1214,7 +1235,6 @@ function block_ned_mentor_render_notification_rule_table($notification, $number)
                     <th class="notification_c2" nowrap="nowrap">'.get_string('when_to_send', 'block_ned_mentor').'</th>
                     <th class="notification_c3" nowrap="nowrap">'.get_string('who_to_send', 'block_ned_mentor').'</th>
                     <th class="notification_c4" nowrap="nowrap">'.get_string('how_often', 'block_ned_mentor').'</th>
-                    <th class="notification_c5" nowrap="nowrap">'.get_string('appended_message', 'block_ned_mentor').'</th>
                   </tr>
                   <tr>
                     <td class="notification_rule_body notification_c1">';
@@ -1311,11 +1331,29 @@ function block_ned_mentor_render_notification_rule_table($notification, $number)
 
         $html .= '</ul>';
     }
+
+    $apendedmessage = '';
+    if ($notification->studentmsgenabled) {
+        $apendedmessage .= get_string('dear', 'block_ned_mentor').' '.
+            get_string($notification->studentgreeting, 'block_ned_mentor').', <br >'.
+            $notification->studentappendedmsg.'<br />';
+    }
+
+    if ($notification->mentormsgenabled) {
+        $apendedmessage .= get_string('dear', 'block_ned_mentor').' '.
+            get_string($notification->mentorgreeting, 'block_ned_mentor').', <br /><br />'.
+            $notification->mentorappendedmsg.'<br />';
+    }
+
+    if ($notification->teachermsgenabled) {
+        $apendedmessage .= get_string('dear', 'block_ned_mentor').' '.
+            get_string($notification->teachergreeting, 'block_ned_mentor').', <br /><br />'.
+            $notification->teacherappendedmsg.'<br />';
+    }
+
     $html .= '</td>
                     <td class="notification_rule_body notification_c4">'.
         get_string('period', 'block_ned_mentor', $notification->period).'</td>
-                    <td class="notification_rule_body notification_c5">'.
-        $notification->appended_message.'</td>
                   </tr>
                 </table>';
     return $html;
@@ -1813,6 +1851,19 @@ function block_ned_mentor_group_messages () {
                     'notificationid' => $group->notificationid, 'sent' => '0'
                 ), 'userid ASC'
             )) {
+                $appendedmessage = '';
+                $greetings = '';
+                if (($group->type == 'student') && $notification->studentmsgenabled) {
+                    $appendedmessage = $notification->studentappendedmsg;
+                }
+                if (($group->type == 'mentor') && $notification->mentormsgenabled) {
+                    $appendedmessage = $notification->mentorappendedmsg;
+                }
+                if (($group->type == 'teacher') && $notification->teachermsgenabled) {
+                    $appendedmessage = $notification->teacherappendedmsg;
+                }
+
+                $emailbody .= $appendedmessage . '<hr />';
 
                 foreach ($messages as $message) {
                     $student = $DB->get_record('user', array('id' => $message->userid));
@@ -1832,11 +1883,6 @@ function block_ned_mentor_group_messages () {
                     $DB->update_record('block_ned_mentor_notific_msg', $message);
                 }
 
-                $appendedmessage = '';
-                if ($notification->appended_message) {
-                    $appendedmessage = '<p>' . $notification->appended_message . '</p>';
-                }
-                $emailbody .= $appendedmessage . '<hr />';
                 $emailbody .= get_string('automatedmessage', 'block_ned_mentor', format_string($site->fullname));
 
                 $rec = new stdClass();
@@ -1860,9 +1906,40 @@ function block_ned_mentor_group_messages () {
 
                 $sent = 0;
                 if ($to = $DB->get_record('user', array('id' => $group->receiverid))) {
+                    if (($group->type == 'student') && $notification->studentmsgenabled) {
+                        if ($notification->studentgreeting == 'firstname') {
+                            $greetings = get_string('dearfirstname', 'block_ned_mentor', $to->firstname);
+                        } else if ($notification->studentgreeting == 'rolename') {
+                            $greetings = get_string('dearrolename', 'block_ned_mentor',
+                                get_string($group->type, 'block_ned_mentor'));
+                        } else if ($notification->studentgreeting == 'sirmadam') {
+                            $greetings = get_string('dearsirmadam', 'block_ned_mentor');
+                        }
+                    }
+                    if (($group->type == 'mentor') && $notification->mentormsgenabled) {
+                        if ($notification->mentorgreeting == 'firstname') {
+                            $greetings = get_string('dearfirstname', 'block_ned_mentor', $to->firstname);
+                        } else if ($notification->mentorgreeting == 'rolename') {
+                            $greetings = get_string('dearrolename', 'block_ned_mentor',
+                                get_string($group->type, 'block_ned_mentor'));
+                        } else if ($notification->mentorgreeting == 'sirmadam') {
+                            $greetings = get_string('dearsirmadam', 'block_ned_mentor');
+                        }
+                    }
+                    if (($group->type == 'teacher') && $notification->teachermsgenabled) {
+                        if ($notification->teachergreeting == 'firstname') {
+                            $greetings = get_string('dearfirstname', 'block_ned_mentor', $to->firstname);
+                        } else if ($notification->teachergreeting == 'rolename') {
+                            $greetings = get_string('dearrolename', 'block_ned_mentor',
+                                get_string($group->type, 'block_ned_mentor'));
+                        } else if ($notification->teachergreeting == 'sirmadam') {
+                            $greetings = get_string('dearsirmadam', 'block_ned_mentor');
+                        }
+                    }
                     $emailsent = $group->type . 'email';
                     $smssent = $group->type . 'sms';
                     if ($notification->$emailsent) {
+                        $emailbody = $greetings.$emailbody;
                         if (email_to_user($to, $supportuser, $subject, '', $emailbody)) {
                             $sent = 1;
                             $notificationreport .= $to->firstname . ' ' .
@@ -1889,6 +1966,9 @@ function block_ned_mentor_group_messages () {
                 }
             }
         }
+    }
+    if (!$notificationreport) {
+        return get_string('nomessagessent', 'block_ned_mentor').'<br>';
     }
     return $notificationreport;
 }
@@ -1970,6 +2050,7 @@ function block_ned_mentor_activity_progress($course, $menteeid) {
     if (isset($SESSION->completioncache)) {
         unset($SESSION->completioncache);
     }
+
     $progressdata = new stdClass();
     $progressdata->content = new stdClass;
     $progressdata->content->items = array();
@@ -1984,6 +2065,12 @@ function block_ned_mentor_activity_progress($course, $menteeid) {
     $notattemptedactivities = 0;
     $waitingforgradeactivities = 0;
 
+    $info = new completion_info($course);
+    $progressdata->timecompleted = 0;
+    if ($iscomplete = $info->is_course_complete($menteeid)) {
+        $ccompletion = $DB->get_record('course_completions', array('userid' => $menteeid, 'course' => $course->id));
+        $progressdata->timecompleted = $ccompletion->timecompleted;
+    }
 
     $completion = new completion_info($course);
     $activities = $completion->get_activities();
@@ -2140,7 +2227,7 @@ function block_ned_mentor_activity_progress($course, $menteeid) {
             '/blocks/ned_mentor/pix/unmarked.gif" class="icon" alt="">';
 
         $progressdata->completed = $completedactivities + $incompletedactivities;
-        $progressdata->total = $completedactivities + $incompletedactivities+$savedactivities+$notattemptedactivities+$waitingforgradeactivities;
+        $progressdata->total = $completedactivities + $incompletedactivities + $savedactivities + $notattemptedactivities + $waitingforgradeactivities;
 
         $sql = "SELECT gg.id,
                        gg.rawgrademax,
@@ -2171,7 +2258,6 @@ function block_ned_mentor_simplegradebook($course, $menteeuser, $modgradesarray)
 
     $cobject = new stdClass();
     $cobject->course = $course;
-
 
     $simplegradebook = array();
     $weekactivitycount = array();
@@ -2262,7 +2348,6 @@ function block_ned_mentor_simplegradebook($course, $menteeuser, $modgradesarray)
                                     "src=\"$CFG->wwwroot/mod/$mod->modname/pix/icon.png\" height=16 ".
                                     "width=16 ALT=\"$mod->modfullname\"></a>";
 
-
                                 $weekactivitycount[$i]['mod'][] = $image;
                                 foreach ($simplegradebook as $key => $value) {
 
@@ -2352,4 +2437,127 @@ function block_ned_mentor_simplegradebook($course, $menteeuser, $modgradesarray)
     }
 
     return array($simplegradebook, $weekactivitycount, $courseformat);
+}
+
+function block_ned_mentor_generate_report(progress_bar $progressbar = null) {
+    global $DB;
+    $inprogress = get_config('block_ned_mentor', 'inprogress');
+    $reportdate = get_config('block_ned_mentor', 'reportdate');
+
+    if ($inprogress && ((time() - $reportdate) < 10 * 60)) {
+        return;
+    } else {
+        set_config('inprogress', 1, 'block_ned_mentor');
+    }
+
+    $time = time();
+    if (!$students = block_ned_mentor_get_all_students()) {
+        return;
+    }
+    $numberofstudents = count($students);
+    $counter = 0;
+    $sql = "TRUNCATE TABLE {block_ned_mentor_report_data}";
+    $DB->execute($sql);
+
+    foreach ($students as $student) {
+        $counter++;
+        if ($enrolledcourses = enrol_get_all_users_courses($student->id, true , 'id,fullname,shortname', 'fullname ASC')) {
+            foreach ($enrolledcourses as $key => $enrolledcourse) {
+                $course = $DB->get_record('course', array('id' => $enrolledcourse->id));
+                $progressdata = block_ned_mentor_activity_progress($course, $student->id);
+                $progressdata->completed;
+                $progressdata->total;
+                $percentageofcompletion = 0;
+
+                if ($progressdata->total) {
+                    $percentageofcompletion = ($progressdata->completed / $progressdata->total) * 100;
+                }
+                $groupids = '';
+                $sql = "SELECT g.id
+                          FROM {groups} g
+                          JOIN {groups_members} gm
+                            ON g.id = gm.groupid
+                         WHERE g.courseid = ?
+                           AND gm.userid = ?";
+                if ($groups = $DB->get_records_sql($sql, array(SITEID, $student->id))) {
+                    $groupids = implode(',', array_keys($groups));
+                }
+
+                $mentorids = '';
+                if ($mentors = block_ned_mentor_get_mentors($student->id)) {
+                    $arrmentor = array();
+                    foreach ($mentors as $mentor) {
+                        $arrmentor[] = $mentor->mentorid;
+                    }
+                    $mentorids = implode(',', $arrmentor);
+                }
+
+                $rec = new stdClass();
+                $rec->userid = $student->id;
+                $rec->courseid = $course->id;
+                $rec->completionrate = $percentageofcompletion;
+                $rec->passinggrade = $progressdata->percentage;
+                $rec->mentors = $mentorids;
+                $rec->groups = $groupids;
+                $rec->timemodified = time();
+                $rec->id = $DB->insert_record('block_ned_mentor_report_data', $rec);
+            }
+        }
+        if (!is_null($progressbar)) {
+            $donepercent = floor($counter / $numberofstudents * 90);
+            $progressbar->update_full($donepercent, "$counter of $numberofstudents students");
+        }
+    }
+
+    // Pivot part.
+    $sql = "SELECT DISTINCT rd.courseid FROM {block_ned_mentor_report_data} rd WHERE rd.deleted = 0";
+    $fieldscreate = '';
+    $fieldsdata = '';
+    if ($fields = $DB->get_records_sql($sql)) {
+        foreach ($fields as $field) {
+            $fieldscreate .= " `completion".$field->courseid."` decimal(10,2) NOT NULL DEFAULT '0.00',\n";
+            $fieldscreate .= " `passing".$field->courseid."` decimal(10,2) DEFAULT NULL,\n";
+            $fieldsdata .= " MAX(CASE WHEN td.courseid=".
+                $field->courseid." THEN td.completionrate ELSE '-1' END) completion".$field->courseid.",\n";
+            $fieldsdata .= " MAX(CASE WHEN td.courseid=".
+                $field->courseid." THEN td.passinggrade ELSE '-1' END) passing".$field->courseid.",\n";
+        }
+    }
+    $sqldrop = "DROP TABLE {block_ned_mentor_report_pvt}";
+
+    $sqlcreate = "CREATE TABLE `{block_ned_mentor_report_pvt}` (
+          `id` bigint(11) NOT NULL AUTO_INCREMENT,
+          `userid` bigint(11) NOT NULL,
+          `mentors` tinytext,
+          `groups` tinytext,
+          `courses` tinytext,
+          ".$fieldscreate."
+          PRIMARY KEY (`id`),
+          UNIQUE KEY `ix_user` (`userid`) USING BTREE
+        ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8";
+
+    $sqldata = "SELECT td.id, td.groups, td.mentors, GROUP_CONCAT(td.courseid) courses, ".
+        $fieldsdata." td.userid FROM {block_ned_mentor_report_data} td GROUP BY td.userid";
+
+    $DB->execute($sqldrop);
+    $DB->execute($sqlcreate);
+    purge_all_caches();
+    if ($rows = $DB->get_records_sql($sqldata)) {
+        $numofrecords = count($rows);
+        $counter = 0;
+        foreach ($rows as $row) {
+            ++$counter;
+            $DB->insert_record('block_ned_mentor_report_pvt', $row);
+            if (!is_null($progressbar)) {
+                $donepercent = 90 + floor($counter / $numofrecords * 10);
+                $progressbar->update_full($donepercent, "$counter of $numofrecords records");
+            }
+        }
+    }
+    if (!is_null($progressbar)) {
+        $progressbar->update_full(100, get_string('completed', 'block_ned_mentor'));
+    }
+    set_config('reportdate', time(), 'block_ned_mentor');
+    set_config('inprogress', 0, 'block_ned_mentor');
+    return;
 }

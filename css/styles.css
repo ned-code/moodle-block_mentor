@@ -101,7 +101,6 @@
     overflow: hidden;
     width: 75%;
     float: right;
-    padding-top: 18px;
 }
 #page-blocks-ned_mentor-all_students #mentee-course-overview-center-single,
 #page-blocks-ned_mentor-course_overview #mentee-course-overview-center-single,
@@ -110,7 +109,6 @@
     overflow: hidden;
     width: 75%;
     float: right;
-    margin-top: 18px;
 }
 #page-blocks-ned_mentor-all_students .mentee-course-overview-block,
 #page-blocks-ned_mentor-course_overview .mentee-course-overview-block,
@@ -182,11 +180,16 @@
     width: 100%;
     border-spacing: 10px;
     border-collapse: separate;
+    height: 180px;
 }
 #page-blocks-ned_mentor-course_overview .mentee-course-overview-center_table td,
 #page-blocks-ned_mentor-course_overview_single .mentee-course-overview-center_table td {
     background-color: white;
     width: 33%;
+}
+#page-blocks-ned_mentor-course_overview .mentee-course-overview-center_table td.completed {
+    background-color: #E6FAC0;
+    text-align: center;
 }
 #page-blocks-ned_mentor-course_overview .mentee-blue-border,
 #page-blocks-ned_mentor-course_overview_single .mentee-blue-border {
@@ -233,6 +236,20 @@
     text-align: right;
     width: 70%;
 }
+#page-blocks-ned_mentor-course_overview div.overview-grade-right {
+    border: 0 none;
+    font-size: 30px;
+    font-weight: bold;
+    padding: 6px;
+    text-align: center;
+    margin-top: 15px;
+}
+#page-blocks-ned_mentor-course_overview div.overview-grade-completed {
+    border: 0 none;
+    font-size: 30px;
+    font-weight: bold;
+    text-align: center;
+}
 #page-blocks-ned_mentor-course_overview td.overview-grade-right,
 #page-blocks-ned_mentor-course_overview_single td.overview-grade-right {
     border: 0 none;
@@ -256,7 +273,7 @@
 }
 #page-blocks-ned_mentor-course_overview .vertical-textd,
 #page-blocks-ned_mentor-course_overview_single .vertical-textd {
-    padding: 5px 10px 0;
+    padding: 5px 10px 5px;
 }
 #page-blocks-ned_mentor-course_overview .mentee-menu,
 #page-blocks-ned_mentor-course_overview_single .mentee-menu {
@@ -303,6 +320,8 @@
     width: 100%;
     margin-bottom: 16px;
 }
+#page-blocks-ned_mentor-course_overview td.blue,
+#page-blocks-ned_mentor-course_overview_single td.blue,
 #page-blocks-ned_mentor-course_overview .blue,
 #page-blocks-ned_mentor-course_overview_single .blue {
     background-color: #50b4ef;
@@ -311,6 +330,7 @@
     font-weight: bold;
     padding: 5px;
     text-align: center;
+    height: 20px;
 }
 #page-blocks-ned_mentor-course_overview .white,
 #page-blocks-ned_mentor-course_overview_single .white {
@@ -476,16 +496,16 @@
     padding: 10px;
     width: 900px;
 }
-#page-blocks-ned_mentor-notification table.notification th,
-#page-blocks-ned_mentor-course_overview table.notification th,
-#page-blocks-ned_mentor-course_overview_single table.notification th {
+#page-blocks-ned_mentor-notification table.notification  > tbody > tr > th,
+#page-blocks-ned_mentor-course_overview table.notification > tbody > tr > th,
+#page-blocks-ned_mentor-course_overview_single table.notification  > tbody > tr > th {
     background-color: #ededed;
     border: 1px solid #b5afaf;
     padding: 10px 15px;
 }
-#page-blocks-ned_mentor-notification  table.notification td,
-#page-blocks-ned_mentor-course_overview table.notification td,
-#page-blocks-ned_mentor-course_overview_single table.notification td {
+#page-blocks-ned_mentor-notification  table.notification > tbody > tr > td,
+#page-blocks-ned_mentor-course_overview table.notification  > tbody > tr > td,
+#page-blocks-ned_mentor-course_overview_single table.notification  > tbody > tr > td {
     background-color: white;
     border: 1px solid #b5afaf;
     padding: 15px;
@@ -501,7 +521,7 @@
 #page-blocks-ned_mentor-course_overview ._textinput,
 #page-blocks-ned_mentor-course_overview_single ._textinput {
     text-align: center;
-    width: 20px !important;
+    width: 25px !important;
 }
 #page-blocks-ned_mentor-notification .fz_form_course_category,
 #page-blocks-ned_mentor-course_overview .fz_form_course_category,
@@ -528,6 +548,7 @@
     border-collapse: collapse;
     margin-bottom: 20px;
     max-width: 800px;
+    width: 700px;
 }
 #page-blocks-ned_mentor-notification .notification_rule th {
     background-color: #c3c3c3;
@@ -687,9 +708,65 @@
     background-color: #ddd;
     border: 1px solid #787878;
 }
+#page-blocks-ned_mentor-all_students  th.header-yellow {
+    background-color: #F7F1D7;
+    border: 1px solid #787878;
+}
 #page-blocks-ned_mentor-all_students .failed {
     background-color: #FFCDCF;
 }
 #page-blocks-ned_mentor-all_students .passed {
     background-color: #CEFECE;
+}
+#page-blocks-ned_mentor-all_students .paging {
+    margin: 20px 0 0 5px;
+}
+#page-blocks-ned_mentor-all_students .sort-course-link {
+    display: block;
+}
+#page-blocks-ned_mentor-all_students #mentee-update-report-data {
+    border: 1px solid orange;
+    margin-bottom: 20px;
+    overflow: hidden;
+    padding: 10px;
+}
+#page-blocks-ned_mentor-all_students .mentee-update-report-data-text {
+    text-align: center;
+    margin-bottom: 15px;
+}
+#page-blocks-ned_mentor-all_students #mentee-update-report-data .singlebutton {
+    text-align: center;
+    margin-bottom: 10px;
+}
+#page-blocks-ned_mentor-all_students #mentee-update-report-data .singlebutton input,
+#page-blocks-ned_mentor-all_students #mentee-update-report-data .singlebutton div {
+    margin: 0 !important;
+}
+#page-blocks-ned_mentor-all_students  .inprogress-msg {
+    text-align: center;
+    font-style: italic;
+}
+
+#page-blocks-ned_mentor-update_all_students_data .page-title {
+    text-align: center;
+}
+#page-blocks-ned_mentor-update_all_students_data .buttons {
+    text-align: center;
+}
+#page-blocks-ned_mentor-update_all_students_data #notice {
+    display: table;
+    margin: auto;
+    width: unset !important;
+}
+#page-blocks-ned_mentor-update_all_students_data .alert.alert-block.alert-danger {
+    display: table;
+}
+#page-blocks-ned_mentor-update_all_students_data .progressbar_container h2 {
+    text-align: center;
+}
+#page-blocks-ned_mentor-update_all_students_data .progressbar_container p {
+    display: none;
+}
+#page-blocks-ned_mentor-notification table.notification {
+    width: 600px;
 }
