@@ -697,17 +697,17 @@ foreach ($columns as $column) {
 
     if ($sort != $column) {
         $columnicon = "";
-        $columndir = "ASC";
+        $columndir = "DESC";
         $columnicon = "<img class='iconsort' src=\"" . $OUTPUT->pix_url('sort_inactive', 'block_ned_mentor') . "\" alt=\"\" />";
     } else {
-        if ($dir == 'ASC') {
-            $columndir = 'DESC';
-            $columnicon = "<img class='iconsort' src=\"" . $OUTPUT->pix_url('sort_asc', 'block_ned_mentor') . "\" alt=\"\" />";
-        } else if ($dir == 'DESC') {
-            $columndir = 'CLEAR';
-            $columnicon = "<img class='iconsort' src=\"" . $OUTPUT->pix_url('sort_desc', 'block_ned_mentor') . "\" alt=\"\" />";
-        } else {
+        if ($dir == 'DESC') {
             $columndir = 'ASC';
+            $columnicon = "<img class='iconsort' src=\"" . $OUTPUT->pix_url('sort_desc', 'block_ned_mentor') . "\" alt=\"\" />";
+        } else if ($dir == 'ASC') {
+            $columndir = 'CLEAR';
+            $columnicon = "<img class='iconsort' src=\"" . $OUTPUT->pix_url('sort_asc', 'block_ned_mentor') . "\" alt=\"\" />";
+        } else {
+            $columndir = 'DESC';
             $columnicon = "<img class='iconsort' src=\"" . $OUTPUT->pix_url('sort_inactive', 'block_ned_mentor') . "\" alt=\"\" />";
         }
     }
