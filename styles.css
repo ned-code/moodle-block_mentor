@@ -45,3 +45,10 @@
 .block_ned_mentor .gray > a {
     color: #999;
 }
+.block_ned_mentor .footer-separator {
+    margin-top: 12px;
+    height: 1px;
+    border: none;
+    color: #ddd;
+    background-color: #ddd;
+}

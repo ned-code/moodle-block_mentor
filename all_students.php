@@ -894,4 +894,7 @@ echo html_writer::div(
 );
 
 echo html_writer::end_div(); // Mentee course overview page.
+
+echo block_ned_mentor_footer();
+
 echo $OUTPUT->footer();

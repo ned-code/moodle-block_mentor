@@ -74,6 +74,6 @@ echo block_ned_mentor_single_button_form ('create_new_rule',
 );
 echo '</div>';
 
-
+echo block_ned_mentor_footer();
 
 echo $OUTPUT->footer();

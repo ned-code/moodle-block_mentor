@@ -814,4 +814,7 @@ if ($navpage == 'overview') {
 
 echo '</div>'; // Mentee course overview center single.
 echo '</div>'; // Mentee course overview page.
+
+echo block_ned_mentor_footer();
+
 echo $OUTPUT->footer();

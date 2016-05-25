@@ -213,3 +213,4 @@ $string['dear'] = 'Dear';
 $string['firstname'] = 'First name';
 $string['rolename'] = 'Role name';
 $string['sirmadam'] = 'Sir or Madam';
+$string['version'] = 'Version';

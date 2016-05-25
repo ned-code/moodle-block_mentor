@@ -93,4 +93,6 @@ $form->set_data($toform);
 
 $form->display();
 
+echo block_ned_mentor_footer();
+
 echo $OUTPUT->footer();

@@ -280,7 +280,6 @@ class block_ned_mentor extends block_base {
                     $this->content->text .= '<div class="mentee"><img src="'.$OUTPUT->pix_url('i/report').'" class="mentee-img">'.
                         '<a href="'.$CFG->wwwroot.'/'.$indexphp.'?sortby='.$sortby.'&coursefilter='.$coursefilter.'&showall=1">'.
                         get_string('show_all', 'block_ned_mentor').'</a></div>';
-
                     $this->content->text .= '</div>';
                 } else {
                     $this->content->text .= block_ned_mentor_render_mentees_by_mentor($visiblementees, $showunenrolledstudents);
@@ -307,10 +306,11 @@ class block_ned_mentor extends block_base {
                 }
             }
         }
-
-        $this->content->text .= '<hr style="margin-top:12px;height:1px;border:none;color:#ddd;background-color:#ddd;" />'.
-            '<div class="mentee-footer-menu">';
-
+        if (has_capability('block/ned_mentor:assignmentor', context_system::instance())
+            || has_capability('block/ned_mentor:createnotificationrule', context_system::instance())) {
+            $this->content->text .= '<hr class="footer-separator" />' .
+                '<div class="mentee-footer-menu">';
+        }
         if (has_capability('block/ned_mentor:assignmentor', context_system::instance())) {
             $this->content->text .= '<div class="mentee-block-menu">'.
                 '<img class="mentee-img" src="'.$OUTPUT->pix_url('i/navigationitem').'">'.
@@ -323,7 +323,10 @@ class block_ned_mentor extends block_base {
                 '<a href="'.$CFG->wwwroot.'/blocks/ned_mentor/notification_rules.php">'.
                 get_string('manage_notification', 'block_ned_mentor').'</a></div>';
         }
-        $this->content->text .= '</div>';
+        if (has_capability('block/ned_mentor:assignmentor', context_system::instance())
+            || has_capability('block/ned_mentor:createnotificationrule', context_system::instance())) {
+            $this->content->text .= '</div>';
+        }
 
         return $this->content;
     }

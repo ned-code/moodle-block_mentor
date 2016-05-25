@@ -2561,3 +2561,34 @@ function block_ned_mentor_generate_report(progress_bar $progressbar = null) {
     set_config('inprogress', 0, 'block_ned_mentor');
     return;
 }
+
+function block_ned_mentor_footer() {
+    global $OUTPUT;
+
+    $output = '';
+
+    $pluginman = core_plugin_manager::instance();
+    $pluginfo = $pluginman->get_plugin_info('block_ned_mentor');
+
+    $output = html_writer::div(
+        html_writer::div(
+            html_writer::link('#', get_string('pluginname', 'block_ned_mentor')),
+            'mentormanagercontainer-footer-left'
+        ).
+        html_writer::div(
+            get_string('version', 'block_ned_mentor').': '.
+            html_writer::span($pluginfo->versiondb, 'mentormanager-version'),
+            'mentormanagercontainer-footer-center'
+        ).
+        html_writer::div(
+            html_writer::link(
+                'https://github.com/fernandooliveira/moodle-block_mentor_manager',
+                html_writer::img($OUTPUT->pix_url('ned_26', 'block_ned_mentor'), 'NED'),
+                array('target' => '_blank')
+            ),
+            'mentormanagercontainer-footer-right'
+        ),
+        'mentormanagercontainer-footer'
+    );
+    return $output;
+}
