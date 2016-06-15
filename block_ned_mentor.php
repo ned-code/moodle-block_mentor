@@ -256,8 +256,9 @@ class block_ned_mentor extends block_base {
                 array('id' => 'courseForm', 'name' => 'jump2')
             );
         }
-
-        $this->content->text .= '</div>';
+        if ($isteacher || $isadmin || $ismentor) {
+            $this->content->text .= '</div>';
+        }
 
         if (($isstudent) && (!$isteacher && !$isadmin && !$ismentor)) {
             $this->content->text .= block_ned_mentor_render_mentees_by_student($USER->id);

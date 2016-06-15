@@ -2572,7 +2572,11 @@ function block_ned_mentor_footer() {
 
     $output = html_writer::div(
         html_writer::div(
-            html_writer::link('#', get_string('pluginname', 'block_ned_mentor')),
+            html_writer::link(
+                'http://ned.ca/mentor-manager',
+                get_string('pluginname', 'block_ned_mentor'),
+                array('target' => '_blank')
+            ),
             'mentormanagercontainer-footer-left'
         ).
         html_writer::div(
@@ -2582,7 +2586,7 @@ function block_ned_mentor_footer() {
         ).
         html_writer::div(
             html_writer::link(
-                'https://github.com/fernandooliveira/moodle-block_mentor_manager',
+                'http://ned.ca',
                 html_writer::img($OUTPUT->pix_url('ned_26', 'block_ned_mentor'), 'NED'),
                 array('target' => '_blank')
             ),
