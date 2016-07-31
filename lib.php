@@ -613,7 +613,8 @@ function block_ned_mentor_assignment_status($mod, $userid) {
 
             $submissionisgraded = reset($submissionisgraded);
             if ($submissionisgraded->grade > -1) {
-                if ($submission->timemodified > $submissionisgraded->timemodified) {
+                if (($submission->timemodified > $submissionisgraded->timemodified)
+                    || ($submission->attemptnumber > $submissionisgraded->attemptnumber)) {
                     $graded = false;
                 } else {
                     $graded = true;
@@ -633,11 +634,7 @@ function block_ned_mentor_assignment_status($mod, $userid) {
             }
         }
         if ($submission->status == 'reopened') {
-            if ($graded) {
-                return 'submitted';
-            } else {
-                return 'waitinggrade';
-            }
+            return 'submitted';
         }
         if ($submission->status == 'submitted') {
             if ($graded) {
