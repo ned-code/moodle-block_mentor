@@ -731,7 +731,9 @@ $table = new html_table();
 $table->attributes = array('class' => 'course-completion');
 
 $table->head = array();
+$table->wrap = array();
 foreach ($columns as $column) {
+    $table->wrap[$column] = '';
     if (strpos($column, 'completion') === 0) {
         $cid = (int)str_replace('completion', '', $column);
         $headcell = new html_table_cell("<a class='sort-course-link' onclick=\"window.open('".
@@ -753,6 +755,7 @@ foreach ($columns as $column) {
     }
 }
 
+$table->wrap['name'] = 'nowrap';
 
 $tablerows = $DB->get_records_sql($sql, null, $page * $perpage, $perpage);
 
@@ -776,6 +779,7 @@ foreach ($tablerows as $tablerow) {
                 }
                 break;
             case 'name':
+                $tablerow->$column = (strlen($tablerow->$column) > 16) ? substr($tablerow->$column, 0, 16) : $tablerow->$column;
                 $$varname = new html_table_cell(
                     html_writer::link(
                         new moodle_url('/blocks/ned_mentor/course_overview.php', array('menteeid' => $tablerow->userid)),
@@ -888,7 +892,11 @@ $pagingbar = new paging_bar($totalcount, $page, $perpage, $pagingurl, 'page');
 
 
 echo html_writer::div(
-    html_writer::table($table).$OUTPUT->render($pagingbar),
+    html_writer::div(
+        html_writer::table($table),
+        'course-completion-table_wrapper'
+    ).
+    $OUTPUT->render($pagingbar),
     '',
     array('id' => 'mentee-course-overview-center')
 );

@@ -687,16 +687,19 @@
 #page-blocks-ned_mentor-notification_send .ned_mentor_error {
     color: red;
 }
+#page-blocks-ned_mentor-all_students .course-completion-table_wrapper {
+    overflow: auto;
+}
 #page-blocks-ned_mentor-all_students table.course-completion {
     border-collapse: collapse;
     margin-left: 5px;
 }
 #page-blocks-ned_mentor-all_students table.course-completion td {
     border: 1px solid #787878;
-    padding: 5px 10px;
+    padding: 2px;
 }
 #page-blocks-ned_mentor-all_students table.course-completion th{
-    padding: 10px 10px 0 10px;
+    padding: 10px 2px 0 2px;
 }
 #page-blocks-ned_mentor-all_students .mentee-course-overview-block-filter {
     text-align: right;
