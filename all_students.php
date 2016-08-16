@@ -173,7 +173,18 @@ $categoryurl->param('categoryid', 0);
 $categorymenuurl[0] = $categoryurl->out(false);
 $categorymenu[$categorymenuurl[0]] = get_string('all', 'block_ned_mentor');
 
-if ($categories = $DB->get_records('course_categories', array('visible' => 1))) {
+if ($categorycoursesfromsetting = block_ned_mentor_get_setting_courses()) {
+    list($sqlf, $params) = $DB->get_in_or_equal($categorycoursesfromsetting);
+    $params[] = 1;
+    $sql = "SELECT DISTINCT cc.* FROM {course_categories} cc 
+            INNER JOIN {course} c ON cc.id = c.category 
+            WHERE c.id {$sqlf} AND cc.visible = ?";
+} else {
+    $sql = "SELECT cc.* FROM {course_categories} cc WHERE cc.visible = ?";
+    $params = array(1);
+}
+
+if ($categories = $DB->get_records_sql($sql, $params)) {
     foreach ($categories as $category) {
         $categoryurl->param('categoryid', $category->id);
         $categorymenuurl[$category->id] = $categoryurl->out(false);
@@ -472,6 +483,15 @@ foreach ($reportcourses as $reportcourse) {
 
 // Filter.
 $where = '';
+$datacolumnsfilter = array();
+foreach ($reportcourses as $reportcourse) {
+    $datacolumnsfilter['completion'.$reportcourse] = 'r.completion'.$reportcourse.' <> -1';
+}
+
+if (count($datacolumnsfilter)) {
+    $where .= " AND (".implode(' OR ', $datacolumnsfilter).")";
+}
+
 if (($show == 1) && $isadmin) {
     $where .= " AND {$datacolumns['mentors']} <> '' ";
 }
@@ -485,172 +505,182 @@ if ($groupid) {
     $where .= " AND  FIND_IN_SET($groupid,{$datacolumns['groups']})";
 }
 
-if ($completionstatus && $gradepassing) {
-    $completionstatusfilter = array();
-    if ($completionstatus == 1) {
-        foreach ($reportcourses as $reportcourse) {
-            if ($gradecompletion = $DB->get_record('course_completion_criteria',
-                array('course' => $reportcourse,
-                    'criteriatype' => COMPLETION_CRITERIA_TYPE_GRADE
+if ($reportcourses) {
+    if ($completionstatus && $gradepassing) {
+        $completionstatusfilter = array();
+        if ($completionstatus == 1) {
+            foreach ($reportcourses as $reportcourse) {
+                if ($gradecompletion = $DB->get_record('course_completion_criteria',
+                    array('course' => $reportcourse,
+                        'criteriatype' => COMPLETION_CRITERIA_TYPE_GRADE
+                    )
                 )
-            )) {
-                $gradecompletionpercentage = $gradecompletion->gradepass;
-            } else {
-                $gradecompletionpercentage = $passinggrade;
-            }
+                ) {
+                    $gradecompletionpercentage = $gradecompletion->gradepass;
+                } else {
+                    $gradecompletionpercentage = $passinggrade;
+                }
 
-            if ($gradepassing == 1) {
-                $completionstatusfilter[] = '(r.completion'.$reportcourse.'=0 AND r.passing'.
-                    $reportcourse.'>='.$gradecompletionpercentage.')';
-            } else {
-                $completionstatusfilter[] = '(r.completion'.$reportcourse.'=0 AND r.passing'.
-                    $reportcourse.'<'.$gradecompletionpercentage.')';
+                if ($gradepassing == 1) {
+                    $completionstatusfilter[] = '(r.completion' . $reportcourse . '=0 AND r.passing' .
+                        $reportcourse . '>=' . $gradecompletionpercentage . ')';
+                } else {
+                    $completionstatusfilter[] = '(r.completion' . $reportcourse . '=0 AND r.passing' .
+                        $reportcourse . '<' . $gradecompletionpercentage . ')';
+                }
             }
-        }
-        $where .= " AND (".implode(' OR ', $completionstatusfilter).")";
-    } else if ($completionstatus == 2) {
-        foreach ($reportcourses as $reportcourse) {
-            if ($gradecompletion = $DB->get_record('course_completion_criteria',
-                array('course' => $reportcourse,
-                    'criteriatype' => COMPLETION_CRITERIA_TYPE_GRADE
+            $where .= " AND (" . implode(' OR ', $completionstatusfilter) . ")";
+        } else if ($completionstatus == 2) {
+            foreach ($reportcourses as $reportcourse) {
+                if ($gradecompletion = $DB->get_record('course_completion_criteria',
+                    array('course' => $reportcourse,
+                        'criteriatype' => COMPLETION_CRITERIA_TYPE_GRADE
+                    )
                 )
-            )) {
-                $gradecompletionpercentage = $gradecompletion->gradepass;
-            } else {
-                $gradecompletionpercentage = $passinggrade;
+                ) {
+                    $gradecompletionpercentage = $gradecompletion->gradepass;
+                } else {
+                    $gradecompletionpercentage = $passinggrade;
+                }
+                if ($gradepassing == 1) {
+                    $completionstatusfilter[] = '(r.completion' . $reportcourse . '>0 AND r.completion' .
+                        $reportcourse . '<50 AND r.passing' . $reportcourse . '>=' . $gradecompletionpercentage . ')';
+                } else {
+                    $completionstatusfilter[] = '(r.completion' . $reportcourse . '>0 AND r.completion' .
+                        $reportcourse . '<50 AND r.passing' . $reportcourse . '<' . $gradecompletionpercentage . ')';
+                }
             }
-            if ($gradepassing == 1) {
-                $completionstatusfilter[] = '(r.completion'.$reportcourse.'>0 AND r.completion'.
-                    $reportcourse.'<50 AND r.passing'.$reportcourse.'>='.$gradecompletionpercentage.')';
-            } else {
-                $completionstatusfilter[] = '(r.completion'.$reportcourse.'>0 AND r.completion'.
-                    $reportcourse.'<50 AND r.passing'.$reportcourse.'<'.$gradecompletionpercentage.')';
-            }
-        }
-        $where .= " AND (".implode(' OR ', $completionstatusfilter).")";
-    } else if ($completionstatus == 3) {
-        foreach ($reportcourses as $reportcourse) {
-            if ($gradecompletion = $DB->get_record('course_completion_criteria',
-                array('course' => $reportcourse,
-                    'criteriatype' => COMPLETION_CRITERIA_TYPE_GRADE
+            $where .= " AND (" . implode(' OR ', $completionstatusfilter) . ")";
+        } else if ($completionstatus == 3) {
+            foreach ($reportcourses as $reportcourse) {
+                if ($gradecompletion = $DB->get_record('course_completion_criteria',
+                    array('course' => $reportcourse,
+                        'criteriatype' => COMPLETION_CRITERIA_TYPE_GRADE
+                    )
                 )
-            )) {
-                $gradecompletionpercentage = $gradecompletion->gradepass;
-            } else {
-                $gradecompletionpercentage = $passinggrade;
-            }
+                ) {
+                    $gradecompletionpercentage = $gradecompletion->gradepass;
+                } else {
+                    $gradecompletionpercentage = $passinggrade;
+                }
 
-            if ($gradepassing == 1) {
-                $completionstatusfilter[] = '(r.completion'.$reportcourse.'>=50 AND r.completion'.
-                    $reportcourse.'<75 AND r.passing'.$reportcourse.'>='.$gradecompletionpercentage.')';
-            } else {
-                $completionstatusfilter[] = '(r.completion'.$reportcourse.'>=50 AND r.completion'.
-                    $reportcourse.'<75 AND r.passing'.$reportcourse.'<'.$gradecompletionpercentage.')';
+                if ($gradepassing == 1) {
+                    $completionstatusfilter[] = '(r.completion' . $reportcourse . '>=50 AND r.completion' .
+                        $reportcourse . '<75 AND r.passing' . $reportcourse . '>=' . $gradecompletionpercentage . ')';
+                } else {
+                    $completionstatusfilter[] = '(r.completion' . $reportcourse . '>=50 AND r.completion' .
+                        $reportcourse . '<75 AND r.passing' . $reportcourse . '<' . $gradecompletionpercentage . ')';
+                }
             }
-        }
-        $where .= " AND (".implode(' OR ', $completionstatusfilter).")";
-    } else if ($completionstatus == 4) {
-        foreach ($reportcourses as $reportcourse) {
-            if ($gradecompletion = $DB->get_record('course_completion_criteria',
-                array('course' => $reportcourse,
-                    'criteriatype' => COMPLETION_CRITERIA_TYPE_GRADE
+            $where .= " AND (" . implode(' OR ', $completionstatusfilter) . ")";
+        } else if ($completionstatus == 4) {
+            foreach ($reportcourses as $reportcourse) {
+                if ($gradecompletion = $DB->get_record('course_completion_criteria',
+                    array('course' => $reportcourse,
+                        'criteriatype' => COMPLETION_CRITERIA_TYPE_GRADE
+                    )
                 )
-            )) {
-                $gradecompletionpercentage = $gradecompletion->gradepass;
-            } else {
-                $gradecompletionpercentage = $passinggrade;
+                ) {
+                    $gradecompletionpercentage = $gradecompletion->gradepass;
+                } else {
+                    $gradecompletionpercentage = $passinggrade;
+                }
+                if ($gradepassing == 1) {
+                    $completionstatusfilter[] = '(r.completion' . $reportcourse . '>=75 AND r.completion' .
+                        $reportcourse . '<100 AND r.passing' . $reportcourse . '>=' . $gradecompletionpercentage . ')';
+                } else {
+                    $completionstatusfilter[] = '(r.completion' . $reportcourse . '>=75 AND r.completion' .
+                        $reportcourse . '<100 AND r.passing' . $reportcourse . '<' . $gradecompletionpercentage . ')';
+                }
             }
-            if ($gradepassing == 1) {
-                $completionstatusfilter[] = '(r.completion'.$reportcourse.'>=75 AND r.completion'.
-                    $reportcourse.'<100 AND r.passing'.$reportcourse.'>='.$gradecompletionpercentage.')';
-            } else {
-                $completionstatusfilter[] = '(r.completion'.$reportcourse.'>=75 AND r.completion'.
-                    $reportcourse.'<100 AND r.passing'.$reportcourse.'<'.$gradecompletionpercentage.')';
-            }
-        }
-        $where .= " AND (".implode(' OR ', $completionstatusfilter).")";
-    } else if ($completionstatus == 5) {
-        foreach ($reportcourses as $reportcourse) {
-            if ($gradecompletion = $DB->get_record('course_completion_criteria',
-                array('course' => $reportcourse,
-                    'criteriatype' => COMPLETION_CRITERIA_TYPE_GRADE
+            $where .= " AND (" . implode(' OR ', $completionstatusfilter) . ")";
+        } else if ($completionstatus == 5) {
+            foreach ($reportcourses as $reportcourse) {
+                if ($gradecompletion = $DB->get_record('course_completion_criteria',
+                    array('course' => $reportcourse,
+                        'criteriatype' => COMPLETION_CRITERIA_TYPE_GRADE
+                    )
                 )
-            )) {
-                $gradecompletionpercentage = $gradecompletion->gradepass;
-            } else {
-                $gradecompletionpercentage = $passinggrade;
-            }
+                ) {
+                    $gradecompletionpercentage = $gradecompletion->gradepass;
+                } else {
+                    $gradecompletionpercentage = $passinggrade;
+                }
 
-            if ($gradepassing == 1) {
-                $completionstatusfilter[] = '(r.completion'.$reportcourse.'=100 AND r.passing'.
-                    $reportcourse.'>='.$gradecompletionpercentage.')';
-            } else {
-                $completionstatusfilter[] = '(r.completion'.$reportcourse.'=100 AND r.passing'.
-                    $reportcourse.'<'.$gradecompletionpercentage.')';
+                if ($gradepassing == 1) {
+                    $completionstatusfilter[] = '(r.completion' . $reportcourse . '=100 AND r.passing' .
+                        $reportcourse . '>=' . $gradecompletionpercentage . ')';
+                } else {
+                    $completionstatusfilter[] = '(r.completion' . $reportcourse . '=100 AND r.passing' .
+                        $reportcourse . '<' . $gradecompletionpercentage . ')';
+                }
             }
+            $where .= " AND (" . implode(' OR ', $completionstatusfilter) . ")";
         }
-        $where .= " AND (".implode(' OR ', $completionstatusfilter).")";
-    }
-} else if ($completionstatus) {
-    $completionstatusfilter = array();
-    if ($completionstatus == 1) {
+    } else if ($completionstatus) {
+        $completionstatusfilter = array();
+        if ($completionstatus == 1) {
+            foreach ($reportcourses as $reportcourse) {
+                $completionstatusfilter[] = 'r.completion' . $reportcourse . '=0';
+            }
+            $where .= " AND (" . implode(' OR ', $completionstatusfilter) . ")";
+        } else if ($completionstatus == 2) {
+            foreach ($reportcourses as $reportcourse) {
+                $completionstatusfilter[] = '(r.completion' . $reportcourse . '>0 AND r.completion' . $reportcourse . '<50)';
+            }
+            $where .= " AND (" . implode(' OR ', $completionstatusfilter) . ")";
+        } else if ($completionstatus == 3) {
+            foreach ($reportcourses as $reportcourse) {
+                $completionstatusfilter[] = '(r.completion' . $reportcourse . '>=50 AND r.completion' . $reportcourse . '<75)';
+            }
+            $where .= " AND (" . implode(' OR ', $completionstatusfilter) . ")";
+        } else if ($completionstatus == 4) {
+            foreach ($reportcourses as $reportcourse) {
+                $completionstatusfilter[] = '(r.completion' . $reportcourse . '>=75 AND r.completion' . $reportcourse . '<100)';
+            }
+            $where .= " AND (" . implode(' OR ', $completionstatusfilter) . ")";
+        } else if ($completionstatus == 5) {
+            foreach ($reportcourses as $reportcourse) {
+                $completionstatusfilter[] = 'r.completion' . $reportcourse . '=100';
+            }
+            $where .= " AND (" . implode(' OR ', $completionstatusfilter) . ")";
+        }
+    } else if ($gradepassing) {
+        $gradepassingfilter = array();
         foreach ($reportcourses as $reportcourse) {
-            $completionstatusfilter[] = 'r.completion'.$reportcourse.'=0';
-        }
-        $where .= " AND (".implode(' OR ', $completionstatusfilter).")";
-    } else if ($completionstatus == 2) {
-        foreach ($reportcourses as $reportcourse) {
-            $completionstatusfilter[] = '(r.completion'.$reportcourse.'>0 AND r.completion'.$reportcourse.'<50)';
-        }
-        $where .= " AND (".implode(' OR ', $completionstatusfilter).")";
-    } else if ($completionstatus == 3) {
-        foreach ($reportcourses as $reportcourse) {
-            $completionstatusfilter[] = '(r.completion'.$reportcourse.'>=50 AND r.completion'.$reportcourse.'<75)';
-        }
-        $where .= " AND (".implode(' OR ', $completionstatusfilter).")";
-    } else if ($completionstatus == 4) {
-        foreach ($reportcourses as $reportcourse) {
-            $completionstatusfilter[] = '(r.completion'.$reportcourse.'>=75 AND r.completion'.$reportcourse.'<100)';
-        }
-        $where .= " AND (".implode(' OR ', $completionstatusfilter).")";
-    } else if ($completionstatus == 5) {
-        foreach ($reportcourses as $reportcourse) {
-            $completionstatusfilter[] = 'r.completion'.$reportcourse.'=100';
-        }
-        $where .= " AND (".implode(' OR ', $completionstatusfilter).")";
-    }
-} else if ($gradepassing) {
-    $gradepassingfilter = array();
-    foreach ($reportcourses as $reportcourse) {
-        if ($gradecompletion = $DB->get_record('course_completion_criteria',
-            array('course' => $reportcourse,
-                'criteriatype' => COMPLETION_CRITERIA_TYPE_GRADE
+            if ($gradecompletion = $DB->get_record('course_completion_criteria',
+                array('course' => $reportcourse,
+                    'criteriatype' => COMPLETION_CRITERIA_TYPE_GRADE
+                )
             )
-        )) {
-            $gradecompletionpercentage = $gradecompletion->gradepass;
-        } else {
-            $gradecompletionpercentage = $passinggrade;
+            ) {
+                $gradecompletionpercentage = $gradecompletion->gradepass;
+            } else {
+                $gradecompletionpercentage = $passinggrade;
+            }
+            if ($gradepassing == 1) {
+                $gradepassingfilter[] = 'r.passing' . $reportcourse . '>=' . $gradecompletionpercentage;
+            } else {
+                $gradepassingfilter[] = 'r.passing' . $reportcourse . '<' . $gradecompletionpercentage;
+            }
         }
-        if ($gradepassing == 1) {
-            $gradepassingfilter[] = 'r.passing' . $reportcourse . '>=' . $gradecompletionpercentage;
-        } else {
-            $gradepassingfilter[] = 'r.passing' . $reportcourse . '<' . $gradecompletionpercentage;
-        }
+        $where .= " AND (" . implode(' OR ', $gradepassingfilter) . ")";
     }
-    $where .= " AND (".implode(' OR ', $gradepassingfilter).")";
-
+} else {
+    $where .= " AND 1=0";
 }
-
 // Sort.
 $order = '';
 $sortcourseid = 0;
-if ($sort) {
-    $sort = ($dir == 'CLEAR') ? 'name' : $sort;
-    $dir = ($dir == 'CLEAR') ? 'ASC' : $dir;
-    $order = " ORDER BY $datacolumns[$sort] $dir";
-    if (strpos($sort, 'completion') === 0) {
-        $sortcourseid = (int)str_replace('completion', '', $sort);
-        $where .= " AND  FIND_IN_SET($sortcourseid,{$datacolumns['courses']})";
+if (isset($datacolumns[$sort])) {
+    if ($sort) {
+        $sort = ($dir == 'CLEAR') ? 'name' : $sort;
+        $dir = ($dir == 'CLEAR') ? 'ASC' : $dir;
+        $order = " ORDER BY $datacolumns[$sort] $dir";
+        if (strpos($sort, 'completion') === 0) {
+            $sortcourseid = (int)str_replace('completion', '', $sort);
+            $where .= " AND  FIND_IN_SET($sortcourseid,{$datacolumns['courses']})";
+        }
     }
 }
 
@@ -780,12 +810,19 @@ foreach ($tablerows as $tablerow) {
                 break;
             case 'name':
                 $tablerow->$column = (strlen($tablerow->$column) > 16) ? substr($tablerow->$column, 0, 16) : $tablerow->$column;
-                $$varname = new html_table_cell(
-                    html_writer::link(
-                        new moodle_url('/blocks/ned_mentor/course_overview.php', array('menteeid' => $tablerow->userid)),
+
+                if (block_ned_mentor_get_mentors($tablerow->userid)) {
+                    $$varname = new html_table_cell(
+                        html_writer::link(
+                            new moodle_url('/blocks/ned_mentor/course_overview.php', array('menteeid' => $tablerow->userid)),
+                            $tablerow->$column
+                        )
+                    );
+                } else {
+                    $$varname = new html_table_cell(
                         $tablerow->$column
-                    )
-                );
+                    );
+                }
                 break;
             case 'timecreated':
             case 'timemodified':

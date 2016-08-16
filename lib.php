@@ -23,7 +23,7 @@
 require_once($CFG->dirroot.'/mod/assignment/lib.php');
 require_once($CFG->dirroot.'/lib/completionlib.php');
 
-function block_ned_mentor_get_all_students($filter = '') {
+function block_ned_mentor_get_all_students($filter = '', $selectedcoursesonly = false) {
     global $DB, $CFG;
 
     $studentrole = get_config('block_ned_mentor', 'studentrole');
@@ -39,6 +39,16 @@ function block_ned_mentor_get_all_students($filter = '') {
         $params[] = "%".$filter."%";
         $params[] = "%".$filter."%";
     }
+    $join = '';
+    $filter = '';
+    if ($selectedcoursesonly) {
+        if ($settingcourses = block_ned_mentor_get_setting_courses()) {
+            list($sqlfilter, $paramcourses) = $DB->get_in_or_equal($settingcourses);
+            $params = array_merge($params, $paramcourses);
+            $join = "INNER JOIN {context} ctx ON ra.contextid = ctx.id";
+            $filter = "AND ctx.instanceid {$sqlfilter}";
+        }
+    }
 
     $sql = "SELECT DISTINCT u.id,
                             u.firstname,
@@ -46,10 +56,12 @@ function block_ned_mentor_get_all_students($filter = '') {
                        FROM {role_assignments} ra
                  INNER JOIN {user} u
                          ON ra.userid = u.id
+                            $join
                       WHERE u.deleted = ?
                         AND u.suspended = ?
                         AND ra.roleid = ?
-                        $wherecondions
+                            $wherecondions
+                            $filter
                    ORDER BY u.lastname ASC";
 
     $everyone = $DB->get_records_sql($sql, $params);
@@ -2448,7 +2460,7 @@ function block_ned_mentor_generate_report(progress_bar $progressbar = null) {
     }
 
     $time = time();
-    if (!$students = block_ned_mentor_get_all_students()) {
+    if (!$students = block_ned_mentor_get_all_students('', true)) {
         return;
     }
     $numberofstudents = count($students);
@@ -2506,11 +2518,18 @@ function block_ned_mentor_generate_report(progress_bar $progressbar = null) {
         }
     }
 
+    $filter = '';
+    $params = array();
+    if ($settingcourses = block_ned_mentor_get_setting_courses()) {
+        list($sqlfilter, $params) = $DB->get_in_or_equal($settingcourses);
+        $filter = " AND rd.courseid {$sqlfilter}";
+    }
+
     // Pivot part.
-    $sql = "SELECT DISTINCT rd.courseid FROM {block_ned_mentor_report_data} rd WHERE rd.deleted = 0";
+    $sql = "SELECT DISTINCT rd.courseid FROM {block_ned_mentor_report_data} rd WHERE rd.deleted = 0".$filter;
     $fieldscreate = '';
     $fieldsdata = '';
-    if ($fields = $DB->get_records_sql($sql)) {
+    if ($fields = $DB->get_records_sql($sql, $params)) {
         foreach ($fields as $field) {
             $fieldscreate .= " `completion".$field->courseid."` decimal(10,2) NOT NULL DEFAULT '0.00',\n";
             $fieldscreate .= " `passing".$field->courseid."` decimal(10,2) DEFAULT NULL,\n";
@@ -2592,4 +2611,44 @@ function block_ned_mentor_footer() {
         'mentormanagercontainer-footer'
     );
     return $output;
+}
+
+function block_ned_mentor_get_setting_courses () {
+    global $DB;
+
+    $filtercourses = array();
+
+    if ($configcategory = get_config('block_ned_mentor', 'category')) {
+        $selectedcategories = explode(',', $configcategory);
+        foreach ($selectedcategories as $categoryid) {
+
+            if ($parentcatcourses = $DB->get_records('course', array('category' => $categoryid))) {
+                foreach ($parentcatcourses as $catcourse) {
+                    $filtercourses[] = $catcourse->id;
+                }
+            }
+            if ($categorystructure = block_ned_mentor_get_course_category_tree($categoryid)) {
+                foreach ($categorystructure as $category) {
+
+                    if ($category->courses) {
+                        foreach ($category->courses as $subcatcourse) {
+                            $filtercourses[] = $subcatcourse->id;
+                        }
+                    }
+                    if ($category->categories) {
+                        foreach ($category->categories as $subcategory) {
+                            block_ned_mentor_get_selected_courses($subcategory, $filtercourses);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    if ($configcourse = get_config('block_ned_mentor', 'course')) {
+        $selectedcourses = explode(',', $configcourse);
+        $filtercourses = array_merge($filtercourses, $selectedcourses);
+    }
+
+    return $filtercourses;
 }
