@@ -83,6 +83,15 @@ $settings->add(
     )
 );
 
+$settings->add(
+    new admin_setting_configcheckbox(
+        'block_ned_mentor/menteecanview',
+        get_string('menteecanview', 'block_ned_mentor'),
+        '',
+        '0'
+    )
+);
+
 $roleoptions = array();
 $roles = $DB->get_records('role');
 foreach ($roles as $role) {

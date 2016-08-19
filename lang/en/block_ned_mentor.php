@@ -214,3 +214,4 @@ $string['firstname'] = 'First name';
 $string['rolename'] = 'Role name';
 $string['sirmadam'] = 'Sir or Madam';
 $string['version'] = 'Version';
+$string['menteecanview'] = 'Allow mentee to see block';

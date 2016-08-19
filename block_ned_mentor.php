@@ -58,6 +58,7 @@ class block_ned_mentor extends block_base {
         $strmentee = get_config('block_ned_mentor', 'mentee');
         $strmentees = get_config('block_ned_mentor', 'mentees');
         $maxnumberofmentees = get_config('block_ned_mentor', 'maxnumberofmentees');
+        $menteecanview = get_config('block_ned_mentor', 'menteecanview');
 
         if (!isset($this->config->show_mentee_without_course)) {
             $showunenrolledstudents = 0;
@@ -89,7 +90,13 @@ class block_ned_mentor extends block_base {
         }
 
         if (!has_capability('block/ned_mentor:viewblock', $this->context)) {
-            return $this->content;
+            if ($isstudent) {
+                if (!$menteecanview) {
+                    return $this->content;
+                }
+            } else {
+                return $this->content;
+            }
         }
 
         if ($this->instance->pagetypepattern == 'my-index') {
@@ -192,7 +199,7 @@ class block_ned_mentor extends block_base {
                 }
             }
         } else if ($ismentor) {
-            if ($students = block_ned_mentor_get_mentees_by_mentor(0, $filter)) {
+            if ($students = block_ned_mentor_get_mentees_by_mentor(0, $filter, $USER->id)) {
                 $students = reset($students);
 
                 list($insql, $params) = $DB->get_in_or_equal(array_keys($students['mentee']));
@@ -266,7 +273,11 @@ class block_ned_mentor extends block_base {
             $numberofmentees = 0;
 
             if ($sortby == 'mentor') {
-                $visiblementees = block_ned_mentor_get_mentees_by_mentor($coursefilter, $filter);
+                if ($ismentor) {
+                    $visiblementees = block_ned_mentor_get_mentees_by_mentor($coursefilter, $filter, $USER->id);
+                } else {
+                    $visiblementees = block_ned_mentor_get_mentees_by_mentor($coursefilter, $filter);
+                }
                 foreach ($visiblementees as $visiblementee) {
                     $numberofmentees += count($visiblementee['mentee']);
                 }

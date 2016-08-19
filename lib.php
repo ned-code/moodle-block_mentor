@@ -374,7 +374,7 @@ function block_ned_mentor_has_system_role($userid, $roleid) {
 
 }
 
-function block_ned_mentor_get_mentees_by_mentor($courseid=0, $filter='') {
+function block_ned_mentor_get_mentees_by_mentor($courseid=0, $filter='', $mentorid=0) {
     global $USER;
 
     $data = array();
@@ -398,6 +398,11 @@ function block_ned_mentor_get_mentees_by_mentor($courseid=0, $filter='') {
     if ($mentors = get_role_users(get_config('block_ned_mentor', 'mentor_role_system'),
         context_system::instance(), false, 'u.id, u.firstname, u.lastname', 'u.lastname')) {
         foreach ($mentors as $mentor) {
+            if ($mentorid) {
+                if ($mentorid <> $mentor->id) {
+                    continue;
+                }
+            }
             if ($mentees = block_ned_mentor_get_mentees($mentor->id, $courseid, $allcoursestudents)) {
                 $data[$mentor->id]['mentor'] = $mentor;
                 $data[$mentor->id]['mentee'] = $mentees;
