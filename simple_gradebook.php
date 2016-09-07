@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * @package    block_ned_mentor
+ * @package    block_fn_mentor
  * @copyright  Michael Gardener <mgardener@cissq.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -186,7 +186,7 @@ for ($i = 0; $i < $upto; $i++) {
                                             $simplegradebook[$key]['avg'][] = array('grade' => 0, 'grademax' => $item->grademax);
                                         }
                                     }
-                                } else if ($modstatus = block_ned_mentor_assignment_status($mod, $key, true)) {
+                                } else if ($modstatus = block_fn_mentor_assignment_status($mod, $key, true)) {
 
                                     switch ($modstatus) {
                                         case 'submitted':

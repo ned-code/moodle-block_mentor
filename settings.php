@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * @package    block_ned_mentor
+ * @package    block_fn_mentor
  * @copyright  Michael Gardener <mgardener@cissq.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -24,10 +24,10 @@ defined('MOODLE_INTERNAL') || die();
 
 $settings->add(
     new admin_setting_configtext(
-        'block_ned_mentor/blockname',
-        get_string('blockname', 'block_ned_mentor'),
+        'block_fn_mentor/blockname',
+        get_string('blockname', 'block_fn_mentor'),
         '',
-        get_string('blocktitle', 'block_ned_mentor')
+        get_string('blocktitle', 'block_fn_mentor')
     )
 );
 
@@ -39,8 +39,8 @@ foreach (array_keys($themeconfig->layouts) as $layout) {
 
 $settings->add(
     new admin_setting_configselect(
-        'block_ned_mentor/pagelayout',
-        get_string('pagelayout', 'block_ned_mentor'),
+        'block_fn_mentor/pagelayout',
+        get_string('pagelayout', 'block_fn_mentor'),
         '',
         'login',
         $layouts
@@ -49,44 +49,44 @@ $settings->add(
 
 $settings->add(
     new admin_setting_configtext(
-        'block_ned_mentor/mentor',
-        get_string('wordformentor', 'block_ned_mentor'),
+        'block_fn_mentor/mentor',
+        get_string('wordformentor', 'block_fn_mentor'),
         '',
-        get_string('mentor', 'block_ned_mentor')
+        get_string('mentor', 'block_fn_mentor')
     )
 );
 
 $settings->add(
     new admin_setting_configtext(
-        'block_ned_mentor/mentors',
-        get_string('wordformentors', 'block_ned_mentor'),
+        'block_fn_mentor/mentors',
+        get_string('wordformentors', 'block_fn_mentor'),
         '',
-        get_string('mentors', 'block_ned_mentor')
+        get_string('mentors', 'block_fn_mentor')
     )
 );
 
 $settings->add(
     new admin_setting_configtext(
-        'block_ned_mentor/mentee',
-        get_string('wordformentee', 'block_ned_mentor'),
+        'block_fn_mentor/mentee',
+        get_string('wordformentee', 'block_fn_mentor'),
         '',
-        get_string('mentee', 'block_ned_mentor')
+        get_string('mentee', 'block_fn_mentor')
     )
 );
 
 $settings->add(
     new admin_setting_configtext(
-        'block_ned_mentor/mentees',
-        get_string('wordformentees', 'block_ned_mentor'),
+        'block_fn_mentor/mentees',
+        get_string('wordformentees', 'block_fn_mentor'),
         '',
-        get_string('mentees', 'block_ned_mentor')
+        get_string('mentees', 'block_fn_mentor')
     )
 );
 
 $settings->add(
     new admin_setting_configcheckbox(
-        'block_ned_mentor/menteecanview',
-        get_string('menteecanview', 'block_ned_mentor'),
+        'block_fn_mentor/menteecanview',
+        get_string('menteecanview', 'block_fn_mentor'),
         '',
         '0'
     )
@@ -111,8 +111,8 @@ if ($mentoruser = $DB->get_record('role', array('shortname' => 'mentor_user'))) 
 
 $settings->add(
     new admin_setting_configselect(
-        'block_ned_mentor/studentrole',
-        get_string('studentrole', 'block_ned_mentor'),
+        'block_fn_mentor/studentrole',
+        get_string('studentrole', 'block_fn_mentor'),
         '',
         5,
         $roleoptions
@@ -121,8 +121,8 @@ $settings->add(
 
 $settings->add(
     new admin_setting_configselect(
-        'block_ned_mentor/teacherrole',
-        get_string('teacherrole', 'block_ned_mentor'),
+        'block_fn_mentor/teacherrole',
+        get_string('teacherrole', 'block_fn_mentor'),
         '',
         3,
         $roleoptions
@@ -131,8 +131,8 @@ $settings->add(
 
 $settings->add(
     new admin_setting_configselect(
-        'block_ned_mentor/mentor_role_system',
-        get_string('mentor_role_system', 'block_ned_mentor'),
+        'block_fn_mentor/mentor_role_system',
+        get_string('mentor_role_system', 'block_fn_mentor'),
         '',
         $mentorrolesystemdefault,
         $roleoptions
@@ -141,8 +141,8 @@ $settings->add(
 
 $settings->add(
     new admin_setting_configselect(
-        'block_ned_mentor/mentor_role_user',
-        get_string('mentor_role_user', 'block_ned_mentor'),
+        'block_fn_mentor/mentor_role_user',
+        get_string('mentor_role_user', 'block_fn_mentor'),
         '',
         $mentorroleuserdefault,
         $roleoptions
@@ -151,8 +151,8 @@ $settings->add(
 
 $settings->add(
     new admin_setting_configtext(
-        'block_ned_mentor/maxnumberofmentees',
-        get_string('maxnumberofmentees', 'block_ned_mentor'),
+        'block_fn_mentor/maxnumberofmentees',
+        get_string('maxnumberofmentees', 'block_fn_mentor'),
         '',
         '15',
         PARAM_INT
@@ -161,42 +161,42 @@ $settings->add(
 
 $settings->add(
     new admin_setting_configcheckbox(
-        'block_ned_mentor/allownotes',
-        get_string('allownotes', 'block_ned_mentor'),
+        'block_fn_mentor/allownotes',
+        get_string('allownotes', 'block_fn_mentor'),
         '',
         '0'
     )
 );
 
-$coursecaturl = new moodle_url('/blocks/ned_mentor/coursecategories.php');
+$coursecaturl = new moodle_url('/blocks/fn_mentor/coursecategories.php');
 $settings->add(
     new admin_setting_configempty(
-        'block_ned_mentor/coursecategories',
-        get_string('coursecategoriesincluded', 'block_ned_mentor'),
-        '<a class="btn" href="'.$coursecaturl->out().'">'.get_string('selectcategories', 'block_ned_mentor').'</a>'
+        'block_fn_mentor/coursecategories',
+        get_string('coursecategoriesincluded', 'block_fn_mentor'),
+        '<a class="btn" href="'.$coursecaturl->out().'">'.get_string('selectcategories', 'block_fn_mentor').'</a>'
     )
 );
 
 $settings->add(
     new admin_setting_configcheckbox(
-        'block_ned_mentor/showallstudents',
-        get_string('showallstudents', 'block_ned_mentor'),
+        'block_fn_mentor/showallstudents',
+        get_string('showallstudents', 'block_fn_mentor'),
         '',
         '1'
     )
 );
 $settings->add(
     new admin_setting_configcheckbox(
-        'block_ned_mentor/showsitegroups',
-        get_string('showsitegroups', 'block_ned_mentor'),
+        'block_fn_mentor/showsitegroups',
+        get_string('showsitegroups', 'block_fn_mentor'),
         '',
         '0'
     )
 );
 $settings->add(
     new admin_setting_configcheckbox(
-        'block_ned_mentor/showgradestatus',
-        get_string('showgradestatus', 'block_ned_mentor'),
+        'block_fn_mentor/showgradestatus',
+        get_string('showgradestatus', 'block_fn_mentor'),
         '',
         '1'
     )
@@ -204,8 +204,8 @@ $settings->add(
 
 $settings->add(
     new admin_setting_configtext(
-        'block_ned_mentor/passinggrade',
-        get_string('passinggrade', 'block_ned_mentor'),
+        'block_fn_mentor/passinggrade',
+        get_string('passinggrade', 'block_fn_mentor'),
         '',
         '50',
         PARAM_INT

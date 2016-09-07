@@ -17,7 +17,7 @@ function textrotate_make_svg(el)
   svg.setAttribute('version','1.1');
   var width=(textHeight*9)/8;
   svg.setAttribute('width',width);
-  svg.setAttribute('height',textWidth+20);
+  svg.setAttribute('height',textWidth); // CISSQ +20 removed
 
   // Add text
   var text=document.createElementNS(SVGNS,'text');

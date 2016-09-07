@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * @package    block_ned_mentor
+ * @package    block_fn_mentor
  * @copyright  Michael Gardener <mgardener@cissq.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -27,17 +27,17 @@ class coursecategory_form extends moodleform {
     public function definition() {
 
         $mform = $this->_form;
-        $mform->addElement('header', '', get_string('markinmanagerscoursecats', 'block_ned_mentor'), '');
-        $mform->addElement('static', 'description', '', get_string('markinmanagerscoursecatsdesc', 'block_ned_mentor'));
+        $mform->addElement('header', '', get_string('markinmanagerscoursecats', 'block_fn_mentor'), '');
+        $mform->addElement('static', 'description', '', get_string('markinmanagerscoursecatsdesc', 'block_fn_mentor'));
 
         $table = new html_table();
         $table->attributes['class'] = 'notification';
 
         $c1 = new html_table_cell();
 
-        $categories = block_ned_mentor_get_course_category_tree();
+        $categories = block_fn_mentor_get_course_category_tree();
 
-        $c1->text = block_ned_mentor_category_tree_form($categories,
+        $c1->text = block_fn_mentor_category_tree_form($categories,
                                        (isset($this->_customdata['category'])) ? $this->_customdata['category'] : '',
                                        (isset($this->_customdata['course'])) ? $this->_customdata['course'] : '');
         $table->data[] = new html_table_row(array( $c1));

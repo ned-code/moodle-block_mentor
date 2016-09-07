@@ -15,18 +15,18 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * @package    block_ned_mentor
+ * @package    block_fn_mentor
  * @copyright  Michael Gardener <mgardener@cissq.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-function xmldb_block_ned_mentor_upgrade($oldversion) {
+function xmldb_block_fn_mentor_upgrade($oldversion) {
     global $DB;
 
     $dbman = $DB->get_manager();
 
     // Create if not exists !
-    $table = new xmldb_table('block_ned_mentor_notific_msg');
+    $table = new xmldb_table('block_fn_mentor_notific_msg');
     $table->add_field("id", XMLDB_TYPE_INTEGER, '11', null, true, true);
     $table->add_field("notificationid", XMLDB_TYPE_INTEGER, '11');
     $table->add_field("type", XMLDB_TYPE_CHAR, '255');
@@ -46,7 +46,7 @@ function xmldb_block_ned_mentor_upgrade($oldversion) {
     }
 
     if ($oldversion <= 2015101000) {
-        $table = new xmldb_table('block_ned_mentor_notific');
+        $table = new xmldb_table('block_fn_mentor_notific');
 
         $field = new xmldb_field('mentoremail');
         if (!$dbman->field_exists($table, $field)) {
@@ -81,7 +81,7 @@ function xmldb_block_ned_mentor_upgrade($oldversion) {
     }
 
     if ($oldversion <= 2016050800) {
-        $table = new xmldb_table('block_ned_mentor_report_data');
+        $table = new xmldb_table('block_fn_mentor_report_data');
         $table->add_field("id", XMLDB_TYPE_INTEGER, '11', null, true, true);
         $table->add_field("userid", XMLDB_TYPE_INTEGER, '11');
         $table->add_field("courseid", XMLDB_TYPE_INTEGER, '11');
@@ -100,7 +100,7 @@ function xmldb_block_ned_mentor_upgrade($oldversion) {
             $dbman->create_table($table);
         }
 
-        $table = new xmldb_table('block_ned_mentor_report_pvt');
+        $table = new xmldb_table('block_fn_mentor_report_pvt');
         $table->add_field("id", XMLDB_TYPE_INTEGER, '11', null, true, true);
         $table->add_field("userid", XMLDB_TYPE_INTEGER, '11');
         $table->add_field("groups", XMLDB_TYPE_TEXT);
@@ -115,7 +115,7 @@ function xmldb_block_ned_mentor_upgrade($oldversion) {
     }
 
     if ($oldversion <= 2016051700) {
-        $table = new xmldb_table('block_ned_mentor_report_pvt');
+        $table = new xmldb_table('block_fn_mentor_report_pvt');
         $field = new xmldb_field('courses', XMLDB_TYPE_TEXT);
         if (!$dbman->field_exists($table, $field)) {
             $dbman->add_field($table, $field);
@@ -123,7 +123,7 @@ function xmldb_block_ned_mentor_upgrade($oldversion) {
     }
 
     if ($oldversion <= 2016051701) {
-        $table = new xmldb_table('block_ned_mentor_notific');
+        $table = new xmldb_table('block_fn_mentor_notific');
         $field = new xmldb_field('studentmsgenabled', XMLDB_TYPE_INTEGER, '4', null, null, null, '0');
         if (!$dbman->field_exists($table, $field)) {
             $dbman->add_field($table, $field);

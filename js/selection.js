@@ -128,9 +128,9 @@ $(document).ready(function() {
         $(this).parents("ul").prev().prop("checked", sibs);
     });
 
-    $('#page-blocks-ned_mentor-notification_send .fn-send-confirm input[value=Continue]').click(function () {
-        $('#page-blocks-ned_mentor-notification_send .fn-send-confirm div#notice').hide();
-        $('#page-blocks-ned_mentor-notification_send .fn-send-confirm div.notice2').show();
+    $('#page-blocks-fn_mentor-notification_send .fn-send-confirm input[value=Continue]').click(function () {
+        $('#page-blocks-fn_mentor-notification_send .fn-send-confirm div#notice').hide();
+        $('#page-blocks-fn_mentor-notification_send .fn-send-confirm div.notice2').show();
         $(this).closest("form").submit();
     });
 

@@ -15,16 +15,16 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * @package    block_ned_mentor
+ * @package    block_fn_mentor
  * @copyright  Michael Gardener <mgardener@cissq.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2016081800;
+$plugin->version   = 2016090600;
 $plugin->requires  = 2013051400;
-$plugin->component = 'block_ned_mentor';
+$plugin->component = 'block_fn_mentor';
 $plugin->cron = 30;
 $plugin->release = '2.9d';
 $plugin->maturity = MATURITY_STABLE;

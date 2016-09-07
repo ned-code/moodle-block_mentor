@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<XMLDB PATH="blocks/ned_mentor/db" VERSION="20160518" COMMENT="XMLDB file for Moodle blocks/ned_mentor"
+<XMLDB PATH="blocks/fn_mentor/db" VERSION="20160518" COMMENT="XMLDB file for Moodle blocks/fn_mentor"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
 >
   <TABLES>
-    <TABLE NAME="block_ned_mentor_notific" COMMENT="block_ned_mentor_notific table retrofitted from MySQL">
+    <TABLE NAME="block_fn_mentor_notific" COMMENT="block_fn_mentor_notific table retrofitted from MySQL">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="18" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="name" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false"/>
@@ -50,7 +50,7 @@
         <KEY NAME="id" TYPE="primary" FIELDS="id"/>
       </KEYS>
     </TABLE>
-    <TABLE NAME="block_ned_mentor_notific_msg" COMMENT="block_ned_mentor_notific_msg table retrofitted from MySQL">
+    <TABLE NAME="block_fn_mentor_notific_msg" COMMENT="block_fn_mentor_notific_msg table retrofitted from MySQL">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="18" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="notificationid" TYPE="int" LENGTH="18" NOTNULL="false" SEQUENCE="false"/>
@@ -70,7 +70,7 @@
         <INDEX NAME="mdl_blocfnmentnotimsg_not_ix" UNIQUE="false" FIELDS="notificationid"/>
       </INDEXES>
     </TABLE>
-    <TABLE NAME="block_ned_mentor_report_data" COMMENT="block_ned_mentor_report_data table retrofitted from MySQL">
+    <TABLE NAME="block_fn_mentor_report_data" COMMENT="block_fn_mentor_report_data table retrofitted from MySQL">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="18" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="userid" TYPE="int" LENGTH="18" NOTNULL="true" SEQUENCE="false"/>
@@ -92,7 +92,7 @@
         <INDEX NAME="repodata_cou_ix" UNIQUE="false" FIELDS="courseid"/>
       </INDEXES>
     </TABLE>
-    <TABLE NAME="block_ned_mentor_report_pvt" COMMENT="block_ned_mentor_report_pvt table retrofitted from MySQL">
+    <TABLE NAME="block_fn_mentor_report_pvt" COMMENT="block_fn_mentor_report_pvt table retrofitted from MySQL">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="18" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="userid" TYPE="int" LENGTH="18" NOTNULL="true" SEQUENCE="false"/>

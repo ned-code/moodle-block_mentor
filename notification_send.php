@@ -15,13 +15,13 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * @package    block_ned_mentor
+ * @package    block_fn_mentor
  * @copyright  Michael Gardener <mgardener@cissq.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 require_once('../../config.php');
-require_once($CFG->dirroot . '/blocks/ned_mentor/lib.php');
+require_once($CFG->dirroot . '/blocks/fn_mentor/lib.php');
 
 $id = optional_param('id', 0, PARAM_INT);
 $action = optional_param('action', 0, PARAM_RAW);
@@ -31,35 +31,35 @@ require_login(null, false);
 confirm_sesskey();
 
 // PERMISSION.
-require_capability('block/ned_mentor:createnotificationrule', context_system::instance());
+require_capability('block/fn_mentor:createnotificationrule', context_system::instance());
 
-$title = get_string('page_title_assign_mentor', 'block_ned_mentor');
+$title = get_string('page_title_assign_mentor', 'block_fn_mentor');
 $heading = $SITE->fullname;
 
 $PAGE->requires->jquery();
-$PAGE->requires->js('/blocks/ned_mentor/js/selection.js');
+$PAGE->requires->js('/blocks/fn_mentor/js/selection.js');
 
-$PAGE->requires->css('/blocks/ned_mentor/css/styles.css');
+$PAGE->requires->css('/blocks/fn_mentor/css/styles.css');
 
-$PAGE->set_url('/blocks/ned_mentor/notification_send.php');
+$PAGE->set_url('/blocks/fn_mentor/notification_send.php');
 $PAGE->set_pagelayout('course');
 $PAGE->set_context(context_system::instance());
 $PAGE->set_title($heading);
 $PAGE->set_heading($heading);
-$PAGE->navbar->add(get_string('pluginname', 'block_ned_mentor'), new moodle_url('/blocks/ned_mentor/course_overview.php'));
-$PAGE->navbar->add(get_string('notification_rules', 'block_ned_mentor'),
-    new moodle_url('/blocks/ned_mentor/notification_rules.php')
+$PAGE->navbar->add(get_string('pluginname', 'block_fn_mentor'), new moodle_url('/blocks/fn_mentor/course_overview.php'));
+$PAGE->navbar->add(get_string('notification_rules', 'block_fn_mentor'),
+    new moodle_url('/blocks/fn_mentor/notification_rules.php')
 );
 
 if (($action == 'send') && ($id)) {
-    $notificationrule = $DB->get_record('block_ned_mentor_notific', array('id' => $id), '*', MUST_EXIST);
+    $notificationrule = $DB->get_record('block_fn_mentor_notific', array('id' => $id), '*', MUST_EXIST);
 }
 
 if ($process) {
-    $report = block_ned_mentor_send_notifications($notificationrule->id, true);
+    $report = block_fn_mentor_send_notifications($notificationrule->id, true);
     echo $OUTPUT->header();
 
-    $redirecturl = new moodle_url('/blocks/ned_mentor/notification_rules.php');
+    $redirecturl = new moodle_url('/blocks/fn_mentor/notification_rules.php');
 
     echo '<div class="box generalbox" id="notice">
           <p>'.$report.'</p>
@@ -68,7 +68,7 @@ if ($process) {
               <form action="'.$redirecturl->out().'" method="post">
                 <div>
                   <input type="hidden" value="'.sesskey().'" name="sesskey"/>
-                  <input class="singlebutton" type="submit" value="'.get_string('continue', 'block_ned_mentor').'"/>
+                  <input class="singlebutton" type="submit" value="'.get_string('continue', 'block_fn_mentor').'"/>
                 </div>
               </form>
             </div>
@@ -82,12 +82,12 @@ if ($process) {
     echo $OUTPUT->header();
     echo '<span class="fn-send-confirm">';
     echo '<div id="notice" style="display: none" class="box generalbox notice2">'.
-        get_string('messagesprocessing', 'block_ned_mentor').
-        '<br><img style="margin-left: 60px;" src="'.$OUTPUT->pix_url('email3', 'block_ned_mentor').'"></div>';
-    echo $OUTPUT->confirm(get_string('confirmsend', 'block_ned_mentor'),
-        new moodle_url('/blocks/ned_mentor/notification_send.php',
+        get_string('messagesprocessing', 'block_fn_mentor').
+        '<br><img style="margin-left: 60px;" src="'.$OUTPUT->pix_url('email3', 'block_fn_mentor').'"></div>';
+    echo $OUTPUT->confirm(get_string('confirmsend', 'block_fn_mentor'),
+        new moodle_url('/blocks/fn_mentor/notification_send.php',
             array('id' => $id, 'process' => 1)
-        ), '/blocks/ned_mentor/notification_rules.php'
+        ), '/blocks/fn_mentor/notification_rules.php'
     );
     echo '</span>';
     echo $OUTPUT->footer();

@@ -22,14 +22,14 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-$string['ned_mentor:addinstance'] = 'Add a NED Mentor Manager block';
-$string['ned_mentor:myaddinstance'] = 'Add a NED Mentor Manager block to my moodle';
-$string['ned_mentor:assignmentor'] = 'Assign mentor';
-$string['ned_mentor:createnotificationrule'] = 'Create notification rule';
-$string['ned_mentor:viewcoursenotes'] = 'View course notes';
-$string['ned_mentor:viewactivitylist'] = 'View activity list';
-$string['ned_mentor:manageall'] = 'Manage all';
-$string['ned_mentor:viewblock'] = 'View block';
+$string['fn_mentor:addinstance'] = 'Add a NED Mentor Manager block';
+$string['fn_mentor:myaddinstance'] = 'Add a NED Mentor Manager block to my moodle';
+$string['fn_mentor:assignmentor'] = 'Assign mentor';
+$string['fn_mentor:createnotificationrule'] = 'Create notification rule';
+$string['fn_mentor:viewcoursenotes'] = 'View course notes';
+$string['fn_mentor:viewactivitylist'] = 'View activity list';
+$string['fn_mentor:manageall'] = 'Manage all';
+$string['fn_mentor:viewblock'] = 'View block';
 $string['pluginname'] = 'NED Mentor Manager';
 $string['blocktitle'] = 'Mentor Manager';
 $string['blockname'] = 'Block name';
@@ -215,3 +215,5 @@ $string['rolename'] = 'Role name';
 $string['sirmadam'] = 'Sir or Madam';
 $string['version'] = 'Version';
 $string['menteecanview'] = 'Allow mentee to see block';
+$string['showallteachers'] = 'Show all Teachers';
+$string['showallmentors'] = 'Show all Mentors';

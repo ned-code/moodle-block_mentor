@@ -26,12 +26,12 @@
 define('NO_OUTPUT_BUFFERING', true); // progress bar is used here
 
 require(dirname(dirname(dirname(__FILE__))) . '/config.php');
-require_once($CFG->dirroot . '/blocks/ned_mentor/lib.php');
+require_once($CFG->dirroot . '/blocks/fn_mentor/lib.php');
 
 require_login(null, false);
 $contextsystem = context_system::instance();
 
-$thispageurl = new moodle_url('/blocks/ned_mentor/progress.php');
+$thispageurl = new moodle_url('/blocks/fn_mentor/progress.php');
 
 $PAGE->set_url($thispageurl);
 $PAGE->set_pagelayout('course');
@@ -56,7 +56,7 @@ $progressbar->create();         // prints the HTML code of the progress bar
 // we may need a bit of extra execution time and memory here
 core_php_time_limit::raise(HOURSECS);
 raise_memory_limit(MEMORY_EXTRA);
-block_ned_mentor_generate_report($students, $progressbar);
+block_fn_mentor_generate_report($students, $progressbar);
 
 echo $OUTPUT->continue_button(new moodle_url('/admin/tool/customlang/edit.php', array('lng' => $lng)), 'get');
 echo $OUTPUT->footer();

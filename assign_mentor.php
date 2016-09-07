@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * @package    block_ned_mentor
+ * @package    block_fn_mentor
  * @copyright  Michael Gardener <mgardener@cissq.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -31,45 +31,45 @@ $studentmenu = optional_param('student_menu', 'all_students', PARAM_TEXT);
 require_login(null, false);
 
 // PERMISSION.
-require_capability('block/ned_mentor:assignmentor', context_system::instance(), $USER->id);
+require_capability('block/fn_mentor:assignmentor', context_system::instance(), $USER->id);
 
 switch ($mentormenu) {
     case 'all_mentors':
-        $mentors = block_ned_mentor_get_all_mentors();
+        $mentors = block_fn_mentor_get_all_mentors();
         break;
 
     case 'mentors_without_mentee':
-        $mentors = block_ned_mentor_get_mentors_without_mentee();
+        $mentors = block_fn_mentor_get_mentors_without_mentee();
         break;
 }
 
 switch ($studentmenu) {
     case 'all_students':
-        $students = block_ned_mentor_get_all_students();
+        $students = block_fn_mentor_get_all_students();
         break;
 
     case 'students_without_mentor':
-        $students = block_ned_mentor_get_students_without_mentor();
+        $students = block_fn_mentor_get_students_without_mentor();
         break;
 }
 
-$title = get_string('page_title_assign_mentor', 'block_ned_mentor');
+$title = get_string('page_title_assign_mentor', 'block_fn_mentor');
 $heading = $SITE->fullname;
 
-$PAGE->set_url('/blocks/ned_mentor/assign_mentor.php');
+$PAGE->set_url('/blocks/fn_mentor/assign_mentor.php');
 $PAGE->set_pagelayout('course');
 $PAGE->set_context(context_system::instance());
 $PAGE->set_title($title);
 $PAGE->set_heading($heading);
 $PAGE->set_cacheable(true);
 
-$PAGE->requires->css('/blocks/ned_mentor/css/styles.css');
+$PAGE->requires->css('/blocks/fn_mentor/css/styles.css');
 
 $PAGE->requires->jquery();
-$PAGE->requires->js('/blocks/ned_mentor/js/selection.js');
+$PAGE->requires->js('/blocks/fn_mentor/js/selection.js');
 
-$PAGE->navbar->add(get_string('pluginname', 'block_ned_mentor'), new moodle_url('/blocks/ned_mentor/course_overview.php'));
-$PAGE->navbar->add(get_string('manage_mentors', 'block_ned_mentor'), new moodle_url('/blocks/ned_mentor/assign_mentor.php'));
+$PAGE->navbar->add(get_string('pluginname', 'block_fn_mentor'), new moodle_url('/blocks/fn_mentor/course_overview.php'));
+$PAGE->navbar->add(get_string('manage_mentors', 'block_fn_mentor'), new moodle_url('/blocks/fn_mentor/assign_mentor.php'));
 
 echo $OUTPUT->header();
 
@@ -93,6 +93,6 @@ $form->set_data($toform);
 
 $form->display();
 
-echo block_ned_mentor_footer();
+echo block_fn_mentor_footer();
 
 echo $OUTPUT->footer();

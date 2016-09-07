@@ -15,14 +15,14 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * @package    block_ned_mentor
+ * @package    block_fn_mentor
  * @copyright  Michael Gardener <mgardener@cissq.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 $tasks = array(
     array(
-        'classname' => 'block_ned_mentor\task\update_alluser_report',
+        'classname' => 'block_fn_mentor\task\update_alluser_report',
         'blocking' => 0,
         'minute' => '0',
         'hour' => '0',

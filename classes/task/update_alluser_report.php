@@ -15,23 +15,23 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * @package    block_ned_mentor
+ * @package    block_fn_mentor
  * @copyright  Michael Gardener <mgardener@cissq.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace block_ned_mentor\task;
+namespace block_fn_mentor\task;
 
 
 class update_alluser_report extends \core\task\scheduled_task {
 
     public function get_name() {
-        return get_string('pluginname', 'block_ned_mentor');
+        return get_string('pluginname', 'block_fn_mentor');
     }
 
     public function execute() {
         global $CFG;
-        require_once($CFG->dirroot . '/blocks/ned_mentor/lib.php');
-        block_ned_mentor_generate_report();
+        require_once($CFG->dirroot . '/blocks/fn_mentor/lib.php');
+        block_fn_mentor_generate_report();
     }
 }

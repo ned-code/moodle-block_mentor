@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * @package    block_ned_mentor
+ * @package    block_fn_mentor
  * @copyright  Michael Gardener <mgardener@cissq.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -24,7 +24,7 @@ defined('MOODLE_INTERNAL') || die();
 
 $capabilities = array(
 
-    'block/ned_mentor:myaddinstance' => array(
+    'block/fn_mentor:myaddinstance' => array(
         'captype' => 'write',
         'contextlevel' => CONTEXT_SYSTEM,
         'archetypes' => array(
@@ -33,7 +33,7 @@ $capabilities = array(
         )
     ),
 
-    'block/ned_mentor:addinstance' => array(
+    'block/fn_mentor:addinstance' => array(
         'captype' => 'write',
         'contextlevel' => CONTEXT_BLOCK,
         'archetypes' => array(
@@ -41,7 +41,7 @@ $capabilities = array(
             'manager' => CAP_ALLOW
         )
     ),
-    'block/ned_mentor:viewblock' => array(
+    'block/fn_mentor:viewblock' => array(
         'captype' => 'read',
         'contextlevel' => CONTEXT_BLOCK,
         'archetypes' => array(
@@ -51,7 +51,7 @@ $capabilities = array(
         )
     ),
 
-    'block/ned_mentor:assignmentor' => array(
+    'block/fn_mentor:assignmentor' => array(
         'captype' => 'write',
         'contextlevel' => CONTEXT_SYSTEM,
         'archetypes' => array(
@@ -60,7 +60,7 @@ $capabilities = array(
         )
     ),
 
-    'block/ned_mentor:createnotificationrule' => array(
+    'block/fn_mentor:createnotificationrule' => array(
         'captype' => 'write',
         'contextlevel' => CONTEXT_SYSTEM,
         'archetypes' => array(
@@ -69,7 +69,7 @@ $capabilities = array(
         )
     ),
 
-    'block/ned_mentor:viewcoursenotes' => array(
+    'block/fn_mentor:viewcoursenotes' => array(
         'captype' => 'read',
         'contextlevel' => CONTEXT_SYSTEM,
         'archetypes' => array(
@@ -78,7 +78,7 @@ $capabilities = array(
         )
     ),
 
-    'block/ned_mentor:viewactivitylist' => array(
+    'block/fn_mentor:viewactivitylist' => array(
         'captype' => 'read',
         'contextlevel' => CONTEXT_COURSE,
         'archetypes' => array(
@@ -87,7 +87,7 @@ $capabilities = array(
             'manager' => CAP_ALLOW
         )
     ),
-    'block/ned_mentor:manageall' => array(
+    'block/fn_mentor:manageall' => array(
         'captype' => 'write',
         'contextlevel' => CONTEXT_SYSTEM,
         'archetypes' => array(

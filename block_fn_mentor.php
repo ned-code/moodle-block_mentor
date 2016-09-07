@@ -15,50 +15,50 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * @package    block_ned_mentor
+ * @package    block_fn_mentor
  * @copyright  Michael Gardener <mgardener@cissq.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
-require_once($CFG->dirroot . '/blocks/ned_mentor/lib.php');
+require_once($CFG->dirroot . '/blocks/fn_mentor/lib.php');
 require_once($CFG->libdir . '/formslib.php');
 
-class block_ned_mentor extends block_base {
+class block_fn_mentor extends block_base {
 
     public function init() {
-        $this->title = get_string('pluginname', 'block_ned_mentor');
+        $this->title = get_string('pluginname', 'block_fn_mentor');
     }
 
     public function specialization() {
-        if ($title = get_config('block_ned_mentor', 'blockname')) {
+        if ($title = get_config('block_fn_mentor', 'blockname')) {
             $this->title = $title;
         } else {
-            $this->title = get_string('blocktitle', 'block_ned_mentor');
+            $this->title = get_string('blocktitle', 'block_fn_mentor');
         }
     }
 
     public function get_content() {
         global $CFG, $OUTPUT, $USER, $DB;
 
-        $studentrole = get_config('block_ned_mentor', 'studentrole');
+        $studentrole = get_config('block_fn_mentor', 'studentrole');
 
         $sortby = optional_param('sortby', 'mentor', PARAM_TEXT);
         $coursefilter = optional_param('coursefilter', 0, PARAM_INT);
         $showall = optional_param('showall', 0, PARAM_INT);
 
-        $isadmin   = has_capability('block/ned_mentor:manageall', context_system::instance());
-        $ismentor  = block_ned_mentor_has_system_role($USER->id, get_config('block_ned_mentor', 'mentor_role_system'));
-        $isteacher = block_ned_mentor_isteacherinanycourse($USER->id);
-        $isstudent = block_ned_mentor_isstudentinanycourse($USER->id);
+        $isadmin   = has_capability('block/fn_mentor:manageall', context_system::instance());
+        $ismentor  = block_fn_mentor_has_system_role($USER->id, get_config('block_fn_mentor', 'mentor_role_system'));
+        $isteacher = block_fn_mentor_isteacherinanycourse($USER->id);
+        $isstudent = block_fn_mentor_isstudentinanycourse($USER->id);
 
-        $strmentor = get_config('block_ned_mentor', 'mentor');
-        $strmentors = get_config('block_ned_mentor', 'mentors');
-        $strmentee = get_config('block_ned_mentor', 'mentee');
-        $strmentees = get_config('block_ned_mentor', 'mentees');
-        $maxnumberofmentees = get_config('block_ned_mentor', 'maxnumberofmentees');
-        $menteecanview = get_config('block_ned_mentor', 'menteecanview');
+        $strmentor = get_config('block_fn_mentor', 'mentor');
+        $strmentors = get_config('block_fn_mentor', 'mentors');
+        $strmentee = get_config('block_fn_mentor', 'mentee');
+        $strmentees = get_config('block_fn_mentor', 'mentees');
+        $maxnumberofmentees = get_config('block_fn_mentor', 'maxnumberofmentees');
+        $menteecanview = get_config('block_fn_mentor', 'menteecanview');
 
         if (!isset($this->config->show_mentee_without_course)) {
             $showunenrolledstudents = 0;
@@ -89,7 +89,7 @@ class block_ned_mentor extends block_base {
             return $this->content;
         }
 
-        if (!has_capability('block/ned_mentor:viewblock', $this->context)) {
+        if (!has_capability('block/fn_mentor:viewblock', $this->context)) {
             if ($isstudent) {
                 if (!$menteecanview) {
                     return $this->content;
@@ -111,20 +111,20 @@ class block_ned_mentor extends block_base {
             'mentee' => $CFG->wwwroot.'/'.$indexphp.'?coursefilter='.$coursefilter.'&sortby=mentee'
         );
         $sortmenu = array(
-            $sortbyurl['mentor'] => get_config('block_ned_mentor', 'mentor'),
-            $sortbyurl['mentee'] => get_config('block_ned_mentor', 'mentee')
+            $sortbyurl['mentor'] => get_config('block_fn_mentor', 'mentor'),
+            $sortbyurl['mentee'] => get_config('block_fn_mentor', 'mentee')
         );
 
         // COURSE SELECT.
         $courseurl = array(
             0 => $CFG->wwwroot.'/'.$indexphp.'?coursefilter=0&sortby='.$sortby.'&showall='.$showall
         );
-        $coursemenu = array($courseurl[0] => get_string('all_courses', 'block_ned_mentor') );
+        $coursemenu = array($courseurl[0] => get_string('all_courses', 'block_fn_mentor') );
 
         $filtercourses = array();
 
         // CATEGORY.
-        if ($configcategory = get_config('block_ned_mentor', 'category')) {
+        if ($configcategory = get_config('block_fn_mentor', 'category')) {
 
             $selectedcategories = explode(',', $configcategory);
 
@@ -135,7 +135,7 @@ class block_ned_mentor extends block_base {
                         $filtercourses[] = $catcourse->id;
                     }
                 }
-                if ($categorystructure = block_ned_mentor_get_course_category_tree($categoryid)) {
+                if ($categorystructure = block_fn_mentor_get_course_category_tree($categoryid)) {
                     foreach ($categorystructure as $category) {
 
                         if ($category->courses) {
@@ -145,7 +145,7 @@ class block_ned_mentor extends block_base {
                         }
                         if ($category->categories) {
                             foreach ($category->categories as $subcategory) {
-                                block_ned_mentor_get_selected_courses($subcategory, $filtercourses);
+                                block_fn_mentor_get_selected_courses($subcategory, $filtercourses);
                             }
                         }
                     }
@@ -154,7 +154,7 @@ class block_ned_mentor extends block_base {
         }
 
         // COURSE.
-        if ($configcourse = get_config('block_ned_mentor', 'course')) {
+        if ($configcourse = get_config('block_fn_mentor', 'course')) {
             $selectedcourses = explode(',', $configcourse);
             $filtercourses = array_merge($filtercourses, $selectedcourses);
         }
@@ -182,7 +182,7 @@ class block_ned_mentor extends block_base {
                 }
             }
         } else if ($isteacher) { // Course - Teacher.
-            if ($courses = block_ned_mentor_get_teacher_courses()) {
+            if ($courses = block_fn_mentor_get_teacher_courses()) {
                 foreach ($courses as $course) {
 
                     if ($filtercourses) {
@@ -199,7 +199,7 @@ class block_ned_mentor extends block_base {
                 }
             }
         } else if ($ismentor) {
-            if ($students = block_ned_mentor_get_mentees_by_mentor(0, $filter, $USER->id)) {
+            if ($students = block_fn_mentor_get_mentees_by_mentor(0, $filter, $USER->id)) {
                 $students = reset($students);
 
                 list($insql, $params) = $DB->get_in_or_equal(array_keys($students['mentee']));
@@ -245,7 +245,7 @@ class block_ned_mentor extends block_base {
         // Sort.
         if ($isteacher || $isadmin && (isset($this->config->show_mentor_sort) && $this->config->show_mentor_sort)) {
             $this->content->text .= html_writer::tag('form',
-                get_string('sortby', 'block_ned_mentor') . ' ' .
+                get_string('sortby', 'block_fn_mentor') . ' ' .
                 html_writer::select($sortmenu, 'sortby', $sortbyurl[$sortby], null,
                     array('onChange' => 'location=document.jump1.sortby.options[document.jump1.sortby.selectedIndex].value;')
                 ),
@@ -254,7 +254,7 @@ class block_ned_mentor extends block_base {
         // COURSE.
         if (($isteacher || $isadmin || $ismentor) && $courses && ($this->page->course->id == SITEID)) {
             $this->content->text .= html_writer::tag('form',
-                get_string('course', 'block_ned_mentor') . ' ' .
+                get_string('course', 'block_fn_mentor') . ' ' .
                 html_writer::select($coursemenu, 'coursefilter', $courseurl[$coursefilter], null,
                     array('onChange' => 'location=document.jump2.coursefilter.'.
                         'options[document.jump2.coursefilter.selectedIndex].value;'
@@ -268,15 +268,15 @@ class block_ned_mentor extends block_base {
         }
 
         if (($isstudent) && (!$isteacher && !$isadmin && !$ismentor)) {
-            $this->content->text .= block_ned_mentor_render_mentees_by_student($USER->id);
+            $this->content->text .= block_fn_mentor_render_mentees_by_student($USER->id);
         } else {
             $numberofmentees = 0;
 
             if ($sortby == 'mentor') {
                 if ($ismentor) {
-                    $visiblementees = block_ned_mentor_get_mentees_by_mentor($coursefilter, $filter, $USER->id);
+                    $visiblementees = block_fn_mentor_get_mentees_by_mentor($coursefilter, $filter, $USER->id);
                 } else {
-                    $visiblementees = block_ned_mentor_get_mentees_by_mentor($coursefilter, $filter);
+                    $visiblementees = block_fn_mentor_get_mentees_by_mentor($coursefilter, $filter);
                 }
                 foreach ($visiblementees as $visiblementee) {
                     $numberofmentees += count($visiblementee['mentee']);
@@ -286,57 +286,57 @@ class block_ned_mentor extends block_base {
                     $this->content->text .= '<div class="mentee-footer-menu">';
 
                     $this->content->text .= '<div class="mentee"><img src="'.$OUTPUT->pix_url('i/group').'" class="mentee-img">'.
-                        '<a href="'.$CFG->wwwroot.'/blocks/ned_mentor/course_overview.php">'.
-                        get_string('open_progress_reports', 'block_ned_mentor').'</a></div>';
+                        '<a href="'.$CFG->wwwroot.'/blocks/fn_mentor/course_overview.php">'.
+                        get_string('open_progress_reports', 'block_fn_mentor').'</a></div>';
 
                     $this->content->text .= '<div class="mentee"><img src="'.$OUTPUT->pix_url('i/report').'" class="mentee-img">'.
                         '<a href="'.$CFG->wwwroot.'/'.$indexphp.'?sortby='.$sortby.'&coursefilter='.$coursefilter.'&showall=1">'.
-                        get_string('show_all', 'block_ned_mentor').'</a></div>';
+                        get_string('show_all', 'block_fn_mentor').'</a></div>';
                     $this->content->text .= '</div>';
                 } else {
-                    $this->content->text .= block_ned_mentor_render_mentees_by_mentor($visiblementees, $showunenrolledstudents);
+                    $this->content->text .= block_fn_mentor_render_mentees_by_mentor($visiblementees, $showunenrolledstudents);
                 }
             }
 
             if ($sortby == 'mentee') {
-                $visiblementees = block_ned_mentor_get_mentors_by_mentee($coursefilter, $filter);
+                $visiblementees = block_fn_mentor_get_mentors_by_mentee($coursefilter, $filter);
                 $numberofmentees += count($visiblementees);
 
                 if (($numberofmentees > $maxnumberofmentees) && (!$showall)) {
                     $this->content->text .= '<div class="mentee-footer-menu">'.
                         '<div class="mentee-block-menu"><img class="mentee-img" src="'.$OUTPUT->pix_url('i/navigationitem').'">'.
-                        '<a href="'.$CFG->wwwroot.'/blocks/ned_mentor/course_overview.php">'.
-                        get_string('open_progress_reports', 'block_ned_mentor').'</a></div>';
+                        '<a href="'.$CFG->wwwroot.'/blocks/fn_mentor/course_overview.php">'.
+                        get_string('open_progress_reports', 'block_fn_mentor').'</a></div>';
 
                     $this->content->text .= '<div class="mentee-block-menu"><img class="mentee-img" src="'.
                         $OUTPUT->pix_url('i/navigationitem').'">'.
                         '<a href="'.$CFG->wwwroot.'/'.$indexphp.'?sortby='.$sortby.'&coursefilter='.$coursefilter.
-                        '&showall=1">'.get_string('show_all', 'block_ned_mentor').'</a></div>';
+                        '&showall=1">'.get_string('show_all', 'block_fn_mentor').'</a></div>';
                     $this->content->text .= '</div>';
                 } else {
-                    $this->content->text .= block_ned_mentor_render_mentors_by_mentee($visiblementees);
+                    $this->content->text .= block_fn_mentor_render_mentors_by_mentee($visiblementees);
                 }
             }
         }
-        if (has_capability('block/ned_mentor:assignmentor', context_system::instance())
-            || has_capability('block/ned_mentor:createnotificationrule', context_system::instance())) {
+        if (has_capability('block/fn_mentor:assignmentor', context_system::instance())
+            || has_capability('block/fn_mentor:createnotificationrule', context_system::instance())) {
             $this->content->text .= '<hr class="footer-separator" />' .
                 '<div class="mentee-footer-menu">';
         }
-        if (has_capability('block/ned_mentor:assignmentor', context_system::instance())) {
+        if (has_capability('block/fn_mentor:assignmentor', context_system::instance())) {
             $this->content->text .= '<div class="mentee-block-menu">'.
                 '<img class="mentee-img" src="'.$OUTPUT->pix_url('i/navigationitem').'">'.
-                '<a href="'.$CFG->wwwroot.'/blocks/ned_mentor/assign_mentor.php">'.
-                get_string('assign_mentor', 'block_ned_mentor').'</a></div>';
+                '<a href="'.$CFG->wwwroot.'/blocks/fn_mentor/assign_mentor.php">'.
+                get_string('assign_mentor', 'block_fn_mentor').'</a></div>';
         }
-        if (has_capability('block/ned_mentor:createnotificationrule', context_system::instance())) {
+        if (has_capability('block/fn_mentor:createnotificationrule', context_system::instance())) {
             $this->content->text .= '<div class="mentee-block-menu">'.
                 '<img class="mentee-img" src="'.$OUTPUT->pix_url('i/navigationitem').'">'.
-                '<a href="'.$CFG->wwwroot.'/blocks/ned_mentor/notification_rules.php">'.
-                get_string('manage_notification', 'block_ned_mentor').'</a></div>';
+                '<a href="'.$CFG->wwwroot.'/blocks/fn_mentor/notification_rules.php">'.
+                get_string('manage_notification', 'block_fn_mentor').'</a></div>';
         }
-        if (has_capability('block/ned_mentor:assignmentor', context_system::instance())
-            || has_capability('block/ned_mentor:createnotificationrule', context_system::instance())) {
+        if (has_capability('block/fn_mentor:assignmentor', context_system::instance())
+            || has_capability('block/fn_mentor:createnotificationrule', context_system::instance())) {
             $this->content->text .= '</div>';
         }
 
@@ -361,7 +361,7 @@ class block_ned_mentor extends block_base {
     }
 
     public function cron() {
-        block_ned_mentor_send_notifications();
+        block_fn_mentor_send_notifications();
     }
 
 }

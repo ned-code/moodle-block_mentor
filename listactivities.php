@@ -15,14 +15,14 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * @package    block_ned_mentor
+ * @package    block_fn_mentor
  * @copyright  Michael Gardener <mgardener@cissq.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 require_once('../../config.php');
 require_once($CFG->dirroot . '/course/lib.php');
-require_once($CFG->dirroot . '/blocks/ned_mentor/lib.php');
+require_once($CFG->dirroot . '/blocks/fn_mentor/lib.php');
 require_once($CFG->libdir . '/completionlib.php');
 
 $usinghtmleditor = false;
@@ -34,7 +34,7 @@ $show = optional_param('show', 'notloggedin', PARAM_ALPHA);
 // Paging options.
 $page = optional_param('page', 0, PARAM_INT);
 $perpage = optional_param('perpage', 2, PARAM_INT);
-$PAGE->set_url('/blocks/ned_mentor/listactivities.php', array('id' => $id, 'show' => $show, 'navlevel' => 'top'));
+$PAGE->set_url('/blocks/fn_mentor/listactivities.php', array('id' => $id, 'show' => $show, 'navlevel' => 'top'));
 
 
 if (!$course = $DB->get_record("course", array("id" => $id))) {
@@ -43,7 +43,7 @@ if (!$course = $DB->get_record("course", array("id" => $id))) {
 
 require_login(null, false);
 $context = context_course::instance($course->id);
-$canview = has_capability('block/ned_mentor:viewactivitylist', $context);
+$canview = has_capability('block/fn_mentor:viewactivitylist', $context);
 $PAGE->set_context($context);
 
 if (!$canview) {
@@ -68,7 +68,7 @@ if ($completion->is_enabled()) {
         }
         $data = $completion->get_data($activity, true, $menteeid, null);
         $completionstate = $data->completionstate;
-        $assignmentstatus = block_ned_mentor_assignment_status($activity, $menteeid);
+        $assignmentstatus = block_fn_mentor_assignment_status($activity, $menteeid);
 
         if ($completionstate == 0) {
             if (($activity->module == 1)
@@ -127,34 +127,34 @@ switch ($show) {
     case 'completed':
 
         $activitiesresults = $completedactivities;
-        $name = get_string('breadcrumb:activitiescompleted', 'block_ned_mentor');
-        $title = get_string('title:completed', 'block_ned_mentor') . " (Total:" . $completedactivities . " Activities)";
+        $name = get_string('breadcrumb:activitiescompleted', 'block_fn_mentor');
+        $title = get_string('title:completed', 'block_fn_mentor') . " (Total:" . $completedactivities . " Activities)";
         break;
 
     case 'incompleted':
 
         $activitiesresults = $incompletedactivities;
-        $name = get_string('breadcrumb:activitiesincompleted', 'block_ned_mentor');
-        $title = get_string('title:incompleted', 'block_ned_mentor') . " (Total:" . $incompletedactivities . " Activities)";
+        $name = get_string('breadcrumb:activitiesincompleted', 'block_fn_mentor');
+        $title = get_string('title:incompleted', 'block_fn_mentor') . " (Total:" . $incompletedactivities . " Activities)";
         break;
 
     case 'draft':
 
         $activitiesresults = $savedactivities;
-        $name = get_string('breadcrumb:draft', 'block_ned_mentor');
-        $title = get_string('title:saved', 'block_ned_mentor') . " (Total:" . $savedactivities . " Activities)";
+        $name = get_string('breadcrumb:draft', 'block_fn_mentor');
+        $title = get_string('title:saved', 'block_fn_mentor') . " (Total:" . $savedactivities . " Activities)";
         break;
 
     case 'notattempted':
         $activitiesresults = $notattemptedactivities;
-        $name = get_string('breadcrumb:notattempted', 'block_ned_mentor');
-        $title = get_string('title:notattempted', 'block_ned_mentor') . " (Total:" . $notattemptedactivities . " Activities)";
+        $name = get_string('breadcrumb:notattempted', 'block_fn_mentor');
+        $title = get_string('title:notattempted', 'block_fn_mentor') . " (Total:" . $notattemptedactivities . " Activities)";
         break;
 
     case 'waitingforgrade':
         $activitiesresults = $waitingforgradeactivities;
-        $name = get_string('breadcrumb:waitingforgrade', 'block_ned_mentor');
-        $title = get_string('title:waitingforgrade', 'block_ned_mentor') . " (Total:" . $waitingforgradeactivities . " Activities)";
+        $name = get_string('breadcrumb:waitingforgrade', 'block_fn_mentor');
+        $title = get_string('title:waitingforgrade', 'block_fn_mentor') . " (Total:" . $waitingforgradeactivities . " Activities)";
         break;
     default:
         break;
@@ -184,7 +184,7 @@ if (($show == 'completed' || $show == 'incompleted' || $show == 'draft'
     echo "</tr>";
 } else {
     echo '<div style="text-align:center; padding:12px;">';
-    echo "No activity with status " . get_string($show, 'block_ned_mentor') . "";
+    echo "No activity with status " . get_string($show, 'block_fn_mentor') . "";
     echo "</div>";
 }
 
@@ -219,7 +219,7 @@ if ($show == 'completed') {
             }
             $data = $completion->get_data($activity, true, $menteeid, null);
             $activitystate = $data->completionstate;
-            $assignmentstatus = block_ned_mentor_assignment_status($activity, $menteeid);
+            $assignmentstatus = block_fn_mentor_assignment_status($activity, $menteeid);
             if ($activitystate == 3) {
                 if (($activity->module == 1)
                         && ($activity->modname == 'assignment' || $activity->modname == 'assign')
@@ -264,7 +264,7 @@ if ($show == 'completed') {
             }
             $data = $completion->get_data($activity, true, $menteeid, null);
             $activitystate = $data->completionstate;
-            $assignmentstatus = block_ned_mentor_assignment_status($activity, $menteeid);
+            $assignmentstatus = block_fn_mentor_assignment_status($activity, $menteeid);
             if ($activitystate == 0) {
                 if (($activity->module == 1)
                         && ($activity->modname == 'assignment' || $activity->modname == 'assign')
@@ -293,7 +293,7 @@ if ($show == 'completed') {
             }
             $data = $completion->get_data($activity, true, $menteeid, null);
             $activitystate = $data->completionstate;
-            $assignmentstatus = block_ned_mentor_assignment_status($activity, $menteeid);
+            $assignmentstatus = block_fn_mentor_assignment_status($activity, $menteeid);
             if (($activitystate == 0)||($activitystate == 1)||($activitystate == 2)||($activitystate == 3)) {
                 if (($activity->module == 1)
                         && ($activity->modname == 'assignment' || $activity->modname == 'assign')
@@ -325,7 +325,7 @@ if ($show == 'completed') {
             }
             $data = $completion->get_data($activity, true, $menteeid, null);
             $activitystate = $data->completionstate;
-            $assignmentstatus = block_ned_mentor_assignment_status($activity, $menteeid);
+            $assignmentstatus = block_fn_mentor_assignment_status($activity, $menteeid);
             if (($activitystate == 0) || ($activitystate == 1) || ($activitystate == 2) || ($activitystate == 3)) {
                 if (($activity->module == 1)
                         && ($activity->modname == 'assignment' || $activity->modname == 'assign')

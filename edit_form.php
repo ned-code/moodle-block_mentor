@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * @package    block_ned_mentor
+ * @package    block_fn_mentor
  * @copyright  Michael Gardener <mgardener@cissq.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -23,17 +23,17 @@ defined('MOODLE_INTERNAL') || die();
 require_once(dirname(__FILE__) . '/../../config.php');
 
 
-class block_ned_mentor_edit_form extends block_edit_form {
+class block_fn_mentor_edit_form extends block_edit_form {
 
     protected function specific_definition($mform) {
 
         $yesno = array(0 => get_string('no'), 1 => get_string('yes'));
 
-        $mform->addElement('select', 'config_show_mentor_sort', get_string('show_mentor_sort', 'block_ned_mentor'), $yesno);
+        $mform->addElement('select', 'config_show_mentor_sort', get_string('show_mentor_sort', 'block_fn_mentor'), $yesno);
         $mform->setDefault('config_show_mentor_sort', 0);
 
         $mform->addElement('select', 'config_show_mentee_without_course',
-            get_string('mentee_without_course', 'block_ned_mentor'), $yesno
+            get_string('mentee_without_course', 'block_fn_mentor'), $yesno
         );
         $mform->setDefault('config_show_mentee_without_course', 0);
     }

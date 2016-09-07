@@ -15,13 +15,13 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * @package    block_ned_mentor
+ * @package    block_fn_mentor
  * @copyright  Michael Gardener <mgardener@cissq.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 require_once($CFG->libdir . '/formslib.php');
-$PAGE->requires->js('/blocks/ned_mentor/validation.js');
+$PAGE->requires->js('/blocks/fn_mentor/validation.js');
 
 class assign_mentor_form extends moodleform {
 
@@ -40,20 +40,20 @@ class assign_mentor_form extends moodleform {
         $table->attributes['class'] = 'assignmentor';
 
         $mentormenu = array(
-            'all_mentors' => get_string('all_mentors', 'block_ned_mentor'),
-            'mentors_without_mentee' => get_string('mentors_without_mentee', 'block_ned_mentor')
+            'all_mentors' => get_string('all_mentors', 'block_fn_mentor'),
+            'mentors_without_mentee' => get_string('mentors_without_mentee', 'block_fn_mentor')
         );
-        $mentorroleid = get_config('block_ned_mentor', 'mentor_role_system');
+        $mentorroleid = get_config('block_fn_mentor', 'mentor_role_system');
         $assignroleurl = new moodle_url(
             $CFG->wwwroot.'/admin/roles/assign.php',
             array('contextid' => 1,
                 'roleid' => $mentorroleid
             )
         );
-        $assignrolebutton = block_ned_mentor_single_button($assignroleurl->out(),
-            get_string('manage_mentor_role', 'block_ned_mentor'), 'single_button', 'assign_role');
-        $infobutton = block_ned_mentor_single_button($assignroleurl->out(),
-            get_string('info_about_selected_people', 'block_ned_mentor'), 'single_button', 'assign_role');
+        $assignrolebutton = block_fn_mentor_single_button($assignroleurl->out(),
+            get_string('manage_mentor_role', 'block_fn_mentor'), 'single_button', 'assign_role');
+        $infobutton = block_fn_mentor_single_button($assignroleurl->out(),
+            get_string('info_about_selected_people', 'block_fn_mentor'), 'single_button', 'assign_role');
 
         // MENTOR SELECT.
         $selectmentor = new html_table_cell();
@@ -64,7 +64,7 @@ class assign_mentor_form extends moodleform {
             $mentoroptions[$user->id] = $user->firstname . " " . $user->lastname;
         }
 
-        $selectmentor->text = html_writer::tag('div', get_config('block_ned_mentor', 'mentors'),
+        $selectmentor->text = html_writer::tag('div', get_config('block_fn_mentor', 'mentors'),
                 array('class' => 'object_labels')) .
             html_writer::tag('div',
                 html_writer::select($mentormenu, '', '', null,
@@ -75,22 +75,22 @@ class assign_mentor_form extends moodleform {
 
         $selectmentee = new html_table_cell();
 
-        $selectmentee->text = html_writer::tag('div', get_config('block_ned_mentor', 'mentees'), array('class' => 'object_labels'));
+        $selectmentee->text = html_writer::tag('div', get_config('block_fn_mentor', 'mentees'), array('class' => 'object_labels'));
         $selectmentee->text .= html_writer::tag('div', html_writer::select(array(), '', '', null,
             array('id' => 'selectmentee', 'class' => 'ignoredirty', 'multiple' => 'multiple', 'size' => 21)));
 
         $centerbuttons = new html_table_cell();
 
         $centerbuttons->text = (
-            block_ned_mentor_embed($OUTPUT->larrow() . ' ' . get_string('add_button', 'block_ned_mentor'), 'add_button') .
-            block_ned_mentor_embed(get_string('remove_button', 'block_ned_mentor') . ' ' . $OUTPUT->rarrow(), 'remove_button') .
-            block_ned_mentor_embed(get_string('add_all', 'block_ned_mentor'), 'add_all') .
-            block_ned_mentor_embed(get_string('remove_all', 'block_ned_mentor'), 'remove_all')
+            block_fn_mentor_embed($OUTPUT->larrow() . ' ' . get_string('add_button', 'block_fn_mentor'), 'add_button') .
+            block_fn_mentor_embed(get_string('remove_button', 'block_fn_mentor') . ' ' . $OUTPUT->rarrow(), 'remove_button') .
+            block_fn_mentor_embed(get_string('add_all', 'block_fn_mentor'), 'add_all') .
+            block_fn_mentor_embed(get_string('remove_all', 'block_fn_mentor'), 'remove_all')
         );
 
         $studentmenu = array(
-            'all_students' => get_string('all_students', 'block_ned_mentor'),
-            'students_without_mentor' => get_string('students_without_mentor', 'block_ned_mentor')
+            'all_students' => get_string('all_students', 'block_fn_mentor'),
+            'students_without_mentor' => get_string('students_without_mentor', 'block_fn_mentor')
         );
 
         // STUDENT SELECT.
@@ -101,7 +101,7 @@ class assign_mentor_form extends moodleform {
         }
 
         $selectstudent = new html_table_cell();
-        $selectstudent->text = html_writer::tag('div', get_string('students', 'block_ned_mentor'),
+        $selectstudent->text = html_writer::tag('div', get_string('students', 'block_fn_mentor'),
             array('class' => 'object_labels'));
         $selectstudent->text .= html_writer::tag('div',
             html_writer::select($studentmenu, '', '', null, array('id' => 'student_menu', 'class' => 'ignoredirty')).
@@ -109,7 +109,7 @@ class assign_mentor_form extends moodleform {
             'class' => 'ignoredirty', 'multiple' => 'multiple', 'size' => 20))
         );
         $selectstudent->text .= html_writer::tag('div',
-            get_string('search', 'block_ned_mentor') .
+            get_string('search', 'block_fn_mentor') .
             ' <input type="text" id="student_search" name="student_search">', array('id' => 'student_search_container'));
 
         $selectmentor->style = 'vertical-align: top;';
