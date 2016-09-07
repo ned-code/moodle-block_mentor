@@ -1,4 +1,3 @@
-Moodle - Mentor Manager (2.9-3.1)
 
     Name: NED Mentor Manager
     Type: Block
