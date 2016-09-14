@@ -16,8 +16,11 @@
 
 /**
  * @package    block_fn_mentor
- * @copyright  Michael Gardener <mgardener@cissq.com>
+ * @subpackage NED
+ * @copyright  NED {@link http://ned.ca}
+ * @author     NED {@link http://ned.ca}
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @developer  Michael Gardener <mgardener@cissq.com>
  */
 
 defined('MOODLE_INTERNAL') || die();
@@ -26,5 +29,5 @@ $plugin->version   = 2016090600;
 $plugin->requires  = 2013051400;
 $plugin->component = 'block_fn_mentor';
 $plugin->cron = 30;
-$plugin->release = '2.9d';
+$plugin->release = '3.1.1';
 $plugin->maturity = MATURITY_STABLE;
