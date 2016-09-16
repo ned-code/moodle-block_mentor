@@ -32,10 +32,14 @@ class block_fn_mentor extends block_base {
     }
 
     public function specialization() {
+        global $USER;
         if ($title = get_config('block_fn_mentor', 'blockname')) {
             $this->title = $title;
         } else {
             $this->title = get_string('blocktitle', 'block_fn_mentor');
+        }
+        if ($isstudent = block_fn_mentor_is_mentee($USER->id)) {
+            $this->title = get_string('myprogress', 'block_fn_mentor');
         }
     }
 
@@ -243,7 +247,7 @@ class block_fn_mentor extends block_base {
             $this->content->text .= '<div id="mentor-form-container">';
         }
         // Sort.
-        if ($isteacher || $isadmin && (isset($this->config->show_mentor_sort) && $this->config->show_mentor_sort)) {
+        if (($isteacher || $isadmin) && (isset($this->config->show_mentor_sort) && $this->config->show_mentor_sort)) {
             $this->content->text .= html_writer::tag('form',
                 get_string('sortby', 'block_fn_mentor') . ' ' .
                 html_writer::select($sortmenu, 'sortby', $sortbyurl[$sortby], null,

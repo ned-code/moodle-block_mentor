@@ -27,6 +27,9 @@ class block_fn_mentor_edit_form extends block_edit_form {
 
     protected function specific_definition($mform) {
 
+        $mform->addElement('static', 'blockinfo', get_string('blockinfo', 'block_fn_mentor'),
+            '<a target="_blank" href="http://ned.ca/mentor-manager">http://ned.ca/mentor-manager</a>');
+
         $yesno = array(0 => get_string('no'), 1 => get_string('yes'));
 
         $mform->addElement('select', 'config_show_mentor_sort', get_string('show_mentor_sort', 'block_fn_mentor'), $yesno);

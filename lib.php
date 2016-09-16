@@ -126,6 +126,31 @@ function block_fn_mentor_get_students_without_mentor($filter = '') {
     return $studentswithoutmentor;
 }
 
+function block_fn_mentor_is_mentee($userid) {
+    global $DB, $CFG;
+
+    if (! $mentorroleid = get_config('block_fn_mentor', 'mentor_role_user')) {
+        return false;
+    }
+
+    $studentrole = get_config('block_fn_mentor', 'studentrole');
+
+    $wherecondions = '';
+
+    $sqlmentor = "SELECT ra.id,
+                         ra.userid AS mentorid,
+                         ctx.instanceid AS studentid
+                    FROM {context} ctx
+              INNER JOIN {role_assignments} ra
+                      ON ctx.id = ra.contextid
+                   WHERE ctx.contextlevel = ?
+                     AND ra.roleid = ?
+                     AND ctx.instanceid = ?";
+
+    return $DB->record_exists_sql($sqlmentor, array(CONTEXT_USER, $mentorroleid, $userid));
+
+}
+
 function block_fn_mentor_get_mentors_without_mentee() {
     global $DB, $CFG;
 
@@ -539,13 +564,13 @@ function block_fn_mentor_render_mentees_by_student($menteeid) {
             $CFG->wwwroot.'/blocks/fn_mentor/pix/mentee_red.png"><a href="'.
             $CFG->wwwroot.'/blocks/fn_mentor/course_overview.php?menteeid='.$mentee->id.'" >' .
             $mentee->firstname . ' ' . $mentee->lastname . '</a></div>';
-
+        /*
         foreach ($mentors as $mentor) {
             $html .= '<div class="mentor"><img class="mentee-img" src="'.
                 $CFG->wwwroot.'/blocks/fn_mentor/pix/mentor_bullet.png"><a class="mentor-profile" href="'.
                 $CFG->wwwroot.'/user/profile.php?id='.$mentor->mentorid.'">' .$mentor->firstname . ' ' .
                 $mentor->lastname . '</a></div>';
-        }
+        }*/
     }
     return $html;
 }

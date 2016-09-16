@@ -217,3 +217,5 @@ $string['version'] = 'Version';
 $string['menteecanview'] = 'Allow mentee to see block';
 $string['showallteachers'] = 'Show all Teachers';
 $string['showallmentors'] = 'Show all Mentors';
+$string['myprogress'] = 'My Progress';
+$string['blockinfo'] = 'Block info';
