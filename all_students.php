@@ -79,6 +79,8 @@ if ($isadmin) {
     $mentees = block_fn_mentor_get_mentees($USER->id);
 }
 
+$studentids = implode(',', array_keys($mentees));
+
 // Category filter.
 $categorycourses = false;
 if ($categoryid) {
@@ -689,7 +691,7 @@ $countsql = "SELECT COUNT(1)
                FROM {block_fn_mentor_report_pvt} r
          INNER JOIN {user} u
                  ON r.userid = u.id
-              WHERE 0 = 0
+              WHERE r.userid IN ($studentids)
                     $where";
 $totalcount = $DB->count_records_sql($countsql);
 
@@ -711,7 +713,7 @@ $sql = "SELECT r.*,
           FROM {block_fn_mentor_report_pvt} r
     INNER JOIN {user} u
             ON r.userid = u.id
-         WHERE 0 = 0
+         WHERE r.userid IN ($studentids)
                $where
                $order";
 
