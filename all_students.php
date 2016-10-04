@@ -399,7 +399,6 @@ if (($show == 1)  && $isadmin) {
     $mentormenuhtml = '';
 }
 
-
 // Block.
 echo $studentmenuhtml;
 echo html_writer::div(
@@ -420,7 +419,6 @@ echo html_writer::div(
     'mentee-course-overview-block'
 );
 
-
 $inprogress = get_config('block_fn_mentor', 'inprogress');
 $reportdate = get_config('block_fn_mentor', 'reportdate');
 
@@ -437,6 +435,7 @@ if (!$inprogress || ((time() - $reportdate) > 10 * 60)) {
         )
     );
 }
+
 echo html_writer::div(
     html_writer::div(
         get_string('allstudentdataupdateinfo', 'block_fn_mentor', date('m/d/Y H:i', $reportdate)),
@@ -446,8 +445,6 @@ echo html_writer::div(
     'mentee-course-overview-block',
     array('id' => 'mentee-update-report-data')
 );
-
-
 
 echo html_writer::end_div(); // Mentee course overview left.
 
@@ -671,6 +668,7 @@ if ($reportcourses) {
 } else {
     $where .= " AND 1=0";
 }
+
 // Sort.
 $order = '';
 $sortcourseid = 0;
@@ -686,12 +684,18 @@ if (isset($datacolumns[$sort])) {
     }
 }
 
+if (has_capability('block/fn_mentor:viewallmentees', context_system::instance())) {
+    $menteefilter = "0=0";
+} else {
+    $menteefilter = " r.userid IN ($studentids) ";
+}
+
 // Count records for paging.
 $countsql = "SELECT COUNT(1)
                FROM {block_fn_mentor_report_pvt} r
          INNER JOIN {user} u
                  ON r.userid = u.id
-              WHERE r.userid IN ($studentids)
+              WHERE $menteefilter
                     $where";
 $totalcount = $DB->count_records_sql($countsql);
 
@@ -713,7 +717,7 @@ $sql = "SELECT r.*,
           FROM {block_fn_mentor_report_pvt} r
     INNER JOIN {user} u
             ON r.userid = u.id
-         WHERE r.userid IN ($studentids)
+         WHERE $menteefilter
                $where
                $order";
 
@@ -911,9 +915,7 @@ foreach ($tablerows as $tablerow) {
         $row->cells[$column] = $$varname;
     }
     $table->data[] = $row;
-
 }
-
 
 $pagingurl = new moodle_url('/blocks/fn_mentor/all_students.php',
     array(
@@ -928,7 +930,6 @@ $pagingurl = new moodle_url('/blocks/fn_mentor/all_students.php',
     )
 );
 $pagingbar = new paging_bar($totalcount, $page, $perpage, $pagingurl, 'page');
-
 
 echo html_writer::div(
     html_writer::div(

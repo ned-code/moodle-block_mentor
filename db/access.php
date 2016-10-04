@@ -94,4 +94,11 @@ $capabilities = array(
             'manager' => CAP_ALLOW
         )
     ),
+    'block/fn_mentor:viewallmentees' => array(
+        'captype' => 'read',
+        'contextlevel' => CONTEXT_SYSTEM,
+        'archetypes' => array(
+            'manager' => CAP_ALLOW
+        )
+    ),
 );

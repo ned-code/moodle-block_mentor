@@ -75,7 +75,7 @@ if ( has_capability('block/fn_mentor:assignmentor', context_system::instance(), 
         $i = 0;
         foreach ($records as $record) {
             $i++;
-            $selectoptions[$i]['id'] = $record->$idfield[$action];
+            $selectoptions[$i]['id'] = $record->{$idfield[$action]};
             $selectoptions[$i]['label'] = $record->firstname.' '.$record->lastname;
         }
         $data['success'] = true;
