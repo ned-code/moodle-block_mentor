@@ -2575,9 +2575,9 @@ function block_fn_mentor_generate_report(progress_bar $progressbar = null) {
     $sqlcreate = "CREATE TABLE `{block_fn_mentor_report_pvt}` (
           `id` bigint(11) NOT NULL AUTO_INCREMENT,
           `userid` bigint(11) NOT NULL,
-          `mentors` tinytext,
-          `groups` tinytext,
-          `courses` tinytext,
+          `mentors` text,
+          `groups` text,
+          `courses` text,
           ".$fieldscreate."
           PRIMARY KEY (`id`),
           UNIQUE KEY `ix_user` (`userid`) USING BTREE
