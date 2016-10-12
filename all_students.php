@@ -707,7 +707,16 @@ if (isset($selectedgroup)) {
     $columns[] = 'group';
 }
 foreach ($reportcourses as $reportcourse) {
-    $columns[] = 'completion'.$reportcourse;
+    $countcolumnsql = "SELECT COUNT(1)
+                        FROM {block_fn_mentor_report_pvt} r
+                  INNER JOIN {user} u
+                         ON r.userid = u.id
+                      WHERE $menteefilter
+                        AND completion".$reportcourse." > -1
+                            $where";
+    if ($coluncount = $DB->count_records_sql($countcolumnsql)) {
+        $columns[] = 'completion'.$reportcourse;
+    }
 }
 
 $sql = "SELECT r.*,
