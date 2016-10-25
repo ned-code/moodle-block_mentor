@@ -115,6 +115,58 @@ function xmldb_block_fn_mentor_upgrade($oldversion) {
     }
 
     if ($oldversion <= 2016051700) {
+        // Define table block_fn_mentor_notific to be created.
+        $table = new xmldb_table('block_fn_mentor_notific');
+
+        // Adding fields to table block_fn_mentor_notific.
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '18', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('name', XMLDB_TYPE_CHAR, '255', null, null, null, null);
+        $table->add_field('category', XMLDB_TYPE_TEXT, null, null, null, null, null);
+        $table->add_field('course', XMLDB_TYPE_TEXT, null, null, null, null, null);
+        $table->add_field('user', XMLDB_TYPE_INTEGER, '18', null, null, null, null);
+        $table->add_field('g1', XMLDB_TYPE_INTEGER, '2', null, null, null, null);
+        $table->add_field('g2', XMLDB_TYPE_INTEGER, '2', null, null, null, null);
+        $table->add_field('g3', XMLDB_TYPE_INTEGER, '2', null, null, null, null);
+        $table->add_field('g3_value', XMLDB_TYPE_CHAR, '255', null, null, null, null);
+        $table->add_field('g4', XMLDB_TYPE_INTEGER, '2', null, null, null, null);
+        $table->add_field('g4_value', XMLDB_TYPE_CHAR, '255', null, null, null, null);
+        $table->add_field('g5', XMLDB_TYPE_INTEGER, '2', null, null, null, null);
+        $table->add_field('g5_value', XMLDB_TYPE_CHAR, '255', null, null, null, null);
+        $table->add_field('g6', XMLDB_TYPE_INTEGER, '2', null, null, null, null);
+        $table->add_field('g6_value', XMLDB_TYPE_CHAR, '255', null, null, null, null);
+        $table->add_field('n1', XMLDB_TYPE_INTEGER, '2', null, null, null, null);
+        $table->add_field('n1_value', XMLDB_TYPE_CHAR, '255', null, null, null, null);
+        $table->add_field('n2', XMLDB_TYPE_INTEGER, '2', null, null, null, null);
+        $table->add_field('n2_value', XMLDB_TYPE_CHAR, '255', null, null, null, null);
+        $table->add_field('period', XMLDB_TYPE_CHAR, '255', null, null, null, null);
+        $table->add_field('mentoremail', XMLDB_TYPE_INTEGER, '2', null, null, null, null);
+        $table->add_field('mentorsms', XMLDB_TYPE_INTEGER, '2', null, null, null, null);
+        $table->add_field('studentemail', XMLDB_TYPE_INTEGER, '2', null, null, null, null);
+        $table->add_field('studentsms', XMLDB_TYPE_INTEGER, '2', null, null, null, null);
+        $table->add_field('teacheremail', XMLDB_TYPE_INTEGER, '2', null, null, null, null);
+        $table->add_field('teachersms', XMLDB_TYPE_INTEGER, '2', null, null, null, null);
+        $table->add_field('appended_message', XMLDB_TYPE_TEXT, null, null, null, null, null);
+        $table->add_field('timecreated', XMLDB_TYPE_INTEGER, '18', null, null, null, null);
+        $table->add_field('timemodified', XMLDB_TYPE_INTEGER, '18', null, null, null, null);
+        $table->add_field('crontime', XMLDB_TYPE_TEXT, null, null, null, null, null);
+        $table->add_field('studentmsgenabled', XMLDB_TYPE_INTEGER, '4', null, null, null, '0');
+        $table->add_field('mentormsgenabled', XMLDB_TYPE_INTEGER, '4', null, null, null, '0');
+        $table->add_field('teachermsgenabled', XMLDB_TYPE_INTEGER, '4', null, null, null, '0');
+        $table->add_field('studentappendedmsg', XMLDB_TYPE_TEXT, null, null, null, null, null);
+        $table->add_field('mentorappendedmsg', XMLDB_TYPE_TEXT, null, null, null, null, null);
+        $table->add_field('teacherappendedmsg', XMLDB_TYPE_TEXT, null, null, null, null, null);
+        $table->add_field('studentgreeting', XMLDB_TYPE_CHAR, '20', null, null, null, null);
+        $table->add_field('mentorgreeting', XMLDB_TYPE_CHAR, '20', null, null, null, null);
+        $table->add_field('teachergreeting', XMLDB_TYPE_CHAR, '20', null, null, null, null);
+
+        // Adding keys to table block_fn_mentor_notific.
+        $table->add_key('id', XMLDB_KEY_PRIMARY, array('id'));
+
+        // Conditionally launch create table for block_fn_mentor_notific.
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+
         $table = new xmldb_table('block_fn_mentor_report_pvt');
         $field = new xmldb_field('courses', XMLDB_TYPE_TEXT);
         if (!$dbman->field_exists($table, $field)) {
