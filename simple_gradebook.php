@@ -137,9 +137,8 @@ for ($i = 0; $i < $upto; $i++) {
                     $gradefunction = $mod->modname . "_get_user_grades";
 
 
-                    if ((($mod->modname != 'forum') || (($instance->assessed > 0)
-                                && has_capability('mod/forum:rate', $mcontext))) &&
-                        isset($modgradesarray[$mod->modname])) {
+                    if ((($mod->modname != 'forum') || ($instance->assessed > 0))
+                        && isset($modgradesarray[$mod->modname])) {
 
                         if (function_exists($gradefunction)) {
                             ++$numberofitem;
