@@ -25,6 +25,8 @@ define('NO_OUTPUT_BUFFERING', true); // progress bar is used here
 require_once('../../config.php');
 require_once($CFG->dirroot . '/blocks/fn_mentor/lib.php');
 
+set_time_limit(0);
+
 $process = optional_param('process', 0, PARAM_INT);
 
 require_login(null, false);
