@@ -448,7 +448,6 @@ if ($navpage == 'overview') {
     list($simplegradebook, $weekactivitycount, $courseformat) = block_fn_mentor_simplegradebook(
         $course, $menteeuser, $modgradesarray
     );
-
     echo '<div class="tablecontainer">';
     $gradebook = reset($simplegradebook);
 

@@ -636,9 +636,16 @@ function block_fn_mentor_assignment_status($mod, $userid) {
             return false;
         }
 
+        $filesubmissionenabled = block_fn_mentor_assign_plugin_config($assignment->id, 'assignsubmission', 'file', 'enabled');
+        $onlinetextsubmissionenabled = block_fn_mentor_assign_plugin_config($assignment->id, 'assignsubmission', 'onlinetext', 'enabled');
+
         if (!$submission = $DB->get_records('assign_submission', array(
             'assignment' => $assignment->id, 'userid' => $userid), 'attemptnumber DESC', '*', 0, 1)) {
-            return false;
+            if (!$filesubmissionenabled && !$onlinetextsubmissionenabled) {
+                return 'waitinggrade';
+            } else {
+                return false;
+            }
         } else {
             $submission = reset($submission);
         }
@@ -647,6 +654,11 @@ function block_fn_mentor_assignment_status($mod, $userid) {
 
         if (($submission->status == 'reopened') && ($submission->attemptnumber > 0)) {
             $attemptnumber = $submission->attemptnumber - 1;
+        }
+
+        // No grade assignments.
+        if ($assignment->grade == 0) {
+            return 'submitted';
         }
 
         if ($submissionisgraded = $DB->get_records('assign_grades', array(
@@ -667,27 +679,57 @@ function block_fn_mentor_assignment_status($mod, $userid) {
         } else {
             $graded = false;
         }
-
-        if ($submission->status == 'draft') {
-            if ($graded) {
-                return 'submitted';
-            } else {
+        // No grade assignments.
+        if ($assignment->grade == 0) {
+            if ($submission->status == 'new') {
+                return false;
+            } elseif ($submission->status == 'draft') {
                 return 'saved';
-            }
-        }
-        if ($submission->status == 'reopened') {
-            return 'submitted';
-        }
-        if ($submission->status == 'submitted') {
-            if ($graded) {
+            } elseif ($submission->status == 'reopened') {
                 return 'submitted';
-            } else {
-                return 'waitinggrade';
+            } elseif ($submission->status == 'submitted') {
+                return 'submitted';
+            }
+        } else {
+            if (!$filesubmissionenabled && !$onlinetextsubmissionenabled) {
+                if ($graded) {
+                    return 'submitted';
+                } else {
+                    return 'waitinggrade';
+                }
+            } elseif ($submission->status == 'draft') {
+                if ($graded) {
+                    return 'submitted';
+                } else {
+                    return 'saved';
+                }
+            } elseif ($submission->status == 'reopened') {
+                return 'submitted';
+            } elseif ($submission->status == 'submitted') {
+                if ($graded) {
+                    return 'submitted';
+                } else {
+                    return 'waitinggrade';
+                }
             }
         }
     } else {
         return false;
     }
+}
+
+function block_fn_mentor_assign_plugin_config($assignmentid, $subtype = 'assignsubmission', $plugin = 'file', $setting = 'enabled') {
+    global $DB;
+    $dbparams = array('assignment'=>$assignmentid,
+        'subtype'=>$subtype,
+        'plugin'=>$plugin,
+        'name'=>$setting);
+    $result = $DB->get_record('assign_plugin_config', $dbparams, '*', IGNORE_MISSING);
+    if ($result) {
+        return $result->value;
+    }
+
+    return false;
 }
 
 function block_fn_mentor_grade_summary($studentid, $courseid=0) {
@@ -2425,10 +2467,11 @@ function block_fn_mentor_simplegradebook($course, $menteeuser, $modgradesarray) 
                                             }
                                         }
                                     } else if ($modstatus = block_fn_mentor_assignment_status($mod, $key, true)) {
-
                                         switch ($modstatus) {
                                             case 'submitted':
-                                                if ($grade = $gradefunction($instance, $key)) {
+                                                if ($instance->grade == 0) {
+                                                    $simplegradebook[$key]['grade'][$i][$mod->id] = 'graded_.gif';
+                                                } elseif ($grade = $gradefunction($instance, $key)) {
                                                     if ($item->gradepass > 0) {
                                                         if ($grade[$key]->rawgrade >= $item->gradepass) {
                                                             $simplegradebook[$key]['grade'][$i][$mod->id] = 'marked.gif';// Passed.
