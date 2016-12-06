@@ -2121,7 +2121,7 @@ function block_fn_mentor_activity_progress($course, $menteeid) {
     global $CFG, $DB, $SESSION;
 
     // Count grade to pass activities.
-    $sqlgradetopass = "SELECT Count(gi.id)
+    $sqlgradetopass = "SELECT COUNT(gi.id)
                          FROM {grade_items} gi
                         WHERE gi.courseid = ?
                           AND gi.gradepass > ?";
@@ -2162,18 +2162,16 @@ function block_fn_mentor_activity_progress($course, $menteeid) {
             if (!$activity->visible) {
                 continue;
             }
-
             $data = $completion->get_data($activity, true, $menteeid, null);
-
             $completionstate = $data->completionstate;
             $assignmentstatus = block_fn_mentor_assignment_status($activity, $menteeid);
 
             // COMPLETION_INCOMPLETE.
-            if ($completionstate == 0) {
+            if ($completionstate == COMPLETION_INCOMPLETE) {
                 // Show activity as complete when conditions are met.
                 if (($activity->module == 1)
                     && ($activity->modname == 'assignment' || $activity->modname == 'assign')
-                    && ($activity->completion == 2)
+                    && ($activity->completion == COMPLETION_TRACKING_AUTOMATIC)
                     && $assignmentstatus) {
 
                     if (isset($assignmentstatus)) {
@@ -2191,10 +2189,10 @@ function block_fn_mentor_activity_progress($course, $menteeid) {
                     $notattemptedactivities++;
                 }
                 // COMPLETION_COMPLETE - COMPLETION_COMPLETE_PASS.
-            } else if ($completionstate == 1 || $completionstate == 2) {
+            } else if ($completionstate == COMPLETION_COMPLETE || $completionstate == COMPLETION_COMPLETE_PASS) {
                 if (($activity->module == 1)
                     && ($activity->modname == 'assignment' || $activity->modname == 'assign')
-                    && ($activity->completion == 2)
+                    && ($activity->completion == COMPLETION_TRACKING_AUTOMATIC)
                     && $assignmentstatus) {
 
                     if (isset($assignmentstatus)) {
@@ -2217,7 +2215,7 @@ function block_fn_mentor_activity_progress($course, $menteeid) {
                 // Show activity as complete when conditions are met.
                 if (($activity->module == 1)
                     && ($activity->modname == 'assignment' || $activity->modname == 'assign')
-                    && ($activity->completion == 2)
+                    && ($activity->completion == COMPLETION_TRACKING_AUTOMATIC)
                     && $assignmentstatus) {
 
                     if (isset($assignmentstatus)) {
