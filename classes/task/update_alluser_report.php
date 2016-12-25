@@ -26,7 +26,7 @@ namespace block_fn_mentor\task;
 class update_alluser_report extends \core\task\scheduled_task {
 
     public function get_name() {
-        return get_string('pluginname', 'block_fn_mentor');
+        return get_string('updatealluserreport', 'block_fn_mentor');
     }
 
     public function execute() {

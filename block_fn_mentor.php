@@ -363,9 +363,4 @@ class block_fn_mentor extends block_base {
     public function has_config() {
         return true;
     }
-
-    public function cron() {
-        block_fn_mentor_send_notifications();
-    }
-
 }

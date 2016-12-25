@@ -20,23 +20,18 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-$tasks = array(
-    array(
-        'classname' => 'block_fn_mentor\task\update_alluser_report',
-        'blocking' => 0,
-        'minute' => '0',
-        'hour' => '7',
-        'day' => '*',
-        'dayofweek' => '*',
-        'month' => '*'
-    ),
-    array(
-        'classname' => 'block_fn_mentor\task\send_user_notification',
-        'blocking' => 0,
-        'minute' => '0',
-        'hour' => '0',
-        'day' => '*',
-        'dayofweek' => '*',
-        'month' => '*'
-    )
-);
+namespace block_fn_mentor\task;
+
+
+class send_user_notification extends \core\task\scheduled_task {
+
+    public function get_name() {
+        return get_string('sendusernotification', 'block_fn_mentor');
+    }
+
+    public function execute() {
+        global $CFG;
+        require_once($CFG->dirroot . '/blocks/fn_mentor/lib.php');
+        block_fn_mentor_send_notifications();
+    }
+}

@@ -738,6 +738,8 @@ function block_fn_mentor_grade_summary($studentid, $courseid=0) {
     $data = new stdClass();
     $courses = array();
     $coursegrades = array();
+    $nogradeassignments = 0;
+
     if (! $passinggrade = get_config('block_fn_mentor', 'passinggrade')) {
         $passinggrade = 50;
     }
@@ -785,6 +787,18 @@ function block_fn_mentor_grade_summary($studentid, $courseid=0) {
                                        AND gm.userid = ?";
                     if (!$DB->record_exists_sql($sqlgrouiping, array($mod->groupingid, $studentid))) {
                         continue;
+                    }
+                }
+                // Check no grade assignments.
+                if ($mod->modname == 'assign') {
+                    if ($assignment = $DB->get_record('assign', array('id' => $mod->instance))) {
+                        if ($assignment->grade == 0) {
+                            if ($submission = $DB->get_records('assign_submission', array(
+                                'assignment' => $assignment->id, 'userid' => $studentid), 'attemptnumber DESC', '*', 0, 1)
+                            ) {
+                                ++$nogradeassignments;
+                            }
+                        }
                     }
                 }
 
@@ -875,13 +889,13 @@ function block_fn_mentor_grade_summary($studentid, $courseid=0) {
         }
 
         $sqlactivity = "SELECT gi.id,
-                           gg.finalgrade
-                      FROM {grade_items} gi
-           LEFT OUTER JOIN {grade_grades} gg
-                        ON gi.id = gg.itemid
-                     WHERE gi.courseid = ?
-                       AND gi.itemtype = ?
-                       AND gg.userid = ?";
+                               gg.finalgrade
+                          FROM {grade_items} gi
+               LEFT OUTER JOIN {grade_grades} gg
+                            ON gi.id = gg.itemid
+                         WHERE gi.courseid = ?
+                           AND gi.itemtype = ?
+                           AND gg.userid = ?";
         if ($gradedavtivities = $DB->get_records_sql($sqlactivity, array($courseid, 'mod', $studentid))) {
             $numofactivities = 0;
             $numofgraded = 0;
@@ -891,7 +905,8 @@ function block_fn_mentor_grade_summary($studentid, $courseid=0) {
                     $numofgraded++;
                 }
             }
-            $data->numofcompleted = "$numofgraded/$numofactivities";
+            $totalnumofgraded = $nogradeassignments + $numofgraded;
+            $data->numofcompleted = "$totalnumofgraded/$numofactivities";
             $data->percentageofcompleted = round(($numofgraded / $numofactivities) * 100);
         } else {
             $data->numofcompleted = "N/A";
@@ -1643,18 +1658,17 @@ function block_fn_mentor_send_notifications($notificationid=null, $output=false)
     $studentroleid = get_config('block_fn_mentor', 'studentrole');
     $teacherroleid = get_config('block_fn_mentor', 'teacherrole');
 
-    if ($notificationrules = $DB->get_records('block_fn_mentor_notific')) {
+    if ($notificationid && $notificationid != -1) {
+        $notificationrules = $DB->get_records('block_fn_mentor_notific', array('id' => $notificationid));
+    } else {
+        $notificationrules = $DB->get_records('block_fn_mentor_notific');
+    }
 
+    if ($notificationrules) {
         foreach ($notificationrules as $notificationrule) {
-
-            if ($notificationid && $notificationid <> $notificationrule->id) {
-                continue;
-            }
-
             if (!$notificationrule->crontime) {
                 $notificationrule->crontime = '2000-01-01';
             }
-
             $date1 = new DateTime($notificationrule->crontime);
             $now = new DateTime(date("Y-m-d"));
 
@@ -1676,7 +1690,7 @@ function block_fn_mentor_send_notifications($notificationid=null, $output=false)
             $courses = array();
             $notificationmessage = array();
 
-            $getcourses = function($category, &$courses){
+            $getcourses = function($category, &$courses) use (&$getcourses) {
                 if ($category->courses) {
                     foreach ($category->courses as $course) {
                         $courses[] = $course->id;
@@ -2117,7 +2131,7 @@ function block_fn_mentor_embed ($text, $id) {
     );
 };
 
-function block_fn_mentor_activity_progress($course, $menteeid) {
+function block_fn_mentor_activity_progress($course, $menteeid, $modgradesarray) {
     global $CFG, $DB, $SESSION;
 
     // Count grade to pass activities.
@@ -2162,75 +2176,90 @@ function block_fn_mentor_activity_progress($course, $menteeid) {
             if (!$activity->visible) {
                 continue;
             }
-            $data = $completion->get_data($activity, true, $menteeid, null);
-            $completionstate = $data->completionstate;
-            $assignmentstatus = block_fn_mentor_assignment_status($activity, $menteeid);
+            // Skip non tracked activities.
+            if ($activity->completion == COMPLETION_TRACKING_NONE) {
+                continue;
+            }
+            if (! isset($modgradesarray[$activity->modname])) {
+                continue;
+            }
+            // Don't count it if you can't see it.
+            $mcontext = context_module::instance($activity->id);
+            if (!$activity->visible && !has_capability('moodle/course:viewhiddenactivities', $mcontext)) {
+                continue;
+            }
+            $instance = $DB->get_record($activity->modname, array("id" => $activity->instance));
+            $item = $DB->get_record('grade_items',
+                array("itemtype" => 'mod', "itemmodule" => $activity->modname, "iteminstance" => $activity->instance)
+            );
 
-            // COMPLETION_INCOMPLETE.
-            if ($completionstate == COMPLETION_INCOMPLETE) {
-                // Show activity as complete when conditions are met.
-                if (($activity->module == 1)
-                    && ($activity->modname == 'assignment' || $activity->modname == 'assign')
-                    && ($activity->completion == COMPLETION_TRACKING_AUTOMATIC)
-                    && $assignmentstatus) {
+            $libfile = $CFG->dirroot . '/mod/' . $activity->modname . '/lib.php';
 
-                    if (isset($assignmentstatus)) {
-                        if ($assignmentstatus == 'saved') {
-                            $savedactivities++;
-                        } else if ($assignmentstatus == 'submitted') {
-                            $notattemptedactivities++;
-                        } else if ($assignmentstatus == 'waitinggrade') {
-                            $waitingforgradeactivities++;
+            if (file_exists($libfile)) {
+                require_once($libfile);
+                $gradefunction = $activity->modname . "_get_user_grades";
+
+                if ((($activity->modname != 'forum') || ($instance->assessed > 0))
+                    && isset($modgradesarray[$activity->modname])) {
+
+                    if (function_exists($gradefunction)) {
+
+                        if (($activity->modname == 'quiz') || ($activity->modname == 'forum')) {
+
+                            if ($grade = $gradefunction($instance, $menteeid)) {
+                                if ($item->gradepass > 0) {
+                                    if ($grade[$menteeid]->rawgrade >= $item->gradepass) {
+                                        // Passed
+                                        ++$completedactivities;
+                                    } else {
+                                        // Failed
+                                        ++$incompletedactivities;
+                                    }
+                                } else {
+                                    // Graded
+                                    ++$completedactivities;
+                                }
+                            } else {
+                                // Ungraded
+                                ++$notattemptedactivities;
+                            }
+                        } else if ($modstatus = block_fn_mentor_assignment_status($activity, $menteeid, true)) {
+                            switch ($modstatus) {
+                                case 'submitted':
+                                    if ($instance->grade == 0) {
+                                        // Graded
+                                        ++$completedactivities;
+                                    } elseif ($grade = $gradefunction($instance, $menteeid)) {
+                                        if ($item->gradepass > 0) {
+                                            if ($grade[$menteeid]->rawgrade >= $item->gradepass) {
+                                               // Passed
+                                                ++$completedactivities;
+                                            } else {
+                                                // Fail.
+                                                ++$incompletedactivities;
+                                            }
+                                        } else {
+                                            // Graded
+                                            ++$completedactivities;
+                                        }
+                                    }
+                                    break;
+
+                                case 'saved':
+                                    // Saved
+                                    ++$savedactivities;
+                                    break;
+
+                                case 'waitinggrade':
+                                    // Waiting for grade
+                                    ++$waitingforgradeactivities;
+                                    break;
+                            }
+                        } else {
+                            // Ungraded
+                            ++$notattemptedactivities;
                         }
-                    } else {
-                        $notattemptedactivities++;
                     }
-                } else {
-                    $notattemptedactivities++;
-                }
-                // COMPLETION_COMPLETE - COMPLETION_COMPLETE_PASS.
-            } else if ($completionstate == COMPLETION_COMPLETE || $completionstate == COMPLETION_COMPLETE_PASS) {
-                if (($activity->module == 1)
-                    && ($activity->modname == 'assignment' || $activity->modname == 'assign')
-                    && ($activity->completion == COMPLETION_TRACKING_AUTOMATIC)
-                    && $assignmentstatus) {
-
-                    if (isset($assignmentstatus)) {
-                        if ($assignmentstatus == 'saved') {
-                            $savedactivities++;
-                        } else if ($assignmentstatus == 'submitted') {
-                            $completedactivities++;
-                        } else if ($assignmentstatus == 'waitinggrade') {
-                            $waitingforgradeactivities++;
-                        }
-                    } else {
-                        $completedactivities++;
-                    }
-                } else {
-                    $completedactivities++;
-                }
-
-                // COMPLETION_COMPLETE_FAIL.
-            } else if ($completionstate == 3) {
-                // Show activity as complete when conditions are met.
-                if (($activity->module == 1)
-                    && ($activity->modname == 'assignment' || $activity->modname == 'assign')
-                    && ($activity->completion == COMPLETION_TRACKING_AUTOMATIC)
-                    && $assignmentstatus) {
-
-                    if (isset($assignmentstatus)) {
-                        if ($assignmentstatus == 'saved') {
-                            $savedactivities++;
-                        } else if ($assignmentstatus == 'submitted') {
-                            $incompletedactivities++;
-                        } else if ($assignmentstatus == 'waitinggrade') {
-                            $waitingforgradeactivities++;
-                        }
-                    } else {
-                        $incompletedactivities++;
-                    }
-                } else {
-                    $incompletedactivities++;
                 }
             }
         }

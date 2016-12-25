@@ -32,6 +32,14 @@ $menteeid      = optional_param('menteeid', 0, PARAM_INT);
 $courseid      = optional_param('courseid', 0, PARAM_INT);
 $navpage       = optional_param('page', 'overview', PARAM_TEXT);
 
+// Array of functions to call for grading purposes for modules.
+$modgradesarray = array(
+    'assign' => 'assign.submissions.fn.php',
+    'quiz' => 'quiz.submissions.fn.php',
+    'assignment' => 'assignment.submissions.fn.php',
+    'forum' => 'forum.submissions.fn.php',
+);
+
 $allownotes = get_config('block_fn_mentor', 'allownotes');
 
 require_login(null, false);
@@ -307,7 +315,7 @@ if ($navpage == 'overview') {
 
     $context = context_course::instance($course->id);
 
-    $progressdata = block_fn_mentor_activity_progress($course, $menteeid);
+    $progressdata = block_fn_mentor_activity_progress($course, $menteeid, $modgradesarray);
 
     $progress = '';
 
@@ -436,14 +444,6 @@ if ($navpage == 'overview') {
     echo '</tr>';
     echo '<tr>';
     echo '<td class="white mentee-blue-border" align="middle">';
-
-    // Array of functions to call for grading purposes for modules.
-    $modgradesarray = array(
-        'assign' => 'assign.submissions.fn.php',
-        'quiz' => 'quiz.submissions.fn.php',
-        'assignment' => 'assignment.submissions.fn.php',
-        'forum' => 'forum.submissions.fn.php',
-    );
 
     list($simplegradebook, $weekactivitycount, $courseformat) = block_fn_mentor_simplegradebook(
         $course, $menteeuser, $modgradesarray

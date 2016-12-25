@@ -69,6 +69,15 @@ if ($notificationrules = $DB->get_records('block_fn_mentor_notific')) {
     }
 }
 
+$hiddenfields = array(
+    'id' => -1,
+    'action' => 'sendall',
+    'sesskey' => sesskey(),
+);
+echo block_fn_mentor_single_button_form ('runallrules',
+    new moodle_url('/blocks/fn_mentor/notification_send.php'), $hiddenfields,
+    get_string('runallrules', 'block_fn_mentor')
+);
 echo block_fn_mentor_single_button_form ('create_new_rule',
     new moodle_url('/blocks/fn_mentor/notification.php'), null, get_string('create_new_rule', 'block_fn_mentor')
 );

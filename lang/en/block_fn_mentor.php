@@ -221,3 +221,6 @@ $string['showallmentors'] = 'Show all Mentors';
 $string['myprogress'] = 'My Progress';
 $string['blockinfo'] = 'Block info';
 $string['blockinfo'] = 'Block info';
+$string['updatealluserreport'] = 'Update all user report';
+$string['sendusernotification'] = 'Send user notification';
+$string['runallrules'] = 'Run all rules';

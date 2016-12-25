@@ -28,6 +28,14 @@ require_once($CFG->dirroot . '/notes/lib.php');
 $menteeid      = optional_param('menteeid', 0, PARAM_INT);
 $courseid      = optional_param('courseid', 0, PARAM_INT);
 
+// Array of functions to call for grading purposes for modules.
+$modgradesarray = array(
+    'assign' => 'assign.submissions.fn.php',
+    'quiz' => 'quiz.submissions.fn.php',
+    'assignment' => 'assignment.submissions.fn.php',
+    'forum' => 'forum.submissions.fn.php',
+);
+
 require_login(null, false);
 
 // PERMISSION.
@@ -325,7 +333,7 @@ if ($enrolledcourses) {
 
         $context = context_course::instance($course->id);
 
-        $progressdata = block_fn_mentor_activity_progress($course, $menteeid);
+        $progressdata = block_fn_mentor_activity_progress($course, $menteeid, $modgradesarray);
 
         $progresshtml = '';
 

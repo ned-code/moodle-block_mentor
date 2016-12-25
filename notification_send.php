@@ -56,7 +56,12 @@ if (($action == 'send') && ($id)) {
 }
 
 if ($process) {
-    $report = block_fn_mentor_send_notifications($notificationrule->id, true);
+    if (($action == 'sendall')) {
+        $notificationid = -1;
+    } else {
+        $notificationid = $notificationrule->id;
+    }
+    $report = block_fn_mentor_send_notifications($notificationid, true);
     echo $OUTPUT->header();
 
     $redirecturl = new moodle_url('/blocks/fn_mentor/notification_rules.php');
@@ -75,8 +80,6 @@ if ($process) {
            </div>
          </div>';
 
-
-
     echo $OUTPUT->footer();
 } else {
     echo $OUTPUT->header();
@@ -86,7 +89,7 @@ if ($process) {
         '<br><img style="margin-left: 60px;" src="'.$OUTPUT->pix_url('email3', 'block_fn_mentor').'"></div>';
     echo $OUTPUT->confirm(get_string('confirmsend', 'block_fn_mentor'),
         new moodle_url('/blocks/fn_mentor/notification_send.php',
-            array('id' => $id, 'process' => 1)
+            array('id' => $id, 'action' => $action, 'sesskey' => sesskey(), 'process' => 1)
         ), '/blocks/fn_mentor/notification_rules.php'
     );
     echo '</span>';
