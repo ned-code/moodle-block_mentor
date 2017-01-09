@@ -2554,6 +2554,13 @@ function block_fn_mentor_generate_report(progress_bar $progressbar = null) {
     $inprogress = get_config('block_fn_mentor', 'inprogress');
     $reportdate = get_config('block_fn_mentor', 'reportdate');
 
+    $modgradesarray = array(
+        'assign' => 'assign.submissions.fn.php',
+        'quiz' => 'quiz.submissions.fn.php',
+        'assignment' => 'assignment.submissions.fn.php',
+        'forum' => 'forum.submissions.fn.php',
+    );
+
     if ($inprogress && ((time() - $reportdate) < 10 * 60)) {
         return;
     } else {
@@ -2574,7 +2581,7 @@ function block_fn_mentor_generate_report(progress_bar $progressbar = null) {
         if ($enrolledcourses = enrol_get_all_users_courses($student->id, true , 'id,fullname,shortname', 'fullname ASC')) {
             foreach ($enrolledcourses as $key => $enrolledcourse) {
                 $course = $DB->get_record('course', array('id' => $enrolledcourse->id));
-                $progressdata = block_fn_mentor_activity_progress($course, $student->id);
+                $progressdata = block_fn_mentor_activity_progress($course, $student->id, $modgradesarray);
                 $progressdata->completed;
                 $progressdata->total;
                 $percentageofcompletion = 0;
