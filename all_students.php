@@ -824,7 +824,7 @@ foreach ($tablerows as $tablerow) {
                 }
                 break;
             case 'name':
-                $tablerow->$column = (strlen($tablerow->$column) > 16) ? substr($tablerow->$column, 0, 16) : $tablerow->$column;
+                $tablerow->$column = (strlen($tablerow->$column) > 16) ? mb_substr($tablerow->$column, 0, 16) : $tablerow->$column;
 
                 if (block_fn_mentor_get_mentors($tablerow->userid)) {
                     $$varname = new html_table_cell(
