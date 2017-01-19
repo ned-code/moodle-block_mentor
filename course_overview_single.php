@@ -241,15 +241,17 @@ if ($courseid == 0) {
         $menteeid.'&courseid=0">'.get_string('allcourses', 'block_fn_mentor').'</a></div>';
 }
 foreach ($enrolledcourses as $enrolledcourse) {
+    $course_fullname = format_string($enrolledcourse->fullname); //allow mlang filters to process language strings
+    
     if ($courseid == $enrolledcourse->id) {
         $courselist .= '<div class="courselist active"><img class="mentees-course-bullet" src="'.
             $CFG->wwwroot.'/blocks/fn_mentor/pix/b.gif"><a href="'.$CFG->wwwroot.
             '/blocks/fn_mentor/course_overview_single.php?menteeid='.$menteeid.
-            '&courseid='.$enrolledcourse->id.'">'.$enrolledcourse->fullname.'</a></div>';
+            '&courseid='.$enrolledcourse->id.'">'.$course_fullname.'</a></div>';
     } else {
         $courselist .= '<div class="courselist"><img class="mentees-course-bullet" src="'.$CFG->wwwroot.
             '/blocks/fn_mentor/pix/b.gif"><a href="'.$CFG->wwwroot.'/blocks/fn_mentor/course_overview_single.php?menteeid='.
-            $menteeid.'&courseid='.$enrolledcourse->id.'">'.$enrolledcourse->fullname.'</a></div>';
+            $menteeid.'&courseid='.$enrolledcourse->id.'">'.$course_fullname.'</a></div>';
     }
 }
 
@@ -284,12 +286,13 @@ if ($navpage == 'overview') {
 }
 
 // CENTER.
+$course_fullname = format_string($course->fullname); //allow mlang filters to process language strings
 echo '<div id="mentee-course-overview-center-single" class="block">'.
     '<div id="mentee-course-overview-center-menu-container">';
 echo '<div class="mentee-course-overview-center-course-title"><a  href="'.$CFG->wwwroot.'/course/view.php?id='.
     $course->id.'" onclick="window.open(\''.$CFG->wwwroot.'/course/view.php?id='.$course->id.
     '\', \'\', \'width=800,height=600,toolbar=no,location=no,menubar=no,copyhistory=no,status=no,directories=no,'.
-    'scrollbars=yes,resizable=yes\'); return false;" class="" >'.$course->fullname.'</a></div>';
+    'scrollbars=yes,resizable=yes\'); return false;" class="" >'.$course_fullname.'</a></div>';
 
 echo '<div class="mentee-course-overview-center-course-menu">
           <table class="mentee-menu">
