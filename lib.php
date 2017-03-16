@@ -1665,6 +1665,7 @@ function block_fn_mentor_send_notifications($notificationid=null, $output=false)
     }
 
     if ($notificationrules) {
+        $DB->execute("UPDATE {block_fn_mentor_notific_msg} SET sent = 1");
         foreach ($notificationrules as $notificationrule) {
             if (!$notificationrule->crontime) {
                 $notificationrule->crontime = '2000-01-01';
@@ -1704,9 +1705,12 @@ function block_fn_mentor_send_notifications($notificationid=null, $output=false)
             };
 
             // CATEGORY.
-            if ($notificationrule->category) {
-
-                $notificationcategories = explode(',', $notificationrule->category);
+            if ($notificationrule->category >= 0) {
+                if ($notificationrule->category === 0) {
+                    $notificationcategories = block_fn_mentor_get_child_categories(0);
+                } else {
+                    $notificationcategories = explode(',', $notificationrule->category);
+                }
 
                 foreach ($notificationcategories as $categoryid) {
 
