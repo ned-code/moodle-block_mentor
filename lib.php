@@ -1705,13 +1705,12 @@ function block_fn_mentor_send_notifications($notificationid=null, $output=false)
             };
 
             // CATEGORY.
-            if ($notificationrule->category >= 0) {
+            if (!is_null($notificationrule->category ) && $notificationrule->category >= 0) {
                 if ($notificationrule->category === 0) {
                     $notificationcategories = block_fn_mentor_get_child_categories(0);
                 } else {
                     $notificationcategories = explode(',', $notificationrule->category);
                 }
-
                 foreach ($notificationcategories as $categoryid) {
 
                     if ($parentcatcourses = $DB->get_records('course', array('category' => $categoryid))) {
@@ -1742,7 +1741,7 @@ function block_fn_mentor_send_notifications($notificationid=null, $output=false)
                 $notification = explode(',', $notificationrule->course);
                 $courses = array_merge($courses, $notification);
             }
-
+            
             // PREPARE NOTIFICATION FOR EACH COURSES.
             foreach ($courses as $courseid) {
                 if ($course = $DB->get_record('course', array('id' => $courseid))) {
