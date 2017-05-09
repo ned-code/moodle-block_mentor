@@ -51,8 +51,11 @@ $PAGE->navbar->add(get_string('notification_rules', 'block_fn_mentor'),
     new moodle_url('/blocks/fn_mentor/notification_rules.php')
 );
 
-if (($action == 'send') && ($id)) {
+if ((($action == 'send') || ($action == 'list')) && ($id)) {
     $notificationrule = $DB->get_record('block_fn_mentor_notific', array('id' => $id), '*', MUST_EXIST);
+    if ($action == 'list') {
+        $process = 1;
+    }
 }
 
 if ($process) {
@@ -61,10 +64,18 @@ if ($process) {
     } else {
         $notificationid = $notificationrule->id;
     }
-    $report = block_fn_mentor_send_notifications($notificationid, true);
-    echo $OUTPUT->header();
 
-    $redirecturl = new moodle_url('/blocks/fn_mentor/notification_rules.php');
+    if ($action == 'list') {
+        $redirecturl = new moodle_url('/blocks/fn_mentor/notification_list.php', array('id' => $notificationrule->id));
+        $report = block_fn_mentor_send_notifications($notificationid, true, true);
+        redirect($redirecturl);
+        die;
+    } else {
+        $redirecturl = new moodle_url('/blocks/fn_mentor/notification_rules.php');
+        $report = block_fn_mentor_send_notifications($notificationid, true, false);
+    }
+    
+    echo $OUTPUT->header();
 
     echo '<div class="box generalbox" id="notice">
           <p>'.$report.'</p>

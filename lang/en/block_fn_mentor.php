@@ -224,3 +224,9 @@ $string['blockinfo'] = 'Block info';
 $string['updatealluserreport'] = 'Update all user report';
 $string['sendusernotification'] = 'Send user notification';
 $string['runallrules'] = 'Run all rules';
+$string['listrecipients'] = 'List recipients';
+$string['followingstudentsmatch'] = 'The following students currently match the criteria of this notification rule';
+$string['followinguserssend'] = 'If this rule is run now, the Mentor Manager will attempt to send notifications 
+to the following users. Note that the colour of the name indicates the role of that user: 
+Green = student, Blue = mentor, Red = teacher.';
+$string['nocoursetotal'] = 'Gradebook does not contain calculation for course total.';

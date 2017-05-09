@@ -485,6 +485,10 @@
 #page-blocks-fn_mentor-course_overview_single .overview-grade-right.red {
     color: red;
 }
+#page-blocks-fn_mentor-course_overview .overview-grade-right-warning,
+#page-blocks-fn_mentor-course_overview_single .overview-grade-right-warning {
+    text-align: center;
+}
 #page-blocks-fn_mentor-course_overview .overview-grade-right.grey,
 #page-blocks-fn_mentor-course_overview_single .overview-grade-right.grey {
     color: #787878;
@@ -829,4 +833,24 @@ a.mentormanagercontainer-footer-link {
 #page-blocks-fn_mentor-course_overview .modal-header {
     background-color: #50b4ef;
     color: white;
+}
+#page-blocks-fn_mentor-notification .recipient-list-desc,
+#page-blocks-fn_mentor-notification_list .recipient-list-desc {
+    font-size: 1.2em;
+    margin: 15px 0 15px 0;
+}
+#page-blocks-fn_mentor-notification .recipient-list-student,
+#page-blocks-fn_mentor-notification_list .recipient-list-student {
+    color: green;
+    padding: 0 0 0 20px;
+}
+#page-blocks-fn_mentor-notification .recipient-list-mentor,
+#page-blocks-fn_mentor-notification_list .recipient-list-mentor {
+    color: blue;
+    padding: 0 0 0 20px;
+}
+#page-blocks-fn_mentor-notification .recipient-list-teacher,
+#page-blocks-fn_mentor-notification_list .recipient-list-student {
+    color: red;
+    padding: 0 0 0 20px;
 }

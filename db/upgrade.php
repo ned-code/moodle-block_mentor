@@ -214,5 +214,37 @@ function xmldb_block_fn_mentor_upgrade($oldversion) {
         }
     }
 
+    if ($oldversion < 2017040500) {
+
+        // Define table block_fn_mentor_notific_list to be created.
+        $table = new xmldb_table('block_fn_mentor_notific_list');
+
+        // Adding fields to table block_fn_mentor_notific_list.
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '18', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('notificationid', XMLDB_TYPE_INTEGER, '18', null, null, null, null);
+        $table->add_field('type', XMLDB_TYPE_CHAR, '255', null, null, null, null);
+        $table->add_field('receiverid', XMLDB_TYPE_INTEGER, '18', null, null, null, null);
+        $table->add_field('userid', XMLDB_TYPE_INTEGER, '18', null, null, null, null);
+        $table->add_field('courseid', XMLDB_TYPE_INTEGER, '18', null, null, null, null);
+        $table->add_field('message', XMLDB_TYPE_TEXT, null, null, null, null, null);
+        $table->add_field('securitykey', XMLDB_TYPE_CHAR, '255', null, null, null, null);
+        $table->add_field('timecreated', XMLDB_TYPE_INTEGER, '18', null, null, null, null);
+        $table->add_field('sent', XMLDB_TYPE_INTEGER, '2', null, null, null, '1');
+
+        // Adding keys to table block_fn_mentor_notific_list.
+        $table->add_key('id', XMLDB_KEY_PRIMARY, array('id'));
+
+        // Adding indexes to table block_fn_mentor_notific_list.
+        $table->add_index('mdl_blocfnmentnotimsg_not_ix', XMLDB_INDEX_NOTUNIQUE, array('notificationid'));
+
+        // Conditionally launch create table for block_fn_mentor_notific_list.
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+
+        // Fn_mentor savepoint reached.
+        upgrade_block_savepoint(true, 2017040500, 'fn_mentor');
+    }
+
     return true;
 }

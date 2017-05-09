@@ -23,6 +23,8 @@
 require_once('../../config.php');
 require_once($CFG->dirroot . '/blocks/fn_mentor/lib.php');
 require_once($CFG->dirroot . '/notes/lib.php');
+require_once($CFG->libdir.'/gradelib.php');
+require_once($CFG->dirroot.'/grade/lib.php');
 
 // Parameters.
 $menteeid      = optional_param('menteeid', 0, PARAM_INT);

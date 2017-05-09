@@ -744,9 +744,11 @@ function block_fn_mentor_grade_summary($studentid, $courseid=0) {
         $passinggrade = 50;
     }
 
-    $gradetotal = array('attempted_grade' => 0,
-                         'attempted_max' => 0,
-                         'all_max' => 0);
+    $gradetotal = array(
+        'attempted_grade' => 0,
+        'attempted_max' => 0,
+        'all_max' => 0
+    );
 
     if ($courseid) {
         $courses[$courseid] = $courseid;
@@ -777,7 +779,10 @@ function block_fn_mentor_grade_summary($studentid, $courseid=0) {
                 if (!isset($modavailable[$mod->modname])) {
                     continue;
                 }
-
+                // Skip non tracked activities.
+                if ($mod->completion == COMPLETION_TRACKING_NONE) {
+                    continue;
+                }
                 if ($mod->groupingid) {
                     $sqlgrouiping = "SELECT 1
                                       FROM {groupings_groups} gg
@@ -850,14 +855,14 @@ function block_fn_mentor_grade_summary($studentid, $courseid=0) {
     if ($courses) {
         foreach ($courses as $id => $value) {
             $sqlcourseaverage = "SELECT gg.id,
-                                gg.rawgrademax,
-                                gg.finalgrade
-                           FROM {grade_items} gi
-                           JOIN {grade_grades} gg
-                             ON gi.id = gg.itemid
-                          WHERE gi.itemtype = ?
-                            AND gi.courseid = ?
-                            AND gg.userid = ?";
+                                        gg.rawgrademax,
+                                        gg.finalgrade
+                                   FROM {grade_items} gi
+                                   JOIN {grade_grades} gg
+                                     ON gi.id = gg.itemid
+                                  WHERE gi.itemtype = ?
+                                    AND gi.courseid = ?
+                                    AND gg.userid = ?";
             if ($courseaverage = $DB->get_record_sql($sqlcourseaverage, array('course', $id, $studentid))) {
                 $coursegrades[$id] = ($courseaverage->finalgrade / $courseaverage->rawgrademax) * 100;
 
@@ -918,8 +923,10 @@ function block_fn_mentor_grade_summary($studentid, $courseid=0) {
 }
 
 function block_fn_mentor_print_grade_summary ($courseid , $studentid) {
-    $html = '';
+    global $OUTPUT;
 
+    $html = '';
+    $courseaverage = block_fn_mentor_get_user_course_average($studentid, $courseid);
     $gradesummary = block_fn_mentor_grade_summary($studentid, $courseid);
 
     $html .= '<table class="mentee-course-overview-grade_table">';
@@ -929,9 +936,21 @@ function block_fn_mentor_print_grade_summary ($courseid , $studentid) {
     $html .= '</tr>';
     $html .= '<tr>';
     $html .= '<td class="overview-grade-left" valign="middle">'.get_string('currentgrade', 'block_fn_mentor').':</td>';
-    $class = ($gradesummary->courseaverage >= 50) ? 'green' : 'red';
+    if ($courseaverage == false) {
+        $class = 'red';
+        $nocoursetotalmsg = get_string('nocoursetotal', 'block_fn_mentor');
+    } else {
+        $class = ($gradesummary->courseaverage >= 50) ? 'green' : 'red';
+        $nocoursetotalmsg = '';
+    }
     $html .= '<td class="overview-grade-right '.$class.'" valign="middle">'.$gradesummary->courseaverage.'%</td>';
     $html .= '</tr>';
+    if ($courseaverage == false) {
+        $warningimg = '<img class="actionicon" width="16" height="16" alt="" src="'.$OUTPUT->pix_url('i/warning', '').'"> ';
+        $html .= '<tr>';
+        $html .= '<td colspan="2" class="overview-grade-right-warning" valign="middle">'.$warningimg.get_string('nocoursetotal', 'block_fn_mentor').'</td>';
+        $html .= '</tr>';
+    }
     $html .= '</table>';
     return $html;
 }
@@ -1294,15 +1313,16 @@ function block_fn_mentor_single_button_form ($class, $url, $hiddens, $buttontext
 function block_fn_mentor_render_notification_rule_table($notification, $number) {
     global $DB;
 
-    $menteeid      = optional_param('menteeid', 0, PARAM_INT);
-    $courseid      = optional_param('courseid', 0, PARAM_INT);
+    $menteeid = optional_param('menteeid', 0, PARAM_INT);
+    $courseid = optional_param('courseid', 0, PARAM_INT);
 
-    $html = '';
-    $html .= '<table class="notification_rule" cellspacing="0">
+    $html = '<table class="notification_rule" cellspacing="0">
                  <tr>
-                    <td colspan="2" class="notification_rule_ruleno"><strong>'.
+                    <td colspan="4" class="notification_rule_ruleno"><strong>'.
         get_string('rule', 'block_fn_mentor').' '.$number.':</strong> '.$notification->name.'</td>
-                    <td colspan="2" class="notification_rule_button">';
+                 </tr>
+                 <tr>
+                    <td colspan="4" class="notification_rule_button">';
 
     $html .= block_fn_mentor_single_button_form (
         'create_new_rule',
@@ -1310,6 +1330,13 @@ function block_fn_mentor_render_notification_rule_table($notification, $number) 
             array('id' => $notification->id, 'action' => 'send', 'sesskey' => sesskey())
         ),
         null, get_string('run_now', 'block_fn_mentor')
+    );
+    $html .= block_fn_mentor_single_button_form (
+        'create_new_rule',
+        new moodle_url('/blocks/fn_mentor/notification_send.php',
+            array('id' => $notification->id, 'action' => 'list', 'sesskey' => sesskey())
+        ),
+        null, get_string('listrecipients', 'block_fn_mentor')
     );
     $html .= block_fn_mentor_single_button_form (
         'create_new_rule',
@@ -1650,7 +1677,7 @@ function block_fn_mentor_note_print($note, $detail = NOTES_SHOW_FULL) {
     echo '</div>';
 }
 
-function block_fn_mentor_send_notifications($notificationid=null, $output=false) {
+function block_fn_mentor_send_notifications($notificationid=null, $output=false, $list=false) {
     global $DB;
 
     $notificationreport = '';
@@ -1664,9 +1691,19 @@ function block_fn_mentor_send_notifications($notificationid=null, $output=false)
         $notificationrules = $DB->get_records('block_fn_mentor_notific');
     }
 
+    if ($list) {
+        $notificationtbl = 'block_fn_mentor_notific_list';
+    } else {
+        $notificationtbl = 'block_fn_mentor_notific_msg';
+    }
+
     if ($notificationrules) {
-        $DB->execute("UPDATE {block_fn_mentor_notific_msg} SET sent = 1");
+        $DB->execute("UPDATE {" . $notificationtbl . "} SET sent = 1 WHERE notificationid = ? AND sent = 0", array($notificationid));
         foreach ($notificationrules as $notificationrule) {
+            if ($list) {
+                $DB->execute("DELETE FROM {" . $notificationtbl . "} WHERE notificationid = ?", array($notificationid));
+            }
+
             if (!$notificationrule->crontime) {
                 $notificationrule->crontime = '2000-01-01';
             }
@@ -1684,14 +1721,15 @@ function block_fn_mentor_send_notifications($notificationid=null, $output=false)
                 && !($notificationrule->g4 && $notificationrule->g4_value)
                 && !($notificationrule->g6 && $notificationrule->g6_value)
                 && !($notificationrule->n1 && $notificationrule->n1_value)
-                && !($notificationrule->n2 && $notificationrule->n2_value) ) {
+                && !($notificationrule->n2 && $notificationrule->n2_value)
+            ) {
                 continue;
             }
 
             $courses = array();
             $notificationmessage = array();
 
-            $getcourses = function($category, &$courses) use (&$getcourses) {
+            $getcourses = function ($category, &$courses) use (&$getcourses) {
                 if ($category->courses) {
                     foreach ($category->courses as $course) {
                         $courses[] = $course->id;
@@ -1705,7 +1743,7 @@ function block_fn_mentor_send_notifications($notificationid=null, $output=false)
             };
 
             // CATEGORY.
-            if (!is_null($notificationrule->category ) && $notificationrule->category >= 0) {
+            if (!is_null($notificationrule->category) && $notificationrule->category >= 0) {
                 if ($notificationrule->category === 0) {
                     $notificationcategories = block_fn_mentor_get_child_categories(0);
                 } else {
@@ -1741,7 +1779,7 @@ function block_fn_mentor_send_notifications($notificationid=null, $output=false)
                 $notification = explode(',', $notificationrule->course);
                 $courses = array_merge($courses, $notification);
             }
-            
+
             // PREPARE NOTIFICATION FOR EACH COURSES.
             foreach ($courses as $courseid) {
                 if ($course = $DB->get_record('course', array('id' => $courseid))) {
@@ -1761,41 +1799,42 @@ function block_fn_mentor_send_notifications($notificationid=null, $output=false)
                                 ' ' . $student->lastname;
 
                             if ($notificationrule->g2) {
-                                $message .= '<li>'.get_string('g2_message', 'block_fn_mentor',
-                                        array('firstname' => $student->firstname, 'g2' => $gradesummary->courseaverage)).'</li>';
+                                $message .= '<li>' . get_string('g2_message', 'block_fn_mentor',
+                                        array('firstname' => $student->firstname, 'g2' => $gradesummary->courseaverage)) . '</li>';
                                 $notificationmessage[$student->id][$course->id]['coursename'] = $course->fullname;
                                 $notificationmessage[$student->id][$course->id]['message'] = $message;
                             }
                             if ($notificationrule->g4 && $notificationrule->g4_value) {
                                 if ($gradesummary->courseaverage < $notificationrule->g4_value) {
-                                    $message .= '<li>'.get_string('g4_message', 'block_fn_mentor',
+                                    $message .= '<li>' . get_string('g4_message', 'block_fn_mentor',
                                             array('firstname' => $student->firstname,
                                                 'g4' => $gradesummary->courseaverage,
                                                 'g4_value' => $notificationrule->g3_value)
-                                        ).'</li>';
+                                        ) . '</li>';
                                     $notificationmessage[$student->id][$course->id]['coursename'] = $course->fullname;
                                     $notificationmessage[$student->id][$course->id]['message'] = $message;
                                 }
                             }
                             if ($notificationrule->g6 && $notificationrule->g6_value) {
                                 if ($gradesummary->courseaverage > $notificationrule->g6_value) {
-                                    $message .= '<li>'.get_string('g6_message', 'block_fn_mentor',
+                                    $message .= '<li>' . get_string('g6_message', 'block_fn_mentor',
                                             array('firstname' => $student->firstname,
                                                 'g6' => $gradesummary->courseaverage,
                                                 'g6_value' => $notificationrule->g6_value)
-                                        ).'</li>';
+                                        ) . '</li>';
                                     $notificationmessage[$student->id][$course->id]['coursename'] = $course->fullname;
                                     $notificationmessage[$student->id][$course->id]['message'] = $message;
                                 }
                             }
 
                             if ($notificationrule->n1 && $notificationrule->n1_value) {
+                                $lastaccess = 0;
                                 if ($student->lastaccess > 0) {
                                     $lastaccess = round(((time() - $student->lastaccess) / (24 * 60 * 60)), 0);
                                 }
                                 if ($lastaccess >= $notificationrule->n1_value) {
-                                    $message .= '<li>'.get_string('n1_message', 'block_fn_mentor',
-                                            array('firstname' => $student->firstname, 'n1' => $lastaccess)).'</li>';
+                                    $message .= '<li>' . get_string('n1_message', 'block_fn_mentor',
+                                            array('firstname' => $student->firstname, 'n1' => $lastaccess)) . '</li>';
                                     $notificationmessage[$student->id][$course->id]['coursename'] = $course->fullname;
                                     $notificationmessage[$student->id][$course->id]['message'] = $message;
                                 }
@@ -1805,8 +1844,8 @@ function block_fn_mentor_send_notifications($notificationid=null, $output=false)
                                 $lastactivity = block_fn_mentor_last_activity($student->id);
                                 if (is_numeric($lastactivity)) {
                                     if ($lastactivity >= $notificationrule->n2_value) {
-                                        $message .= '<li>'.get_string('n2_message', 'block_fn_mentor',
-                                                array('firstname' => $student->firstname, 'n2' => $lastactivity)).'</li>';
+                                        $message .= '<li>' . get_string('n2_message', 'block_fn_mentor',
+                                                array('firstname' => $student->firstname, 'n2' => $lastactivity)) . '</li>';
                                         $notificationmessage[$student->id][$course->id]['coursename'] = $course->fullname;
                                         $notificationmessage[$student->id][$course->id]['message'] = $message;
                                     }
@@ -1819,7 +1858,6 @@ function block_fn_mentor_send_notifications($notificationid=null, $output=false)
 
             // SEND EMAILS FOR EACH RULE.
             foreach ($notificationmessage as $studentid => $coursemessages) {
-
                 // STUDENT.
                 if (!$student = $DB->get_record('user', array('id' => $studentid))) {
                     continue;
@@ -1859,7 +1897,7 @@ function block_fn_mentor_send_notifications($notificationid=null, $output=false)
                                 $rec->timecreated = $time;
                                 $rec->securitykey = md5(uniqid(rand(), true));
                                 $rec->sent = 0;
-                                $DB->insert_record('block_fn_mentor_notific_msg', $rec);
+                                $DB->insert_record($notificationtbl, $rec);
                             }
                         }
                     }
@@ -1876,7 +1914,7 @@ function block_fn_mentor_send_notifications($notificationid=null, $output=false)
                         $rec->timecreated = $time;
                         $rec->securitykey = md5(uniqid(rand(), true));
                         $rec->sent = 0;
-                        $DB->insert_record('block_fn_mentor_notific_msg', $rec);
+                        $DB->insert_record($notificationtbl, $rec);
                     }
 
                     // MENTOR.
@@ -1896,16 +1934,19 @@ function block_fn_mentor_send_notifications($notificationid=null, $output=false)
                             $rec->timecreated = $time;
                             $rec->securitykey = md5(uniqid(rand(), true));
                             $rec->sent = 0;
-                            $DB->insert_record('block_fn_mentor_notific_msg', $rec);
+                            $DB->insert_record($notificationtbl, $rec);
                         }
                     }
                 }
             }
-            $updatesql = "UPDATE {block_fn_mentor_notific} SET crontime=? WHERE id=?";
-            $DB->execute($updatesql, array(date("Y-m-d"), $notificationrule->id));
+            if (!$list) {
+                $updatesql = "UPDATE {block_fn_mentor_notific} SET crontime=? WHERE id=?";
+                $DB->execute($updatesql, array(date("Y-m-d"), $notificationrule->id));
+            }
         } // END OF EACH NOTIFICATION.
-
-        $notificationreport .= block_fn_mentor_group_messages();
+        if (!$list) {
+            $notificationreport .= block_fn_mentor_group_messages($list);
+        }
     }
 
     if ($output) {
@@ -1913,7 +1954,7 @@ function block_fn_mentor_send_notifications($notificationid=null, $output=false)
     }
 }
 
-function block_fn_mentor_group_messages () {
+function block_fn_mentor_group_messages($list=false) {
     global $DB;
 
     $site = get_site();
@@ -1944,11 +1985,14 @@ function block_fn_mentor_group_messages () {
             $emailbody = '';
             $notification = $DB->get_record('block_fn_mentor_notific', array('id' => $group->notificationid));
 
-            if ($messages = $DB->get_records('block_fn_mentor_notific_msg',
-                array('receiverid' => $group->receiverid, 'type' => $group->type, 'timecreated' => $group->timecreated,
-                    'notificationid' => $group->notificationid, 'sent' => '0'
-                ), 'userid ASC'
-            )) {
+            $params = array(
+                'receiverid' => $group->receiverid,
+                'type' => $group->type,
+                'timecreated' => $group->timecreated,
+                'notificationid' => $group->notificationid,
+                'sent' => 0
+            );
+            if ($messages = $DB->get_records('block_fn_mentor_notific_msg', $params, 'userid ASC')) {
                 $appendedmessage = '';
                 $greetings = '';
                 if (($group->type == 'student') && $notification->studentmsgenabled) {
@@ -2036,7 +2080,7 @@ function block_fn_mentor_group_messages () {
                     }
                     $emailsent = $group->type . 'email';
                     $smssent = $group->type . 'sms';
-                    if ($notification->$emailsent) {
+                    if ($notification->$emailsent && !$list) {
                         $emailbody = $greetings.$emailbody;
                         if (email_to_user($to, $supportuser, $subject, '', $emailbody)) {
                             $sent = 1;
@@ -2048,7 +2092,7 @@ function block_fn_mentor_group_messages () {
                         }
                     }
 
-                    if ($notification->$smssent) {
+                    if ($notification->$smssent && !$list) {
                         if (block_fn_mentor_sms_to_user($to, $supportuser, $subject, '', $smsbody)) {
                             $sent = 1;
                             $notificationreport .= $to->firstname . ' ' . $to->lastname .
@@ -2065,7 +2109,7 @@ function block_fn_mentor_group_messages () {
             }
         }
     }
-    if (!$notificationreport) {
+    if (!$notificationreport ||  $list) {
         return get_string('nomessagessent', 'block_fn_mentor').'<br>';
     }
     return $notificationreport;
@@ -2800,4 +2844,19 @@ function block_fn_mentor_modal_win($modalid, $linktext, $coursename, $sidelable,
             </table>
           </div>
         </div>';
+}
+
+function block_fn_mentor_get_user_course_average($userid, $courseid) {
+    global $DB;
+
+    if ($gradeitem = $DB->get_record('grade_items', array('courseid' => $courseid, 'itemtype' => 'course'))) {
+        if ($gradeitem->gradetype == GRADE_TYPE_NONE) {
+            return false;
+        }
+        if ($grade = $DB->get_record('grade_grades', array('itemid' => $gradeitem->id, 'userid' => $userid))) {
+            return $grade;
+        }
+        return -1;
+    }
+    return false;
 }
