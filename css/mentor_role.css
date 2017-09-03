@@ -1,0 +1,64 @@
+#page-blocks-fn_mentor-mentor_role table.assigntable {
+    margin: auto;
+}
+#page-blocks-fn_mentor-mentor_role #potential-mentor-cell,
+#page-blocks-fn_mentor-mentor_role #selected-mentor-cell {
+    width: 40%;
+}
+#page-blocks-fn_mentor-mentor_role #mentor-action-btn-cell {
+    width: 20%;
+    vertical-align: middle !important;
+}
+#page-blocks-fn_mentor-mentor_role select#selected-mentor {
+    background-color: #D7FBD7;
+}
+#page-blocks-fn_mentor-mentor_role select#potential-mentor-filter,
+#page-blocks-fn_mentor-mentor_role select#selected-mentor-filter,
+#page-blocks-fn_mentor-mentor_role select#potential-mentor,
+#page-blocks-fn_mentor-mentor_role select#selected-mentor,
+#page-blocks-fn_mentor-mentor_role select#selected-mentor {
+    width: 350px;
+    margin-bottom: 5px;
+    display: block;
+}
+#page-blocks-fn_mentor-mentor_role .assign-group-button {
+    box-sizing: border-box;
+    display: block;
+    margin: auto;
+    padding-left: 0;
+    padding-right: 0;
+    width: 100%;
+}
+#page-blocks-fn_mentor-mentor_role .assigntable td {
+    padding: 0.2em 0.3em;
+    vertical-align: top;
+}
+#page-blocks-fn_mentor-mentor_role .no-overflow {
+    position: relative;
+}
+#page-blocks-fn_mentor-mentor_role #group-selection-form {
+    text-align: center;
+}
+#page-blocks-fn_mentor-mentor_role .import-export-user-wrapper {
+    text-align: center;
+}
+#page-blocks-fn_mentor-mentor_role .import-export-user-form {
+    display: inline;
+}
+#page-blocks-fn_mentor-mentor_role .manage-group-link {
+    margin-left: 10px;
+}
+
+#page-blocks-fn_mentor-mentor_role #potential-mentor-search-text,
+#page-blocks-fn_mentor-mentor_role #selected-mentor-search-text {
+    background-clip: padding-box;
+    background-color: #fff;
+    background-image: none;
+    border: 1px solid rgba(0, 0, 0, 0.15);
+    border-radius: 0.25rem;
+    color: #55595c;
+    font-size: 1rem;
+    line-height: 1.25;
+    padding: 0.5rem 0.75rem;
+    margin-right: 10px;
+}

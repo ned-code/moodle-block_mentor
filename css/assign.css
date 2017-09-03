@@ -1,0 +1,76 @@
+#page-blocks-fn_mentor-assign #potential-mentor-cell,
+#page-blocks-fn_mentor-assign #selected-mentor-cell,
+#page-blocks-fn_mentor-assign #selected-mentee-cell,
+#page-blocks-fn_mentor-assign #potential-mentee-cell {
+    width: 20%;
+}
+#page-blocks-fn_mentor-assign select#selected-mentor,
+#page-blocks-fn_mentor-assign select#selected-mentee {
+    background-color: #D7FBD7;
+}
+#page-blocks-fn_mentor-assign #mentor-action-btn-cell,
+#page-blocks-fn_mentor-assign #mentee-action-btn-cell {
+    width: 10%;
+    vertical-align: middle !important;
+}
+#page-blocks-fn_mentor-assign select#potential-mentor-filter,
+#page-blocks-fn_mentor-assign select#potential-mentor,
+#page-blocks-fn_mentor-assign select#selected-mentor,
+#page-blocks-fn_mentor-assign select#potential-mentee,
+#page-blocks-fn_mentor-assign select#potential-mentee-filter,
+#page-blocks-fn_mentor-assign select#selected-mentee {
+    width: 100%;
+    margin-bottom: 5px;
+}
+#page-blocks-fn_mentor-assign .assign-group-button {
+    box-sizing: border-box;
+    display: block;
+    margin: auto;
+    padding-left: 0;
+    padding-right: 0;
+    width: 100%;
+}
+#page-blocks-fn_mentor-assign .assigntable td {
+    padding: 0.2em 0.3em;
+    vertical-align: top;
+}
+#page-blocks-fn_mentor-assign .no-overflow {
+    position: relative;
+}
+#page-blocks-fn_mentor-assign #page-loading {
+    height: 66px;
+    left: 50%;
+    margin: -33px 0 0 -33px;
+    position: absolute;
+    top: 50% !important;
+    width: 66px;
+}
+#page-blocks-fn_mentor-assign #group-selection-form {
+    text-align: center;
+}
+#page-blocks-fn_mentor-importexport .import-export-user-wrapper {
+    text-align: center;
+}
+#page-blocks-fn_mentor-importexport .import-export-user-form {
+    display: inline;
+}
+#page-blocks-fn_mentor-importexport p.warning-msg {
+    color: red;
+}
+#page-blocks-fn_mentor-importexport .import-export-page-desc {
+    margin: 20px auto;
+    max-width: 700px;
+}
+#page-blocks-fn_mentor-assign #potential-mentor-search-text,
+#page-blocks-fn_mentor-assign #potential-mentee-search-text{
+    background-clip: padding-box;
+    background-color: #fff;
+    background-image: none;
+    border: 1px solid rgba(0, 0, 0, 0.15);
+    border-radius: 0.25rem;
+    color: #55595c;
+    font-size: 1rem;
+    line-height: 1.25;
+    padding: 0.5rem 0.75rem;
+    margin-right: 10px;
+}

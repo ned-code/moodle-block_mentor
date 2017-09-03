@@ -246,5 +246,166 @@ function xmldb_block_fn_mentor_upgrade($oldversion) {
         upgrade_block_savepoint(true, 2017040500, 'fn_mentor');
     }
 
+    if ($oldversion < 2017060600) {
+
+        $table = new xmldb_table('block_fn_mentor_notific');
+
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '18', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('name', XMLDB_TYPE_CHAR, '255', null, null, null, null);
+        $table->add_field('category', XMLDB_TYPE_TEXT, null, null, null, null, null);
+        $table->add_field('course', XMLDB_TYPE_TEXT, null, null, null, null, null);
+        $table->add_field('user', XMLDB_TYPE_INTEGER, '18', null, null, null, null);
+        $table->add_field('g1', XMLDB_TYPE_INTEGER, '2', null, null, null, null);
+        $table->add_field('g2', XMLDB_TYPE_INTEGER, '2', null, null, null, null);
+        $table->add_field('g3', XMLDB_TYPE_INTEGER, '2', null, null, null, null);
+        $table->add_field('g3_value', XMLDB_TYPE_CHAR, '255', null, null, null, null);
+        $table->add_field('g4', XMLDB_TYPE_INTEGER, '2', null, null, null, null);
+        $table->add_field('g4_value', XMLDB_TYPE_CHAR, '255', null, null, null, null);
+        $table->add_field('g5', XMLDB_TYPE_INTEGER, '2', null, null, null, null);
+        $table->add_field('g5_value', XMLDB_TYPE_CHAR, '255', null, null, null, null);
+        $table->add_field('g6', XMLDB_TYPE_INTEGER, '2', null, null, null, null);
+        $table->add_field('g6_value', XMLDB_TYPE_CHAR, '255', null, null, null, null);
+        $table->add_field('n1', XMLDB_TYPE_INTEGER, '2', null, null, null, null);
+        $table->add_field('n1_value', XMLDB_TYPE_CHAR, '255', null, null, null, null);
+        $table->add_field('n2', XMLDB_TYPE_INTEGER, '2', null, null, null, null);
+        $table->add_field('n2_value', XMLDB_TYPE_CHAR, '255', null, null, null, null);
+        $table->add_field('period', XMLDB_TYPE_CHAR, '255', null, null, null, null);
+        $table->add_field('mentoremail', XMLDB_TYPE_INTEGER, '2', null, null, null, null);
+        $table->add_field('mentorsms', XMLDB_TYPE_INTEGER, '2', null, null, null, null);
+        $table->add_field('studentemail', XMLDB_TYPE_INTEGER, '2', null, null, null, null);
+        $table->add_field('studentsms', XMLDB_TYPE_INTEGER, '2', null, null, null, null);
+        $table->add_field('teacheremail', XMLDB_TYPE_INTEGER, '2', null, null, null, null);
+        $table->add_field('teachersms', XMLDB_TYPE_INTEGER, '2', null, null, null, null);
+        $table->add_field('appended_message', XMLDB_TYPE_TEXT, null, null, null, null, null);
+        $table->add_field('timecreated', XMLDB_TYPE_INTEGER, '18', null, null, null, null);
+        $table->add_field('timemodified', XMLDB_TYPE_INTEGER, '18', null, null, null, null);
+        $table->add_field('crontime', XMLDB_TYPE_TEXT, null, null, null, null, null);
+        $table->add_field('studentmsgenabled', XMLDB_TYPE_INTEGER, '4', null, null, null, '0');
+        $table->add_field('mentormsgenabled', XMLDB_TYPE_INTEGER, '4', null, null, null, '0');
+        $table->add_field('teachermsgenabled', XMLDB_TYPE_INTEGER, '4', null, null, null, '0');
+        $table->add_field('studentappendedmsg', XMLDB_TYPE_TEXT, null, null, null, null, null);
+        $table->add_field('mentorappendedmsg', XMLDB_TYPE_TEXT, null, null, null, null, null);
+        $table->add_field('teacherappendedmsg', XMLDB_TYPE_TEXT, null, null, null, null, null);
+        $table->add_field('studentgreeting', XMLDB_TYPE_CHAR, '20', null, null, null, null);
+        $table->add_field('mentorgreeting', XMLDB_TYPE_CHAR, '20', null, null, null, null);
+        $table->add_field('teachergreeting', XMLDB_TYPE_CHAR, '20', null, null, null, null);
+
+        $table->add_key('id', XMLDB_KEY_PRIMARY, array('id'));
+
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+
+
+        $table = new xmldb_table('block_fn_mentor_group_mem');
+
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '18', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('groupid', XMLDB_TYPE_INTEGER, '18', null, XMLDB_NOTNULL, null, '0');
+        $table->add_field('userid', XMLDB_TYPE_INTEGER, '18', null, XMLDB_NOTNULL, null, '0');
+        $table->add_field('role', XMLDB_TYPE_CHAR, '10', null, null, null, null);
+        $table->add_field('timeadded', XMLDB_TYPE_INTEGER, '18', null, XMLDB_NOTNULL, null, '0');
+
+        $table->add_key('mdl_cohomemb_cohuse_uix', XMLDB_KEY_UNIQUE, array('groupid', 'userid'));
+        $table->add_key('id', XMLDB_KEY_PRIMARY, array('id'));
+
+        $table->add_index('mdl_cohomemb_coh_ix', XMLDB_INDEX_NOTUNIQUE, array('groupid'));
+        $table->add_index('mdl_cohomemb_use_ix', XMLDB_INDEX_NOTUNIQUE, array('userid'));
+
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+
+
+        upgrade_block_savepoint(true, 2017060600, 'fn_mentor');
+    }
+
+    if ($oldversion < 2017061301) {
+
+        // Define table block_fn_mentor_group to be created.
+        $table = new xmldb_table('block_fn_mentor_group');
+
+        // Adding fields to table block_fn_mentor_group.
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '18', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('name', XMLDB_TYPE_CHAR, '254', null, null, null, '');
+        $table->add_field('idnumber', XMLDB_TYPE_CHAR, '100', null, null, null, null);
+        $table->add_field('timecreated', XMLDB_TYPE_INTEGER, '18', null, null, null, '0');
+        $table->add_field('timemodified', XMLDB_TYPE_INTEGER, '18', null, null, null, '0');
+
+        // Adding keys to table block_fn_mentor_group.
+        $table->add_key('id', XMLDB_KEY_PRIMARY, array('id'));
+
+        // Conditionally launch create table for block_fn_mentor_group.
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+
+
+        // Define table block_fn_mentor_group_mem to be created.
+        $table = new xmldb_table('block_fn_mentor_group_mem');
+
+        // Adding fields to table block_fn_mentor_group_mem.
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '18', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('groupid', XMLDB_TYPE_INTEGER, '18', null, XMLDB_NOTNULL, null, '0');
+        $table->add_field('userid', XMLDB_TYPE_INTEGER, '18', null, XMLDB_NOTNULL, null, '0');
+        $table->add_field('role', XMLDB_TYPE_CHAR, '10', null, null, null, null);
+        $table->add_field('timeadded', XMLDB_TYPE_INTEGER, '18', null, XMLDB_NOTNULL, null, '0');
+
+        // Adding keys to table block_fn_mentor_group_mem.
+        $table->add_key('mdl_cohomemb_cohuse_uix', XMLDB_KEY_UNIQUE, array('groupid', 'userid'));
+        $table->add_key('id', XMLDB_KEY_PRIMARY, array('id'));
+
+        // Adding indexes to table block_fn_mentor_group_mem.
+        $table->add_index('mdl_cohomemb_coh_ix', XMLDB_INDEX_NOTUNIQUE, array('groupid'));
+        $table->add_index('mdl_cohomemb_use_ix', XMLDB_INDEX_NOTUNIQUE, array('userid'));
+
+        // Conditionally launch create table for block_fn_mentor_group_mem.
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+
+        // Fn_mentor savepoint reached.
+        upgrade_block_savepoint(true, 2017061301, 'fn_mentor');
+    }
+
+    if ($oldversion < 2017071100) {
+
+        $table = new xmldb_table('block_fn_mentor_group_mem');
+        $field = new xmldb_field('teamleader', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0', 'role');
+
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        upgrade_block_savepoint(true, 2017071100, 'fn_mentor');
+    }
+
+    if ($oldversion < 2017072400) {
+        $table = new xmldb_table('block_fn_mentor_notific');
+        $field = new xmldb_field('messagecontent', XMLDB_TYPE_INTEGER, '11', null, XMLDB_NOTNULL, null, '0', 'teachergreeting');
+
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+        upgrade_block_savepoint(true, 2017072400, 'fn_mentor');
+    }
+
+    if ($oldversion < 2017072502) {
+
+        $table = new xmldb_table('block_fn_mentor_notific');
+        $field = new xmldb_field('consecutive', XMLDB_TYPE_INTEGER, '2', null, null, null, null, 'n2_value');
+
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        $field = new xmldb_field('consecutive_value', XMLDB_TYPE_CHAR, '255', null, null, null, null, 'consecutive');
+
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        upgrade_block_savepoint(true, 2017072502, 'fn_mentor');
+    }
+
     return true;
 }

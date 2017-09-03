@@ -27,8 +27,7 @@ class coursecategory_form extends moodleform {
     public function definition() {
 
         $mform = $this->_form;
-        $mform->addElement('header', '', get_string('markinmanagerscoursecats', 'block_fn_mentor'), '');
-        $mform->addElement('static', 'description', '', get_string('markinmanagerscoursecatsdesc', 'block_fn_mentor'));
+        //$mform->addElement('static', 'description', '', get_string('markinmanagerscoursecatsdesc', 'block_fn_mentor'));
 
         $table = new html_table();
         $table->attributes['class'] = 'notification';

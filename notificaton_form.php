@@ -92,6 +92,21 @@ class notification_form extends moodleform {
             }
         }
 
+
+        $consecutive = 'block_fn_mentor_checkbox';
+        if (isset($this->_customdata['consecutive'])) {
+            if ($this->_customdata['consecutive']) {
+                $consecutive = 'block_fn_mentor_checkbox_checked';
+            }
+        }
+
+        $consecutivevalue = '';
+        if (isset($this->_customdata['consecutive_value'])) {
+            if ($this->_customdata['consecutive_value'] >= 0) {
+                $consecutivevalue = $this->_customdata['consecutive_value'];
+            }
+        }
+
         $teacheremail = 'block_fn_mentor_checkbox';
         if (isset($this->_customdata['teacheremail'])) {
             if ($this->_customdata['teacheremail']) {
@@ -128,6 +143,20 @@ class notification_form extends moodleform {
         if (isset($this->_customdata['mentorsms'])) {
             if ($this->_customdata['mentorsms']) {
                 $mentorsms = 'block_fn_mentor_checkbox_checked';
+            }
+        }
+
+        $whattosendall = 'block_fn_mentor_radio';
+        if (isset($this->_customdata['messagecontent'])) {
+            if ($this->_customdata['messagecontent'] == BLOCK_FN_MENTOR_MESSAGE_SEND_ALL) {
+                $whattosendall = 'block_fn_mentor_radio_checked';
+            }
+        }
+
+        $whattosendappended = 'block_fn_mentor_radio';
+        if (isset($this->_customdata['messagecontent'])) {
+            if ($this->_customdata['messagecontent'] == BLOCK_FN_MENTOR_MESSAGE_SEND_APPENDED) {
+                $whattosendappended = 'block_fn_mentor_radio_checked';
             }
         }
 
@@ -204,8 +233,26 @@ class notification_form extends moodleform {
             ) .
             html_writer::tag('p', $n2('n2', 'n2', '_checkbox', 1) . ' No activity for ' .
                 block_fn_mentor_textinput('n2_value', 'n2_value', '_textinput', $n2value) . ' days <N2>'
+            ) .
+            html_writer::tag('p', $consecutive('consecutive', 'consecutive2', '_checkbox', 1) . ' Logged in for ' .
+                block_fn_mentor_textinput('consecutive_value', 'consecutive_value', '_textinput', $consecutivevalue) . ' consecutive days <N2>'
             )
         );
+        $mform->addElement('html', '</td>');
+        $mform->addElement('html', '</tr>');
+
+        $mform->addElement('html', '<tr>');
+        $mform->addElement('html', '<th colspan="2">');
+        $mform->addElement('html', get_string('whattosend', 'block_fn_mentor'));
+        $mform->addElement('html', '</th>');
+        $mform->addElement('html', '</tr>');
+
+        $mform->addElement('html', '<tr>');
+        $mform->addElement('html', '<td colspan="2">'.
+            $whattosendall('messagecontent', '', '_radio', BLOCK_FN_MENTOR_MESSAGE_SEND_ALL) . ' '.
+            get_string('sendall', 'block_fn_mentor').'<br>'.
+            $whattosendappended('messagecontent', '', '_radio', BLOCK_FN_MENTOR_MESSAGE_SEND_APPENDED) . ' '.
+            get_string('sendappended', 'block_fn_mentor'));
         $mform->addElement('html', '</td>');
         $mform->addElement('html', '</tr>');
 

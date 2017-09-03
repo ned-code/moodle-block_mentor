@@ -24,12 +24,15 @@ define('AJAX_SCRIPT', true);
 
 require_once('../../config.php');
 require_once('lib.php');
-
-global $CFG, $DB, $OUTPUT, $PAGE, $COURSE;
+require_once($CFG->dirroot.'/blocks/fn_mentor/filters/lib.php');
 
 $action   = optional_param('action', false, PARAM_TEXT);
 $mentorid = optional_param('mentorid', 0, PARAM_INT);
+$groupid = optional_param('groupid', 0, PARAM_INT);
 $filter   = optional_param('filter', '', PARAM_TEXT);
+$sessionfilter   = optional_param('sessionfilter', false, PARAM_BOOL);
+
+$PAGE->set_context(context_system::instance());
 
 confirm_sesskey();
 
@@ -39,35 +42,51 @@ $data = array();
 $selectoptions = array();
 
 $idfield = array(
+    'all_users' => 'id',
     'all_mentors' => 'id',
     'mentors_without_mentee' => 'id',
+    'mentors_without_groups' => 'id',
     'all_students' => 'id',
+    'all_mentees' => 'id',
     'students_without_mentor' => 'id',
-    'get_mentees' => 'studentid'
+    'mentees_without_mentor' => 'id',
+    'get_mentees' => 'studentid',
+    'get_group_mentees' => 'studentid'
 );
 
 // PERMISSION.
 if ( has_capability('block/fn_mentor:assignmentor', context_system::instance(), $USER->id)) {
 
     switch ($action) {
+        case 'all_users':
+            $records = block_fn_mentor_get_all_users($filter);
+            break;
         case 'all_mentors':
-            $records = block_fn_mentor_get_all_mentors();
+            $records = block_fn_mentor_get_all_mentors($filter);
             break;
 
         case 'mentors_without_mentee':
-            $records = block_fn_mentor_get_mentors_without_mentee();
+            $records = block_fn_mentor_get_mentors_without_mentee($filter);
             break;
 
-        case 'all_students':
-            $records = block_fn_mentor_get_all_students($filter);
+        case 'mentors_without_groups':
+            $records = block_fn_mentor_get_mentors_without_groups($filter);
             break;
 
-        case 'students_without_mentor':
+        case 'all_mentees':
+            $records = block_fn_mentor_get_all_students($filter, false, $sessionfilter);
+            break;
+
+        case 'mentees_without_mentor':
             $records = block_fn_mentor_get_students_without_mentor($filter);
             break;
 
         case 'get_mentees':
-            $records = block_fn_mentor_get_mentees($mentorid);
+            $records = block_fn_mentor_get_mentees($mentorid, 0, '', 0, $sessionfilter);
+            break;
+
+        case 'get_group_mentees':
+            $records = block_fn_mentor_get_group_mentees($mentorid, $groupid);
             break;
     }
 

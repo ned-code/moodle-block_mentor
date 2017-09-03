@@ -97,5 +97,12 @@ if ($mform->is_cancelled()) {
     die;
 }
 echo $OUTPUT->header();
+
+$currenttab = 'activecategories';
+require('tabs.php');
+
+echo html_writer::div(
+    get_string('markinmanagerscoursecatsdesc', 'block_fn_mentor'), 'fn_mentor-category-selection-desc'
+);
 $mform->display();
 echo $OUTPUT->footer();

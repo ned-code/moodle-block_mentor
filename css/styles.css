@@ -66,6 +66,7 @@
 #page-blocks-fn_mentor-assign_mentor .object_labels {
     text-align: center;
 }
+#page-blocks-fn_mentor-assign #LoadingImage,
 #page-blocks-fn_mentor-assign_mentor #LoadingImage {
     height: 66px;
     left: 50%;
@@ -415,7 +416,7 @@
     color: #fff;
     padding: 4px;
     text-align: center;
-    border: 1px solid #cccccc
+    border: 1px solid #cccccc;
     font-size: 12px;
     font-weight: bold;
 }
@@ -853,4 +854,11 @@ a.mentormanagercontainer-footer-link {
 #page-blocks-fn_mentor-notification_list .recipient-list-student {
     color: red;
     padding: 0 0 0 20px;
+}
+#page-blocks-fn_mentor-course_overview_single .select.custom-select.menugroupfilter,
+#page-blocks-fn_mentor-course_overview .select.custom-select.menugroupfilter,
+#page-blocks-fn_mentor-course_overview_single .select.custom-select.menustudentfilter,
+#page-blocks-fn_mentor-course_overview .select.custom-select.menustudentfilter {
+    margin-left: 3px;
+    width: 90%;
 }

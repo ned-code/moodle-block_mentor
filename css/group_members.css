@@ -1,0 +1,69 @@
+#page-blocks-fn_mentor-group_members table.assigntable {
+    margin: auto;
+}
+#page-blocks-fn_mentor-group_members #potential-mentor-cell,
+#page-blocks-fn_mentor-group_members #selected-mentor-cell,
+#page-blocks-fn_mentor-group_members #potential-mentee-cell,
+#page-blocks-fn_mentor-group_members #selected-mentee-cell {
+    width: 20%;
+}
+#page-blocks-fn_mentor-group_members select#selected-mentor,
+#page-blocks-fn_mentor-group_members select#selected-mentee {
+    background-color: #D7FBD7;
+}
+#page-blocks-fn_mentor-group_members #mentor-action-btn-cell,
+#page-blocks-fn_mentor-group_members #mentee-action-btn-cell {
+    width: 10%;
+    vertical-align: middle !important;
+}
+#page-blocks-fn_mentor-group_members select#potential-mentor-filter,
+#page-blocks-fn_mentor-group_members select#potential-mentor,
+#page-blocks-fn_mentor-group_members select#selected-mentor,
+#page-blocks-fn_mentor-group_members select#potential-mentee-filter,
+#page-blocks-fn_mentor-group_members select#potential-mentee,
+#page-blocks-fn_mentor-group_members select#selected-mentee {
+    width: 100%;
+    margin-bottom: 5px;
+    display: block;
+}
+#page-blocks-fn_mentor-group_members .assign-group-button {
+    box-sizing: border-box;
+    display: block;
+    margin: auto;
+    padding-left: 0;
+    padding-right: 0;
+    width: 100%;
+}
+#page-blocks-fn_mentor-group_members .assigntable td {
+    padding: 0.2em 0.3em;
+    vertical-align: top;
+}
+#page-blocks-fn_mentor-group_members .no-overflow {
+    position: relative;
+}
+#page-blocks-fn_mentor-group_members #group-selection-form {
+    text-align: center;
+    margin: 35px 0;
+}
+#page-blocks-fn_mentor-group_members .import-export-user-wrapper {
+    text-align: center;
+}
+#page-blocks-fn_mentor-group_members .import-export-user-form {
+    display: inline;
+}
+#page-blocks-fn_mentor-group_members .manage-group-link {
+    margin-left: 10px;
+}
+#page-blocks-fn_mentor-group_members #potential-mentee-search-text,
+#page-blocks-fn_mentor-group_members #potential-mentor-search-text {
+    background-clip: padding-box;
+    background-color: #fff;
+    background-image: none;
+    border: 1px solid rgba(0, 0, 0, 0.15);
+    border-radius: 0.25rem;
+    color: #55595c;
+    font-size: 1rem;
+    line-height: 1.25;
+    padding: 0.5rem 0.75rem;
+    margin-right: 10px;
+}

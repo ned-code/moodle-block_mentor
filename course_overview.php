@@ -27,8 +27,9 @@ require_once($CFG->libdir.'/gradelib.php');
 require_once($CFG->dirroot.'/grade/lib.php');
 
 // Parameters.
-$menteeid      = optional_param('menteeid', 0, PARAM_INT);
-$courseid      = optional_param('courseid', 0, PARAM_INT);
+$menteeid = optional_param('menteeid', 0, PARAM_INT);
+$courseid = optional_param('courseid', 0, PARAM_INT);
+$groupid  = optional_param('groupid', 0, PARAM_INT);
 
 // Array of functions to call for grading purposes for modules.
 $modgradesarray = array(
@@ -60,7 +61,7 @@ if ($allownotes && $ismentor) {
 // Find Mentees.
 $mentees = array();
 if ($isadmin) {
-    $mentees = block_fn_mentor_get_all_mentees();
+    $mentees = block_fn_mentor_get_all_mentees('', $groupid);
 } else if ($isteacher) {
     if ($menteesbymentor = block_fn_mentor_get_mentees_by_mentor(0, $filter = 'teacher')) {
         foreach ($menteesbymentor as $menteebymentor) {
@@ -72,10 +73,10 @@ if ($isadmin) {
         }
     }
 } else if ($ismentor) {
-    $mentees = block_fn_mentor_get_mentees($USER->id);
+    $mentees = block_fn_mentor_get_mentees($USER->id, 0, '', $groupid);
 }
 // Pick a mentee if not selected.
-if (!$menteeid && $mentees) {
+if ((!$menteeid && $mentees) || (!in_array($menteeid, array_keys($mentees)))) {
     $var = reset($mentees);
     $menteeid = $var->studentid;
 }
@@ -124,6 +125,48 @@ if ($menteeuser->lastaccess) {
     $lastaccess .= get_string('lastaccess').get_string('labelsep', 'langconfig').get_string('never');
 }
 
+// Groups menu.
+if ($isadmin) {
+    $groups = $DB->get_records('block_fn_mentor_group', null, 'name ASC');
+} else if ($ismentor) {
+    $sql = "SELECT g.id, g.name
+              FROM {block_fn_mentor_group} g
+              JOIN {block_fn_mentor_group_mem} gm
+                ON g.id = gm.groupid
+             WHERE gm.role = ?
+               AND gm.userid = ?
+          ORDER BY g.name ASC";
+    $groups = $DB->get_records_sql($sql, array('M', $USER->id));
+}
+
+$groupmenu = array();
+$groupmenuurl = array();
+$groupmenuhtml = '';
+
+$groupmenuurl[0] = $CFG->wwwroot.'/blocks/fn_mentor/course_overview.php?menteeid='.$menteeid.'&groupid=0';
+$groupmenu[$groupmenuurl[0]] = get_string('allmentorgroups', 'block_fn_mentor');
+
+if ($groups) {
+    foreach ($groups as $group) {
+        $groupmenuurl[$group->id] = $CFG->wwwroot . '/blocks/fn_mentor/course_overview.php?menteeid=' . $menteeid . '&groupid=' . $group->id;
+        $groupmenu[$groupmenuurl[$group->id]] = $group->name;
+    }
+
+    if ((!$isstudent) || ($isadmin || $ismentor)) {
+        $groupmenuhtml = html_writer::tag('form',
+            html_writer::img($OUTPUT->pix_url('i/group'), get_string('group', 'block_fn_mentor')) . ' ' .
+            html_writer::select(
+                $groupmenu, 'groupfilter', $groupmenuurl[$groupid], null,
+                array('onChange' => 'location=document.jump2.groupfilter.options[document.jump2.groupfilter.selectedIndex].value;')
+            ),
+            array('id' => 'groupFilterForm', 'name' => 'jump2')
+        );
+
+        $groupmenuhtml = '<div class="mentee-course-overview-block-filter">' . $groupmenuhtml . ' </div>';
+    }
+}
+
+// Student menu.
 $studentmenu = array();
 $studentmenuurl = array();
 
@@ -135,7 +178,7 @@ if ($showallstudents = get_config('block_fn_mentor', 'showallstudents')) {
 
 if ($mentees) {
     foreach ($mentees as $mentee) {
-        $studentmenuurl[$mentee->studentid] = $CFG->wwwroot.'/blocks/fn_mentor/course_overview.php?menteeid='.$mentee->studentid;
+        $studentmenuurl[$mentee->studentid] = $CFG->wwwroot.'/blocks/fn_mentor/course_overview.php?menteeid='.$mentee->studentid.'&groupid='.$groupid;
         $studentmenu[$studentmenuurl[$mentee->studentid]] = $mentee->firstname .' '.$mentee->lastname;
     }
 }
@@ -143,19 +186,20 @@ if ($mentees) {
 $studentmenuhtml = '';
 
 if ((!$isstudent) || ($isadmin || $ismentor  || $isteacher)) {
-    $studentmenuhtml = html_writer::tag('form', '<span>'.get_string('select_student', 'block_fn_mentor').'</span>'.
+    $studentmenuhtml = html_writer::tag('form',
+        html_writer::img($OUTPUT->pix_url('i/user'), get_string('user')).' '.
         html_writer::select(
-            $studentmenu, 'sortby', $studentmenuurl[$menteeid], null,
-            array('onChange' => 'location=document.jump1.sortby.options[document.jump1.sortby.selectedIndex].value;')
+            $studentmenu, 'studentfilter', $studentmenuurl[$menteeid], null,
+            array('onChange' => 'location=document.jump1.studentfilter.options[document.jump1.studentfilter.selectedIndex].value;')
         ),
         array('id' => 'studentFilterForm', 'name' => 'jump1')
     );
 
-    $studentmenuhtml = '<div class="mentee-course-overview-block-filter"> '.$studentmenuhtml.' </div>';
+    $studentmenuhtml = '<div class="mentee-course-overview-block-filter">'.$studentmenuhtml.'</div>';
 }
 
 // BLOCK-1.
-echo $studentmenuhtml.'
+echo $groupmenuhtml.$studentmenuhtml.'
       <div class="mentee-course-overview-block">
           <div class="mentee-course-overview-block-title">
               '.get_string('student', 'block_fn_mentor').'

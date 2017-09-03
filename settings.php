@@ -23,27 +23,15 @@
 defined('MOODLE_INTERNAL') || die();
 
 $settings->add(
+    new admin_setting_heading('terminology', get_string('terminology', 'block_fn_mentor'), '')
+);
+
+$settings->add(
     new admin_setting_configtext(
         'block_fn_mentor/blockname',
         get_string('blockname', 'block_fn_mentor'),
         '',
         get_string('blocktitle', 'block_fn_mentor')
-    )
-);
-
-$themeconfig = theme_config::load($CFG->theme);
-$layouts = array();
-foreach (array_keys($themeconfig->layouts) as $layout) {
-    $layouts[$layout] = $layout;
-}
-
-$settings->add(
-    new admin_setting_configselect(
-        'block_fn_mentor/pagelayout',
-        get_string('pagelayout', 'block_fn_mentor'),
-        '',
-        'login',
-        $layouts
     )
 );
 
@@ -84,12 +72,25 @@ $settings->add(
 );
 
 $settings->add(
-    new admin_setting_configcheckbox(
-        'block_fn_mentor/menteecanview',
-        get_string('menteecanview', 'block_fn_mentor'),
+    new admin_setting_configtext(
+        'block_fn_mentor/wordformentorgroup',
+        get_string('wordformentorgroup', 'block_fn_mentor'),
         '',
-        '0'
+        get_string('mentorgroup', 'block_fn_mentor')
     )
+);
+
+$settings->add(
+    new admin_setting_configtext(
+        'block_fn_mentor/wordformentorgroups',
+        get_string('wordformentorgroups', 'block_fn_mentor'),
+        '',
+        get_string('mentorgroups', 'block_fn_mentor')
+    )
+);
+
+$settings->add(
+    new admin_setting_heading('roles', get_string('roles', 'block_fn_mentor'), '')
 );
 
 $roleoptions = array();
@@ -150,6 +151,19 @@ $settings->add(
 );
 
 $settings->add(
+    new admin_setting_heading('blockview', get_string('blockview', 'block_fn_mentor'), '')
+);
+
+$settings->add(
+    new admin_setting_configcheckbox(
+        'block_fn_mentor/menteecanview',
+        get_string('menteecanview', 'block_fn_mentor'),
+        '',
+        '0'
+    )
+);
+
+$settings->add(
     new admin_setting_configtext(
         'block_fn_mentor/maxnumberofmentees',
         get_string('maxnumberofmentees', 'block_fn_mentor'),
@@ -160,12 +174,47 @@ $settings->add(
 );
 
 $settings->add(
+    new admin_setting_heading('reportview', get_string('reportview', 'block_fn_mentor'), '')
+);
+
+$settings->add(
     new admin_setting_configcheckbox(
         'block_fn_mentor/allownotes',
         get_string('allownotes', 'block_fn_mentor'),
         '',
         '0'
     )
+);
+
+$settings->add(
+    new admin_setting_configcheckbox(
+        'block_fn_mentor/showallstudents',
+        get_string('showallstudents', 'block_fn_mentor'),
+        '',
+        '1'
+    )
+);
+
+$settings->add(
+    new admin_setting_configcheckbox(
+        'block_fn_mentor/showsitegroups',
+        get_string('showsitegroups', 'block_fn_mentor'),
+        '',
+        '0'
+    )
+);
+
+$settings->add(
+    new admin_setting_configcheckbox(
+        'block_fn_mentor/showgradestatus',
+        get_string('showgradestatus', 'block_fn_mentor'),
+        '',
+        '1'
+    )
+);
+
+$settings->add(
+    new admin_setting_heading('othersettings', get_string('othersettings', 'block_fn_mentor'), '')
 );
 
 $coursecaturl = new moodle_url('/blocks/fn_mentor/coursecategories.php');
@@ -178,36 +227,45 @@ $settings->add(
 );
 
 $settings->add(
-    new admin_setting_configcheckbox(
-        'block_fn_mentor/showallstudents',
-        get_string('showallstudents', 'block_fn_mentor'),
-        '',
-        '1'
-    )
-);
-$settings->add(
-    new admin_setting_configcheckbox(
-        'block_fn_mentor/showsitegroups',
-        get_string('showsitegroups', 'block_fn_mentor'),
-        '',
-        '0'
-    )
-);
-$settings->add(
-    new admin_setting_configcheckbox(
-        'block_fn_mentor/showgradestatus',
-        get_string('showgradestatus', 'block_fn_mentor'),
-        '',
-        '1'
-    )
-);
-
-$settings->add(
     new admin_setting_configtext(
         'block_fn_mentor/passinggrade',
         get_string('passinggrade', 'block_fn_mentor'),
         '',
         '50',
         PARAM_INT
+    )
+);
+
+$settings->add(
+    new admin_setting_configcheckbox(
+        'block_fn_mentor/includeextranedcolumns',
+        get_string('includeextranedcolumns', 'block_fn_mentor'),
+        '',
+        '0'
+    )
+);
+
+$settings->add(
+    new admin_setting_configcheckbox(
+        'block_fn_mentor/usementorgroups',
+        get_string('usementorgroups', 'block_fn_mentor'),
+        '',
+        '0'
+    )
+);
+
+$themeconfig = theme_config::load($CFG->theme);
+$layouts = array();
+foreach (array_keys($themeconfig->layouts) as $layout) {
+    $layouts[$layout] = $layout;
+}
+
+$settings->add(
+    new admin_setting_configselect(
+        'block_fn_mentor/pagelayout',
+        get_string('pagelayout', 'block_fn_mentor'),
+        '',
+        'login',
+        $layouts
     )
 );

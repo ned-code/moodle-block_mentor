@@ -23,185 +23,314 @@
 require_once($CFG->dirroot.'/mod/assignment/lib.php');
 require_once($CFG->dirroot.'/lib/completionlib.php');
 
-function block_fn_mentor_get_all_students($filter = '', $selectedcoursesonly = false) {
-    global $DB, $CFG;
+define('BLOCK_FN_MENTOR_MESSAGE_SEND_ALL', 0);
+define('BLOCK_FN_MENTOR_MESSAGE_SEND_APPENDED', 1);
+
+function block_fn_mentor_get_all_students($filter = '', $selectedcoursesonly = false, $sessionfilter = false) {
+    global $DB;
 
     $studentrole = get_config('block_fn_mentor', 'studentrole');
-
-    $params = array(0, 0, $studentrole);
     $wherecondions = '';
 
+    $params = array();
+    $params['deleted'] = 0;
+    $params['suspended'] = 0;
+    $params['roleid'] = $studentrole;
+
     if ($filter) {
-        $wherecondions .= " AND (u.firstname LIKE '%".$filter."%'
-                            OR u.lastname LIKE '%".$filter."%'
-                            OR u.email LIKE '%".$filter."%')";
-        $params[] = "%".$filter."%";
-        $params[] = "%".$filter."%";
-        $params[] = "%".$filter."%";
+        $wherecondions = " AND CONCAT(u.firstname, ' ', u.lastname) LIKE '%".$filter."%'";
     }
+
     $join = '';
     $filter = '';
     if ($selectedcoursesonly) {
         if ($settingcourses = block_fn_mentor_get_setting_courses()) {
-            list($sqlfilter, $paramcourses) = $DB->get_in_or_equal($settingcourses);
+            list($sqlfilter, $paramcourses) = $DB->get_in_or_equal($settingcourses, SQL_PARAMS_NAMED, 'crs');
             $params = array_merge($params, $paramcourses);
             $join = "INNER JOIN {context} ctx ON ra.contextid = ctx.id";
             $filter = "AND ctx.instanceid {$sqlfilter}";
         }
     }
+    $extrasql = '';
+    if ($sessionfilter) {
+        $ufiltering = new fn_user_filtering(null, null, null, 'mentee');
+        list($extrasql, $extraparams) = $ufiltering->get_sql_filter('', $params);
+        if ($extrasql) {
+            $extrasql = 'AND '.$extrasql;
+            $params = $extraparams;
+        }
+    }
 
-    $sql = "SELECT DISTINCT u.id,
-                            u.firstname,
-                            u.lastname
-                       FROM {role_assignments} ra
-                 INNER JOIN {user} u
-                         ON ra.userid = u.id
-                            $join
-                      WHERE u.deleted = ?
-                        AND u.suspended = ?
-                        AND ra.roleid = ?
-                            $wherecondions
-                            $filter
-                   ORDER BY u.lastname ASC";
+    $sql = "SELECT u.id,
+                   u.firstname,
+                   u.lastname,
+                   u.email
+              FROM {role_assignments} ra
+        INNER JOIN {user} u
+                ON ra.userid = u.id
+                   $join
+             WHERE u.deleted = :deleted
+               AND u.suspended = :suspended
+               AND ra.roleid = :roleid
+                   $extrasql
+                   $wherecondions
+                   $filter
+          GROUP BY ra.userid
+          ORDER BY u.lastname ASC";
 
     $everyone = $DB->get_records_sql($sql, $params);
 
     return $everyone;
 }
 
-function block_fn_mentor_get_students_without_mentor($filter = '') {
-    global $DB, $CFG;
-
-    if (! $mentorroleid = get_config('block_fn_mentor', 'mentor_role_user')) {
-        return false;
-    }
-
-    $studentrole = get_config('block_fn_mentor', 'studentrole');
-    $params = array(0, 0, $studentrole);
-
-    $wherecondions = '';
-
-    if ($filter) {
-        $wherecondions .= " AND (u.firstname LIKE '%".$filter."%'
-                            OR u.lastname LIKE '%".$filter."%'
-                            OR u.email LIKE '%".$filter."%')";
-        $params[] = "%".$filter."%";
-        $params[] = "%".$filter."%";
-        $params[] = "%".$filter."%";
-    }
-
-    $sql = "SELECT DISTINCT u.id,
-                            u.firstname,
-                            u.lastname
-                       FROM {role_assignments} ra
-                 INNER JOIN {user} u
-                         ON ra.userid = u.id
-                      WHERE u.deleted = ?
-                        AND u.suspended = ?
-                        AND ra.roleid = ?
-                        $wherecondions
-                   ORDER BY u.lastname ASC";
-
-    $everyone = $DB->get_records_sql($sql, $params);
-
-    $sqlmentor = "SELECT ra.id,
-                         ra.userid AS mentorid,
-                         ctx.instanceid AS studentid
-                    FROM {context} ctx
-              INNER JOIN {role_assignments} ra
-                      ON ctx.id = ra.contextid
-                   WHERE ctx.contextlevel = ?
-                     AND ra.roleid = ?";
-
-    $stuwithmentor = array();
-
-    if ($studentswithmentor = $DB->get_records_sql($sqlmentor, array(CONTEXT_USER, $mentorroleid))) {
-        foreach ($studentswithmentor as $key => $value) {
-            $stuwithmentor[$value->studentid] = $value->studentid;
-        }
-    }
-
-    $studentswithoutmentor = array_diff_key($everyone, $stuwithmentor);
-
-    return $studentswithoutmentor;
-}
-
-function block_fn_mentor_is_mentee($userid) {
-    global $DB, $CFG;
-
-    if (! $mentorroleid = get_config('block_fn_mentor', 'mentor_role_user')) {
-        return false;
-    }
-
-    $studentrole = get_config('block_fn_mentor', 'studentrole');
-
-    $wherecondions = '';
-
-    $sqlmentor = "SELECT ra.id,
-                         ra.userid AS mentorid,
-                         ctx.instanceid AS studentid
-                    FROM {context} ctx
-              INNER JOIN {role_assignments} ra
-                      ON ctx.id = ra.contextid
-                   WHERE ctx.contextlevel = ?
-                     AND ra.roleid = ?
-                     AND ctx.instanceid = ?";
-
-    return $DB->record_exists_sql($sqlmentor, array(CONTEXT_USER, $mentorroleid, $userid));
-
-}
-
-function block_fn_mentor_get_mentors_without_mentee() {
-    global $DB, $CFG;
-
-    if (! $mentorroleid = get_config('block_fn_mentor', 'mentor_role_system')) {
-        return false;
-    }
-    $sql = "SELECT DISTINCT u.id,
-                            u.firstname,
-                            u.lastname
-                       FROM {role_assignments} ra
-                 INNER JOIN {user} u
-                         ON ra.userid = u.id
-                      WHERE u.deleted = ?
-                        AND u.suspended = ?
-                        AND ra.roleid = ?
-                   ORDER BY u.lastname ASC";
-
-    $everyone = $DB->get_records_sql($sql, array(0, 0, $mentorroleid));
-
-    if (! $mentorroleiduser = get_config('block_fn_mentor', 'mentor_role_user')) {
-        return false;
-    }
-
-    $sqlmentor = "SELECT ra.id,
-                          ra.userid AS mentorid,
-                          ctx.instanceid AS studentid
-                     FROM {context} ctx
-               INNER JOIN {role_assignments} ra
-                       ON ctx.id = ra.contextid
-                    WHERE ctx.contextlevel = ?
-                      AND ra.roleid = ?";
-
-    $menwithmentee = array();
-
-    if ($mentorswithmentee = $DB->get_records_sql($sqlmentor, array(CONTEXT_USER, $mentorroleiduser))) {
-        foreach ($mentorswithmentee as $key => $value) {
-            $menwithmentee[$value->mentorid] = $value->mentorid;
-        }
-    }
-
-    $mentorswithoutmentee = array_diff_key($everyone, $menwithmentee);
-
-    return $mentorswithoutmentee;
-}
-
-function block_fn_mentor_get_all_mentees($studentids='') {
+function block_fn_mentor_get_students_without_mentor($filter = '', $sessionfilter = false) {
     global $DB;
 
     if (! $mentorroleid = get_config('block_fn_mentor', 'mentor_role_user')) {
         return false;
     }
+
+    $studentroleid = get_config('block_fn_mentor', 'studentrole');
+
+    $wherecondions = '';
+
+    if ($filter) {
+        $wherecondions = " AND CONCAT(u.firstname, ' ', u.lastname) LIKE '%".$filter."%'";
+    }
+
+    $extrasql = '';
+    if ($sessionfilter) {
+        $ufiltering = new fn_user_filtering(null, null, null, 'mentee');
+        list($extrasql, $params) = $ufiltering->get_sql_filter();
+        if ($extrasql) {
+            $extrasql = 'AND '.$extrasql;
+        }
+    } else {
+        $params = array();
+    }
+
+    $params['contextlevel'] = CONTEXT_USER;
+    $params['roleid2'] = $mentorroleid;
+    $params['deleted'] = 0;
+    $params['suspended'] = 0;
+    $params['roleid'] = $studentroleid;
+    $params['numofmentor'] = 0;
+
+    $sql = "SELECT u.id, u.firstname, u.lastname,
+                   (SELECT COUNT(1)
+                      FROM {context} ctx
+                      JOIN {role_assignments} ra2
+                        ON ctx.id = ra2.contextid
+                     WHERE ctx.contextlevel = :contextlevel
+                       AND ra2.roleid = :roleid2
+                       AND ctx.instanceid = ra.userid) numofmentor
+              FROM {role_assignments} ra
+              JOIN {user} u
+                ON ra.userid = u.id
+             WHERE u.deleted = :deleted
+               AND u.suspended = :suspended
+               AND ra.roleid = :roleid
+                   $extrasql
+                   $wherecondions
+          GROUP BY ra.userid
+            HAVING numofmentor = :numofmentor
+          ORDER BY u.lastname ASC";
+
+    return $DB->get_records_sql($sql, $params);
+}
+
+function block_fn_mentor_is_mentee($userid) {
+    global $DB;
+
+    if (! $mentorroleid = get_config('block_fn_mentor', 'mentor_role_user')) {
+        return false;
+    }
+
+    $sql = "SELECT ra.id,
+                   ra.userid mentorid,
+                   ctx.instanceid studentid
+              FROM {context} ctx
+        INNER JOIN {role_assignments} ra
+                ON ctx.id = ra.contextid
+             WHERE ctx.contextlevel = ?
+               AND ra.roleid = ?
+               AND ctx.instanceid = ?";
+
+    return $DB->record_exists_sql($sql, array(CONTEXT_USER, $mentorroleid, $userid));
+}
+
+function block_fn_mentor_is_mentor($userid) {
+    global $DB;
+
+    if (! $mentorroleid = get_config('block_fn_mentor', 'mentor_role_system')) {
+        return false;
+    }
+
+    $sql = "SELECT ra.id,
+                   ra.userid mentorid,
+                   ctx.instanceid studentid
+              FROM {context} ctx
+        INNER JOIN {role_assignments} ra
+                ON ctx.id = ra.contextid
+             WHERE ra.roleid = ?
+               AND ra.userid = ?";
+
+    return $DB->record_exists_sql($sql, array($mentorroleid, $userid));
+
+}
+
+function block_fn_mentor_get_mentors_without_mentee($filter = '', $sessionfilter = false) {
+    global $DB;
+
+    if (!$mentorroleid = get_config('block_fn_mentor', 'mentor_role_system')) {
+        return false;
+    }
+
+    if (!$muserroleid = get_config('block_fn_mentor', 'mentor_role_user')) {
+        return false;
+    }
+
+    $wherecondions = '';
+
+    if ($filter) {
+        $wherecondions = " AND CONCAT(u.firstname, ' ', u.lastname) LIKE '%" . $filter . "%'";
+    }
+
+    $extrasql = '';
+    if ($sessionfilter) {
+        $ufiltering = new fn_user_filtering(null, null, null, 'mentor');
+        list($extrasql, $params) = $ufiltering->get_sql_filter();
+        if ($extrasql) {
+            $extrasql = 'AND '.$extrasql;
+        }
+    } else {
+        $params = array();
+    }
+
+    $params['contextlevel'] = CONTEXT_USER;
+    $params['roleid2'] = $muserroleid;
+    $params['deleted'] = 0;
+    $params['suspended'] = 0;
+    $params['roleid'] = $mentorroleid;
+    $params['numofmentee'] = 0;
+
+    $sql = "SELECT u.id, u.firstname, u.lastname,
+                   (SELECT COUNT(1)
+                      FROM {context} ctx
+                      JOIN {role_assignments} ra2
+                        ON ctx.id = ra2.contextid
+                     WHERE ctx.contextlevel = :contextlevel
+                       AND ra2.roleid = :roleid2
+                       AND ra2.userid = ra.userid) numofmentee
+              FROM {role_assignments} ra
+              JOIN {user} u
+                ON ra.userid = u.id
+             WHERE u.deleted = :deleted
+               AND u.suspended = :suspended
+               AND ra.roleid = :roleid
+                   $extrasql
+                   $wherecondions
+          GROUP BY ra.userid
+            HAVING numofmentee = :numofmentee
+          ORDER BY u.lastname ASC";
+
+    return $DB->get_records_sql($sql, $params);
+
+
+}
+
+function block_fn_mentor_get_mentors_with_mentee() {
+    global $DB;
+
+    if (! $mentorroleiduser = get_config('block_fn_mentor', 'mentor_role_user')) {
+        return false;
+    }
+
+    $sql = "SELECT u.id, 
+                   CONCAT(u.firstname, u.lastname) fullname 
+              FROM {context} ctx 
+        INNER JOIN {role_assignments} ra 
+                ON ctx.id = ra.contextid 
+        INNER JOIN {user} u 
+                ON ra.userid = u.id 
+             WHERE ctx.contextlevel = ? 
+               AND ra.roleid = ? 
+               AND u.deleted = ? 
+          GROUP BY u.id
+          ORDER BY u.lastname ASC";
+
+    if ($mentors = $DB->get_records_sql_menu($sql, array(CONTEXT_USER, $mentorroleiduser, 0))) {
+        return $mentors;
+    }
+
+    return array();
+}
+
+function block_fn_mentor_get_mentors_without_groups($filter = '', $sessionfilter = false) {
+    global $DB;
+
+    if (!$mentorroleid = get_config('block_fn_mentor', 'mentor_role_system')) {
+        return false;
+    }
+
+    $wherecondions = '';
+
+    if ($filter) {
+        $wherecondions = " AND CONCAT(u.firstname, ' ', u.lastname) LIKE '%" . $filter . "%'";
+    }
+
+    $extrasql = '';
+    if ($sessionfilter) {
+        $ufiltering = new fn_user_filtering(null, null, null, 'mentor');
+        list($extrasql, $params) = $ufiltering->get_sql_filter();
+        if ($extrasql) {
+            $extrasql = 'AND '.$extrasql;
+        }
+    } else {
+        $params = array();
+    }
+
+    $params['deleted'] = 0;
+    $params['suspended'] = 0;
+    $params['roleid'] = $mentorroleid;
+    $params['numofgroups'] = 0;
+
+    $sql = "SELECT u.id,
+                   u.firstname,
+                   u.lastname,
+                   (SELECT Count(1) FROM {block_fn_mentor_group_mem} gm
+                     WHERE gm.userid = u.id AND gm.role = 'M') numofgroups
+              FROM {role_assignments} ra
+        INNER JOIN {user} u
+                ON ra.userid = u.id
+             WHERE u.deleted = :deleted
+               AND u.suspended = :suspended
+               AND ra.roleid = :roleid
+                   $extrasql
+                   $wherecondions
+          GROUP BY ra.userid
+            HAVING numofgroups = :numofgroups
+          ORDER BY u.lastname ASC";
+
+    return $DB->get_records_sql($sql, $params);
+}
+
+function block_fn_mentor_get_all_mentees($studentids='', $groupid=0) {
+    global $DB;
+
+    if (! $mentorroleid = get_config('block_fn_mentor', 'mentor_role_user')) {
+        return false;
+    }
+    if ($groupid && $groupmetees = block_fn_mentor_get_group_members($groupid, 'U')) {
+        list($insql, $params) = $DB->get_in_or_equal(array_keys($groupmetees), SQL_PARAMS_NAMED, 'usr');
+        $insql = "AND ctx.instanceid ".$insql;
+    } else {
+        $insql = '';
+        $params = array();
+    }
+
+    $params['roleid'] = $mentorroleid;
+    $params['contextlevel'] = CONTEXT_USER;
 
     $sqlmentor = "SELECT ra.id,
                          ra.userid AS mentorid,
@@ -213,13 +342,14 @@ function block_fn_mentor_get_all_mentees($studentids='') {
                       ON ctx.id = ra.contextid
               INNER JOIN {user} u
                       ON ctx.instanceid = u.id
-                   WHERE ctx.contextlevel = ?
-                     AND ra.roleid = ?
+                   WHERE ctx.contextlevel = :contextlevel
+                     AND ra.roleid = :roleid
+                         {$insql}
                 ORDER BY u.lastname ASC";
 
     $stuwithmentor = array();
 
-    if ($studentswithmentor = $DB->get_records_sql($sqlmentor, array(CONTEXT_USER, $mentorroleid))) {
+    if ($studentswithmentor = $DB->get_records_sql($sqlmentor, $params)) {
         foreach ($studentswithmentor as $key => $value) {
             $stuwithmentor[$value->studentid] = $value;
         }
@@ -231,29 +361,105 @@ function block_fn_mentor_get_all_mentees($studentids='') {
     return $stuwithmentor;
 }
 
-function block_fn_mentor_get_all_mentors() {
+function block_fn_mentor_get_all_mentors($filter = '', $sessionfilter = false, $filtertype = 'mentor') {
     global $DB;
 
     if (! $mentorroleid = get_config('block_fn_mentor', 'mentor_role_system')) {
         return false;
     }
-    $sql = "SELECT DISTINCT u.id,
-                            u.firstname,
-                            u.lastname
-                       FROM {role_assignments} ra
-                 INNER JOIN {user} u
-                         ON ra.userid = u.id
-                      WHERE u.deleted = ?
-                        AND u.suspended = ?
-                        AND ra.roleid = ?
-                   ORDER BY u.lastname ASC";
 
-    $everyone = $DB->get_records_sql($sql, array(0, 0, $mentorroleid));
+    $filtersql = '';
+    if ($filter) {
+        $filtersql = "AND CONCAT(u.firstname, ' ', u.lastname) LIKE '%{$filter}%'";
+    }
+
+    $extrasql = '';
+    if ($sessionfilter) {
+        $ufiltering = new fn_user_filtering(null, null, null, $filtertype);
+        list($extrasql, $params) = $ufiltering->get_sql_filter();
+        if ($extrasql) {
+            $extrasql = 'AND '.$extrasql;
+        }
+    } else {
+        $params = array();
+    }
+
+    $params['deleted'] = 0;
+    $params['suspended'] = 0;
+    $params['roleid'] = $mentorroleid;
+
+    $sql = "SELECT u.id,
+                   u.firstname,
+                   u.lastname,
+                   u.email
+              FROM {role_assignments} ra
+        INNER JOIN {user} u
+                ON ra.userid = u.id
+             WHERE u.deleted = :deleted
+               AND u.suspended = :suspended
+               AND ra.roleid = :roleid
+                   $filtersql
+                   $extrasql
+          GROUP BY u.id
+          ORDER BY u.lastname ASC";
+
+    $everyone = $DB->get_records_sql($sql, $params);
 
     return $everyone;
 }
 
-function block_fn_mentor_get_mentees($mentorid, $courseid=0, $studentids = '') {
+function block_fn_mentor_get_all_users($filter = '', $sessionfilter = false) {
+    global $DB;
+
+    if (! $mentorroleid = get_config('block_fn_mentor', 'mentor_role_system')) {
+        return false;
+    }
+
+    $filtersql = '';
+    if ($filter) {
+        $filtersql = "AND CONCAT(u.firstname, ' ', u.lastname) LIKE '%{$filter}%'";
+    }
+
+    $extrasql = '';
+    if ($sessionfilter) {
+        $ufiltering = new fn_user_filtering(null, null, null, 'mentor');
+        list($extrasql, $params) = $ufiltering->get_sql_filter();
+        if ($extrasql) {
+            $extrasql = 'AND '.$extrasql;
+        }
+    } else {
+        $params = array();
+    }
+
+    $params['deleted'] = 0;
+    $params['suspended'] = 0;
+    $params['userid'] = 1;
+    $params['roleid'] = $mentorroleid;
+    $params['contextlevel'] = CONTEXT_SYSTEM;
+
+    $sql = "SELECT u.id,
+                   u.firstname,
+                   u.lastname
+              FROM {user} u
+             WHERE u.deleted = :deleted
+               AND u.suspended = :suspended
+               AND u.id > :userid
+                   $extrasql
+                   $filtersql
+               AND u.id NOT IN (SELECT ra.userid
+                                  FROM {role_assignments} ra
+                                  JOIN {context} cx
+                                    ON ra.contextid = cx.id
+                                 WHERE ra.roleid = :roleid
+                                   AND cx.contextlevel = :contextlevel)
+          ORDER BY u.lastname ASC";
+
+    $everyone = $DB->get_records_sql($sql, $params);
+
+    return $everyone;
+}
+
+function block_fn_mentor_get_mentees($mentorid, $courseid=0, $studentids = '', $groupid=0, $sessionfilter = false) {
     global $DB;
 
     if (! $mentorroleid = get_config('block_fn_mentor', 'mentor_role_user')) {
@@ -277,6 +483,29 @@ function block_fn_mentor_get_mentees($mentorid, $courseid=0, $studentids = '') {
                                  AND ctx.instanceid = ?";
         $coursestudents = $DB->get_records_sql($sqlcoursestudents, array(50, $studentrole, $courseid));
     }
+    if ($groupid && $groupmetees = block_fn_mentor_get_group_members($groupid, 'U')) {
+        list($insql, $params) = $DB->get_in_or_equal(array_keys($groupmetees), SQL_PARAMS_NAMED, 'usr');
+        $insql = "AND ctx.instanceid ".$insql;
+    } else {
+        $insql = '';
+        $params = array();
+    }
+
+
+    $extrasql = '';
+    $extraparams = array();
+    if ($sessionfilter) {
+        $ufiltering = new fn_user_filtering(null, null, null, 'mentee');
+        list($extrasql, $extraparams) = $ufiltering->get_sql_filter();
+        if ($extrasql) {
+            $extrasql = 'AND '.$extrasql;
+            $params += $extraparams;
+        }
+    }
+
+    $params['roleid'] = $mentorroleid;
+    $params['userid'] = $mentorid;
+    $params['contextlevel'] = CONTEXT_USER;
 
     $sql = "SELECT ctx.instanceid AS studentid,
                    u.firstname,
@@ -286,12 +515,14 @@ function block_fn_mentor_get_mentees($mentorid, $courseid=0, $studentids = '') {
                 ON ra.contextid = ctx.id
         INNER JOIN {user} u
                 ON ctx.instanceid = u.id
-             WHERE ra.roleid = ?
-               AND ra.userid = ?
-               AND ctx.contextlevel = ?
+             WHERE ra.roleid = :roleid
+               AND ra.userid = :userid
+               AND ctx.contextlevel = :contextlevel
+                   $extrasql
+                   {$insql}
           ORDER BY u.lastname ASC";
 
-    $mentees = $DB->get_records_sql($sql, array($mentorroleid, $mentorid, CONTEXT_USER));
+    $mentees = $DB->get_records_sql($sql, $params);
 
     if ($coursestudents) {
         $mentees = array_intersect_key($mentees, $coursestudents);
@@ -300,6 +531,64 @@ function block_fn_mentor_get_mentees($mentorid, $courseid=0, $studentids = '') {
     if ($studentids) {
         $mentees = array_intersect_key($mentees, $studentids);
     }
+
+
+    if ($gm = $DB->record_exists('block_fn_mentor_group_mem', array('teamleader' => 1, 'userid' => $mentorid, 'role' => 'M'))) {
+        $sql = "SELECT gm2.userid studentid, u.firstname, u.lastname 
+                  FROM {block_fn_mentor_group_mem} gm 
+                  JOIN {block_fn_mentor_group_mem} gm2 
+                    ON gm.groupid = gm2.groupid
+                   AND gm2.role = 'U' 
+                  JOIN {user} u 
+                    ON gm2.userid = u.id
+                 WHERE gm.userid = :mentorid 
+                   AND gm.role = 'M' 
+                   AND gm.teamleader = 1
+                       $extrasql";
+        if ($groupmentees = $DB->get_records_sql($sql, $extraparams + array('mentorid' => $mentorid))) {
+            $mentees = $mentees + $groupmentees;
+        }
+    }
+
+    foreach ($mentees as $key => $mentee) {
+        if (block_fn_mentor_isstudentinanycourse($key)) {
+            $mentee->enrolled = 1;
+        } else {
+            $mentee->enrolled = 0;
+        }
+        $mentees[$key] = $mentee;
+    }
+
+    return $mentees;
+
+}
+
+
+function block_fn_mentor_get_group_mentees($mentorid, $groupid) {
+    global $DB;
+
+    if (! $mentorroleid = get_config('block_fn_mentor', 'mentor_role_user')) {
+        return false;
+    }
+
+    $sql = "SELECT ctx.instanceid AS studentid,
+                   u.firstname,
+                   u.lastname
+              FROM {role_assignments} ra
+        INNER JOIN {context} ctx
+                ON ra.contextid = ctx.id
+        INNER JOIN {user} u
+                ON ctx.instanceid = u.id
+        INNER JOIN {block_fn_mentor_group_mem} gm
+                ON u.id = gm.userid
+             WHERE ra.roleid = ?
+               AND ra.userid = ?
+               AND ctx.contextlevel = ?
+               AND gm.role = ?
+               AND gm.groupid = ?
+          ORDER BY u.lastname ASC";
+
+    $mentees = $DB->get_records_sql($sql, array($mentorroleid, $mentorid, CONTEXT_USER, 'U', $groupid));
 
     foreach ($mentees as $key => $mentee) {
         if (block_fn_mentor_isstudentinanycourse($key)) {
@@ -399,8 +688,8 @@ function block_fn_mentor_has_system_role($userid, $roleid) {
 
 }
 
-function block_fn_mentor_get_mentees_by_mentor($courseid=0, $filter='', $mentorid=0) {
-    global $USER;
+function block_fn_mentor_get_mentees_by_mentor($courseid=0, $filter='', $mentorid=0, $groupid=0) {
+    global $USER, $DB;
 
     $data = array();
     $allcoursestudents = array();
@@ -420,15 +709,24 @@ function block_fn_mentor_get_mentees_by_mentor($courseid=0, $filter='', $mentori
         return $data;
     }
 
+    if ($groupid && $groupmentors = block_fn_mentor_get_group_members($groupid, 'M')) {
+        list($extrawheretest, $whereorsortparams) = $DB->get_in_or_equal(array_keys($groupmentors), SQL_PARAMS_NAMED, 'usr');
+        $extrawheretest = 'u.id '.$extrawheretest;
+    } else {
+        $extrawheretest = '';
+        $whereorsortparams = array();
+    }
+
     if ($mentors = get_role_users(get_config('block_fn_mentor', 'mentor_role_system'),
-        context_system::instance(), false, 'u.id, u.firstname, u.lastname', 'u.lastname')) {
+        context_system::instance(), false, 'u.id, u.firstname, u.lastname', 'u.lastname', true, '', '', '',
+        $extrawheretest, $whereorsortparams)) {
         foreach ($mentors as $mentor) {
             if ($mentorid) {
                 if ($mentorid <> $mentor->id) {
                     continue;
                 }
             }
-            if ($mentees = block_fn_mentor_get_mentees($mentor->id, $courseid, $allcoursestudents)) {
+            if ($mentees = block_fn_mentor_get_mentees($mentor->id, $courseid, $allcoursestudents, $groupid)) {
                 $data[$mentor->id]['mentor'] = $mentor;
                 $data[$mentor->id]['mentee'] = $mentees;
             }
@@ -452,8 +750,7 @@ function block_fn_mentor_render_mentees_by_mentor($data, $show) {
 
     $html = '';
     foreach ($data as $mentor) {
-        $html .= '<div class="mentor"><strong><img class="mentor-img" src="'.
-            $CFG->wwwroot.'/blocks/fn_mentor/pix/mentor_bullet.png"> <a class="mentor-profile" href="'.
+        $html .= '<div class="mentor"><strong><a class="mentor-profile" href="'.
             $CFG->wwwroot.'/user/profile.php?id='.$mentor['mentor']->id.'" onclick="window.open(\''.
             $CFG->wwwroot.'/user/profile.php?id='.$mentor['mentor']->id.'\', \'\', \'width=800,height=600,toolbar=no,'.
             'location=no,menubar=no,copyhistory=no,status=no,directories=no,scrollbars=yes,resizable=yes\'); return false;">'.
@@ -465,7 +762,7 @@ function block_fn_mentor_render_mentees_by_mentor($data, $show) {
             } else if (($gradesummary->passed > 0) && ($gradesummary->failed == 0)) {
                 $menteeicon = 'mentee_green.png';
             } else if (($gradesummary->passed > 0) && ($gradesummary->failed > 0)) {
-                $menteeicon = 'mentee_red_green.png';
+                $menteeicon = 'mentee_orange.png';
             } else if (($gradesummary->passed == 0) && ($gradesummary->failed > 0)) {
                 $menteeicon = 'mentee_red.png';
             } else if (($gradesummary->passed == 0) && ($gradesummary->failed == 0)) {
@@ -529,7 +826,7 @@ function block_fn_mentor_render_mentors_by_mentee($data) {
         } else if (($gradesummary->passed > 0) && ($gradesummary->failed == 0)) {
             $menteeicon = 'mentee_green.png';
         } else if (($gradesummary->passed > 0) && ($gradesummary->failed > 0)) {
-            $menteeicon = 'mentee_red_green.png';
+            $menteeicon = 'mentee_orange.png';
         } else if (($gradesummary->passed == 0) && ($gradesummary->failed > 0)) {
             $menteeicon = 'mentee_red.png';
         } else if (($gradesummary->passed == 0) && ($gradesummary->failed == 0)) {
@@ -564,13 +861,6 @@ function block_fn_mentor_render_mentees_by_student($menteeid) {
             $CFG->wwwroot.'/blocks/fn_mentor/pix/mentee_red.png"><a href="'.
             $CFG->wwwroot.'/blocks/fn_mentor/course_overview.php?menteeid='.$mentee->id.'" >' .
             $mentee->firstname . ' ' . $mentee->lastname . '</a></div>';
-        /*
-        foreach ($mentors as $mentor) {
-            $html .= '<div class="mentor"><img class="mentee-img" src="'.
-                $CFG->wwwroot.'/blocks/fn_mentor/pix/mentor_bullet.png"><a class="mentor-profile" href="'.
-                $CFG->wwwroot.'/user/profile.php?id='.$mentor->mentorid.'">' .$mentor->firstname . ' ' .
-                $mentor->lastname . '</a></div>';
-        }*/
     }
     return $html;
 }
@@ -718,12 +1008,15 @@ function block_fn_mentor_assignment_status($mod, $userid) {
     }
 }
 
-function block_fn_mentor_assign_plugin_config($assignmentid, $subtype = 'assignsubmission', $plugin = 'file', $setting = 'enabled') {
+function block_fn_mentor_assign_plugin_config($assignmentid, $subtype = 'assignsubmission',
+                                              $plugin = 'file', $setting = 'enabled') {
     global $DB;
-    $dbparams = array('assignment'=>$assignmentid,
-        'subtype'=>$subtype,
-        'plugin'=>$plugin,
-        'name'=>$setting);
+    $dbparams = array(
+        'assignment' => $assignmentid,
+        'subtype' => $subtype,
+        'plugin' => $plugin,
+        'name' => $setting
+    );
     $result = $DB->get_record('assign_plugin_config', $dbparams, '*', IGNORE_MISSING);
     if ($result) {
         return $result->value;
@@ -1280,6 +1573,20 @@ function block_fn_mentor_checkbox_checked($name, $id , $class, $value) {
     );
 }
 
+function block_fn_mentor_radio($name, $id , $class, $value) {
+    return html_writer::empty_tag('input', array(
+            'value' => $value, 'type' => 'radio', 'id' => $id, 'name' => $name, 'class' => $class
+        )
+    );
+}
+
+function block_fn_mentor_radio_checked($name, $id , $class, $value) {
+    return html_writer::empty_tag('input', array(
+            'value' => $value, 'type' => 'radio', 'id' => $id, 'name' => $name, 'class' => $class, 'checked' => 'checked'
+        )
+    );
+}
+
 function block_fn_mentor_textinput($name, $id, $class , $value = '') {
     return html_writer::empty_tag('input', array(
             'value' => $value, 'type' => 'text', 'id' => $id, 'name' => $name, 'class' => $class
@@ -1354,7 +1661,7 @@ function block_fn_mentor_render_notification_rule_table($notification, $number) 
     $html .= '</td>
                   </tr>
                   <tr>
-                    <th class="notification_c1" nowrap="nowrap">'.get_string('apply_to', 'block_fn_mentor').'</th>
+                    <th class="notification_c1" nowrap="nowrap">'.get_string('applyto', 'block_fn_mentor').'</th>
                     <th class="notification_c2" nowrap="nowrap">'.get_string('when_to_send', 'block_fn_mentor').'</th>
                     <th class="notification_c3" nowrap="nowrap">'.get_string('who_to_send', 'block_fn_mentor').'</th>
                     <th class="notification_c4" nowrap="nowrap">'.get_string('how_often', 'block_fn_mentor').'</th>
@@ -1387,7 +1694,7 @@ function block_fn_mentor_render_notification_rule_table($notification, $number) 
     }
     $html .= '</td><td class="notification_rule_body notification_c2">';
 
-    if ($notification->g2 || $notification->g4 || $notification->g6 || $notification->n1 || $notification->n2) {
+    if ($notification->g2 || $notification->g4 || $notification->g6 || $notification->n1 || $notification->n2 || $notification->consecutive) {
 
         $html .= '<ul>';
         if ($notification->g2) {
@@ -1404,6 +1711,9 @@ function block_fn_mentor_render_notification_rule_table($notification, $number) 
         }
         if ($notification->n2) {
             $html .= '<li>'.get_string('n2', 'block_fn_mentor', $notification->n2_value).'</li>';
+        }
+        if ($notification->consecutive) {
+            $html .= '<li>'.get_string('consecutive', 'block_fn_mentor', $notification->consecutive_value).'</li>';
         }
         $html .= '</ul>';
     }
@@ -1851,6 +2161,15 @@ function block_fn_mentor_send_notifications($notificationid=null, $output=false,
                                     }
                                 }
                             }
+
+                            // Consecutive.
+                            if ($notificationrule->consecutive && $notificationrule->consecutive_value) {
+                                if (block_fn_mentor_concurrent_login($student->id, $notificationrule->consecutive_value)) {
+                                    $message .= '';
+                                    $notificationmessage[$student->id][$course->id]['coursename'] = $course->fullname;
+                                    $notificationmessage[$student->id][$course->id]['message'] = $message;
+                                }
+                            }
                         }
                     }
                 }
@@ -2008,18 +2327,20 @@ function block_fn_mentor_group_messages($list=false) {
                 $emailbody .= $appendedmessage . '<hr />';
 
                 foreach ($messages as $message) {
-                    $student = $DB->get_record('user', array('id' => $message->userid));
-                    $course = $DB->get_record('course', array('id' => $message->courseid));
+                    if ($notification->messagecontent != BLOCK_FN_MENTOR_MESSAGE_SEND_APPENDED) {
+                        $student = $DB->get_record('user', array('id' => $message->userid));
+                        $course = $DB->get_record('course', array('id' => $message->courseid));
 
-                    $emailbody .= get_string('progressreportfrom', 'block_fn_mentor', format_string($site->fullname)).' <br />';
-                    $emailbody .= get_string('student', 'block_fn_mentor').':  <strong>' .
-                        $student->firstname . ' ' . $student->lastname . '</strong> <br /><hr />';
+                        $emailbody .= get_string('progressreportfrom', 'block_fn_mentor', format_string($site->fullname)) . ' <br />';
+                        $emailbody .= get_string('student', 'block_fn_mentor') . ':  <strong>' .
+                            $student->firstname . ' ' . $student->lastname . '</strong> <br /><hr />';
 
-                    $emailbody .= get_string('course', 'block_fn_mentor').': ' . $course->fullname . ' <br />';
-                    $emailbody .= '<ul>' . $message->message . '</ul>';
+                        $emailbody .= get_string('course', 'block_fn_mentor') . ': ' . $course->fullname . ' <br />';
+                        $emailbody .= '<ul>' . $message->message . '</ul>';
 
-                    $menteeurl = new moodle_url('/blocks/fn_mentor/course_overview.php', array('menteeid' => $student->id));
-                    $emailbody .= '<p>' . get_string('linktomentorpage', 'block_fn_mentor', $menteeurl->out()) . '</p><hr />';
+                        $menteeurl = new moodle_url('/blocks/fn_mentor/course_overview.php', array('menteeid' => $student->id));
+                        $emailbody .= '<p>' . get_string('linktomentorpage', 'block_fn_mentor', $menteeurl->out()) . '</p><hr />';
+                    }
 
                     $message->sent = 1;
                     $DB->update_record('block_fn_mentor_notific_msg', $message);
@@ -2121,27 +2442,26 @@ function block_fn_mentor_sms_to_user ($user, $from, $subject, $messagetext, $mes
     $sqlphonenumber = "SELECT t1.shortname, t2.data
 						 FROM {user_info_field} t1 , {user_info_data}  t2
 					    WHERE t1.id = t2.fieldid
-						  AND t1.shortname = 'mobilephone'
+						  AND t1.shortname = ?
 						  AND t2.userid = ?";
 
-    if ($phonenumber = $DB->get_record_sql($sqlphonenumber, array($user->id))) {
-        $smsnumber = $phonenumber->data;
+    $sqlprovider = "SELECT t1.shortname, t2.data
+         			  FROM {user_info_field} t1 , {user_info_data}  t2
+		     	 	 WHERE t1.id = t2.fieldid
+					   AND t1.shortname = ?
+					   AND t2.userid = ?";
 
-        $sqlprovider = "SELECT t1.shortname, t2.data
-     					  FROM {user_info_field} t1 , {user_info_data}  t2
-					 	 WHERE t1.id = t2.fieldid
-						   AND t1.shortname = 'mobileprovider'
-						   AND t2.userid = ?";
-
-        if ($phoneprovider = $DB->get_record_sql($sqlprovider, array($user->id))) {
-            $smsproviderfull = $phoneprovider->data;
-            $smsproviderarray = explode('~', $smsproviderfull);
-            $smsprovider = $smsproviderarray[1];
-            $user->email = $smsnumber . $smsprovider;
-
-            return email_to_user($user, $from, get_string('notification', 'block_fn_mentor'), strip_tags($messagehtml), '');
+    for ($i =1; $i <= 2; $i++) {
+        if ($phonenumber = $DB->get_record_sql($sqlphonenumber, array('mobilephone'.$i, $user->id))) {
+            $smsnumber = $phonenumber->data;
+            if ($phoneprovider = $DB->get_record_sql($sqlprovider, array('mobileprovider'.$i, $user->id))) {
+                $smsproviderfull = $phoneprovider->data;
+                $smsproviderarray = explode('~', $smsproviderfull);
+                $smsprovider = $smsproviderarray[1];
+                $user->email = $smsnumber . $smsprovider;
+                email_to_user($user, $from, get_string('notification', 'block_fn_mentor'), strip_tags($messagehtml), '');
+            }
         }
-
     }
     return false;
 }
@@ -2859,4 +3179,243 @@ function block_fn_mentor_get_user_course_average($userid, $courseid) {
         return -1;
     }
     return false;
+}
+
+function block_fn_mentor_assign_action_btn($text, $id) {
+    $attributes = array(
+        'value' => $text, 'type' => 'button', 'id' => $id, 'class' => 'btn btn-secondary assign-group-button'
+    );
+
+    return html_writer::tag('p',
+        html_writer::empty_tag('input', $attributes)
+    );
+};
+
+function block_fn_mentor_add_group_member($userid, $groupid, $role) {
+    global $DB;
+
+    $user = $DB->get_record('user', array('id' => $userid), '*', MUST_EXIST);
+
+    if ($user->deleted) {
+        return false;
+    }
+
+    if ($DB->record_exists('block_fn_mentor_group', array('id' => $groupid))) {
+        if (!$DB->record_exists('block_fn_mentor_group_mem', array('groupid' => $groupid, 'userid' => $userid, 'role' => $role))) {
+            $member = new stdClass();
+            $member->groupid = $groupid;
+            $member->userid = $userid;
+            $member->timeadded = time();
+            $member->role = $role;
+            return $DB->insert_record('block_fn_mentor_group_mem', $member);
+        }
+    }
+
+    return false;
+}
+
+function block_fn_mentor_remove_group_member($userid, $groupid, $role) {
+    global $DB;
+
+    $user = $DB->get_record('user', array('id'=>$userid), '*', MUST_EXIST);
+
+    if ($user->deleted) {
+        return false;
+    }
+
+    if ($DB->record_exists('block_fn_mentor_group', array('id' => $groupid))) {
+        $params = array(
+            'groupid' => $groupid,
+            'userid' => $userid,
+            'role' => $role
+        );
+        return $DB->delete_records('block_fn_mentor_group_mem', $params);
+    } else {
+        return false;
+    }
+};
+
+function block_fn_mentor_get_group_members($groupid, $role) {
+    global $DB;
+
+    if ($role == 'M') {
+        $select = "IF(gm.teamleader='1', CONCAT('[GT] ', u.firstname, ' ', u.lastname), CONCAT(u.firstname, ' ', u.lastname)) fullname";
+    } else {
+        $select = "CONCAT( u.firstname, ' ', u.lastname) fullname";
+    }
+
+    $sql = "SELECT u.id,
+                   $select
+              FROM {block_fn_mentor_group_mem} gm
+              JOIN {user} u
+                ON gm.userid = u.id
+             WHERE gm.groupid = ?
+               AND gm.role = ?
+               AND u.deleted = ?
+          ORDER BY u.lastname ASC";
+
+    return $DB->get_records_sql_menu($sql, array($groupid, $role, 0));
+};
+
+function  block_fn_mentor_get_group_by_idnumber($idnumber) {
+    global $DB;
+
+    if (empty($idnumber)) {
+        return false;
+    }
+    if ($group = $DB->get_record('block_fn_mentor_group', array('idnumber' => $idnumber))) {
+        return $group;
+    }
+    return false;
+}
+
+function block_fn_mentor_users_has_active_enrollment() {
+    global $DB;
+
+    $sql = "SELECT u.id, u.firstname, u.lastname, u.email
+              FROM {course} c
+              JOIN {enrol} en 
+                ON en.courseid = c.id
+              JOIN {user_enrolments} ue 
+                ON ue.enrolid = en.id
+              JOIN {user} u 
+                ON ue.userid = u.id
+          GROUP BY u.id
+          ORDER BY u.lastname ASC";
+
+    return $DB->get_records_sql_menu($sql);
+}
+
+function block_fn_mentor_max_number_of_mentor($userids) {
+    global $DB;
+
+    if (! $mentorroleid = get_config('block_fn_mentor', 'mentor_role_user')) {
+        return false;
+    }
+
+    list($sqlfilter, $params) = $DB->get_in_or_equal($userids);
+
+    $params[] = CONTEXT_USER;
+    $params[] = $mentorroleid;
+
+    $sql = "SELECT MAX(numofmentor) maxmentor
+              FROM (SELECT COUNT(ra2.id) numofmentor,
+                           ctx.instanceid menteeid
+                      FROM {context} ctx
+                      JOIN {role_assignments} ra2 
+                        ON ctx.id = ra2.contextid
+                     WHERE ctx.instanceid {$sqlfilter} 
+                       AND ctx.contextlevel = ? 
+                       AND ra2.roleid = ?
+                  GROUP BY ctx.instanceid) counts";
+
+    $rec =  $DB->get_record_sql($sql, $params);
+    return $rec->maxmentor;
+}
+
+function block_fn_mentor_get_assigned_mentors($userid) {
+    global $DB;
+
+    if (!$muserroleid = get_config('block_fn_mentor', 'mentor_role_user')) {
+        return false;
+    }
+
+    $sql = "SELECT u.*
+              FROM {role_assignments} ra
+              JOIN {context} cx ON ra.contextid = cx.id
+              JOIN {user} u ON ra.userid = u.id
+             WHERE cx.contextlevel = ? 
+               AND ra.roleid = ?
+               AND cx.instanceid = ? 
+               AND u.deleted = ?
+               AND u.suspended = ?";
+
+    return $DB->get_records_sql($sql, array(CONTEXT_USER, $muserroleid, $userid, 0, 0));
+}
+
+function block_fn_mentor_assign_mentor_to_user($mentorid, $userid) {
+    global $DB;
+    $roleid = get_config('block_fn_mentor', 'mentor_role_user');
+
+    $mentor = $DB->get_record('user', array('id' => $mentorid, 'deleted' => 0));
+    $user = $DB->get_record('user', array('id' => $userid, 'deleted' => 0));
+
+    if ($roleid && $mentor && $user) {
+        if (block_fn_mentor_is_mentor($mentor->id)) {
+            $usercontext = context_user::instance($user->id);
+            return role_assign($roleid, $mentor->id, $usercontext->id);
+        }
+    }
+    return false;
+}
+
+function block_fn_mentor_uu_validate_user_upload_columns(csv_import_reader $cir, $stdfields, $profilefields, moodle_url $returnurl) {
+    $columns = $cir->get_columns();
+    if (empty($columns)) {
+        $cir->close();
+        $cir->cleanup();
+        print_error('cannotreadtmpfile', 'error', $returnurl);
+    }
+    if (count($columns) < 2) {
+        $cir->close();
+        $cir->cleanup();
+        print_error('csvfewcolumns', 'error', $returnurl);
+    }
+
+    // test columns
+    $processed = array();
+    foreach ($columns as $key=>$unused) {
+        $field = $columns[$key];
+        $lcfield = core_text::strtolower($field);
+        if (in_array($field, $stdfields) or in_array($lcfield, $stdfields)) {
+            // standard fields are only lowercase
+            $newfield = $lcfield;
+
+        } else if (in_array($field, $profilefields)) {
+            // exact profile field name match - these are case sensitive
+            $newfield = $field;
+
+        } else if (in_array($lcfield, $profilefields)) {
+            // hack: somebody wrote uppercase in csv file, but the system knows only lowercase profile field
+            $newfield = $lcfield;
+
+        } else if (preg_match('/^(cohort|mentor_group|site_group|mentor)\d*$/', $lcfield)) {
+            // special fields for enrolments
+            $newfield = $lcfield;
+
+        } else {
+            $cir->close();
+            $cir->cleanup();
+            print_error('invalidfieldname', 'error', $returnurl, $field);
+        }
+        if (in_array($newfield, $processed)) {
+            $cir->close();
+            $cir->cleanup();
+            print_error('duplicatefieldname', 'error', $returnurl, $newfield);
+        }
+        $processed[$key] = $newfield;
+    }
+
+    return $processed;
+}
+function block_fn_mentor_concurrent_login($userid, $numofday) {
+    global $DB;
+
+    $time = time();
+
+    $sql = "SELECT log.id
+              FROM {logstore_standard_log} log
+             WHERE log.userid = ?
+               AND log.timecreated >= ?
+               AND log.timecreated <= ?";
+
+    for ($i=0; $i < $numofday; $i++) {
+        $timestart = usergetmidnight($time - ($i * 24 * 60 * 60));
+        $timeend = $timestart + 24*60*60-1;
+
+        if (!$DB->record_exists_sql($sql, array($userid, $timestart, $timeend))) {
+            return false;
+        }
+    }
+    return true;
 }

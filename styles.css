@@ -13,18 +13,21 @@
     display: block;
     margin: 0 !important;
 }
+.block_fn_mentor #groupForm,
 .block_fn_mentor #courseForm {
     display: block;
-    float: right;
 }
+.block_fn_mentor #groupForm {
+    margin-bottom: 5px;
+}
+.block_fn_mentor .select.menugroupfilter,
 .block_fn_mentor .select.menucoursefilter {
-    max-width: 150px;
+    width: 90%;
 }
 .block_fn_mentor .mentor-img {
     margin-right: 6px;
 }
 .block_fn_mentor .mentee-img {
-    margin-left: 10px;
     margin-right: 6px;
 }
 .block_fn_mentor .mentor {
@@ -33,14 +36,11 @@
 .block_fn_mentor .mentee-block-menu {
     display: block;
     float: left;
-    font-size: 11px;
+    font-size: 13px;
     width: 50%;
 }
 .block_fn_mentor .mentee-footer-menu {
     overflow: hidden;
-}
-.block_fn_mentor .mentee-footer-menu .mentee {
-    margin: 5px 0;
 }
 .block_fn_mentor .gray > a {
     color: #999;
@@ -51,4 +51,58 @@
     border: none;
     color: #ddd;
     background-color: #ddd;
+}
+.block_fn_mentor_tabmenu {
+    position: relative;
+}
+.block_fn_mentor_tabmeenuicons {
+    float: right;
+    position: absolute;
+    right: 0;
+    top: 10px;
+}
+.fn_mentor-category-selection-desc {
+    margin: 20px 15px 15px;
+}
+.fn_mentor-tab-icons {
+    margin-left: 10px;
+}
+#page-blocks-fn_mentor-group .generaltable {
+    margin: auto;
+    width: auto;
+}
+#page-blocks-fn_mentor-group .add-record-btn-wrapper {
+    text-align: center;
+    margin: 20px;
+}
+#page-blocks-fn_mentor-group .spark-close-form,
+#page-blocks-fn_mentor-group .spark-add-record-form {
+    display: inline;
+    margin: 0 5px;
+}
+#page-blocks-fn_mentor-mentor_role .active-filters > div,
+#page-blocks-fn_mentor-group_members .active-filters > div,
+#page-blocks-fn_mentor-assign .active-filters > div {
+    font-weight: bold;
+    margin: 15px 0 5px;
+}
+#page-blocks-fn_mentor-mentor_role form#potential-mentor-filter,
+#page-blocks-fn_mentor-group_members form#potential-mentor-filter,
+#page-blocks-fn_mentor-group_members form#potential-mentee-filter,
+#page-blocks-fn_mentor-assign form#potential-mentor-filter,
+#page-blocks-fn_mentor-assign form#potential-mentee-filter,
+#page-blocks-fn_mentor-mentor_role form#selected-mentor-filter,
+#page-blocks-fn_mentor-group_members form#selected-mentor-filter,
+#page-blocks-fn_mentor-group_members form#selected-mentee-filter,
+#page-blocks-fn_mentor-assign form#selected-mentor-filter,
+#page-blocks-fn_mentor-assign form#selected-mentee-filter {
+    display: inline;
+    margin-left: 5px;
+}
+.block_fn_mentor .too-many-users {
+    margin-top: 15px;
+    text-align: center;
+}
+.block_fn_mentor .too-many-users.last {
+    margin-bottom: 10px;
 }

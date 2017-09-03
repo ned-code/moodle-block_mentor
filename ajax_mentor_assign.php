@@ -63,7 +63,7 @@ if ( has_capability('block/fn_mentor:assignmentor', context_system::instance(), 
             if ($mentorrole && $mentorid) {
                 foreach ($users as $user) {
                     $usercontext = context_user::instance($user->id);
-                    role_assign($mentorrole, $mentorid, $usercontext);
+                    role_assign($mentorrole, $mentorid, $usercontext->id);
                 }
             } else {
                 $data['success'] = false;
