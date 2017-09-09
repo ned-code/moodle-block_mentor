@@ -36,7 +36,7 @@ $iid         = optional_param('iid', '', PARAM_INT);
 $previewrows = optional_param('previewrows', 10, PARAM_INT);
 
 core_php_time_limit::raise(60 * 60); // 1 hour should be enough.
-raise_memory_limit(MEMORY_HUGE);
+// raise_memory_limit(MEMORY_HUGE);
 
 $struserupdated             = get_string('useraccountupdated', 'tool_uploaduser');
 $strusernotupdated          = get_string('usernotupdatederror', 'error');

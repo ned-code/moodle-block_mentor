@@ -55,7 +55,7 @@ $progressbar->create();         // prints the HTML code of the progress bar
 
 // we may need a bit of extra execution time and memory here
 core_php_time_limit::raise(HOURSECS);
-raise_memory_limit(MEMORY_EXTRA);
+// raise_memory_limit(MEMORY_EXTRA);
 block_fn_mentor_generate_report($students, $progressbar);
 
 echo $OUTPUT->continue_button(new moodle_url('/admin/tool/customlang/edit.php', array('lng' => $lng)), 'get');

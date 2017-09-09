@@ -96,7 +96,7 @@ if ($mform->is_cancelled()) {
 
     // Export data.
     set_time_limit(300);
-    raise_memory_limit(MEMORY_EXTRA);
+    // raise_memory_limit(MEMORY_EXTRA);
     $table = new stdClass();
 
     $headers = array('firstname', 'lastname', 'email', 'mentor_role');

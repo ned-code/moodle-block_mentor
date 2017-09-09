@@ -66,7 +66,7 @@ if ($process) {
     $progressbar = new progress_bar();
     $progressbar->create();
     core_php_time_limit::raise(HOURSECS);
-    raise_memory_limit(MEMORY_EXTRA);
+    // raise_memory_limit(MEMORY_EXTRA);
     block_fn_mentor_generate_report($progressbar);
     echo $OUTPUT->continue_button(new moodle_url('/blocks/fn_mentor/all_students.php'), 'get');
     echo $OUTPUT->footer();
