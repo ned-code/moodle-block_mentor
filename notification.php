@@ -69,21 +69,23 @@ $mform = new notification_form(null, $parameters, 'post', '', array('id' => 'not
 if ($mform->is_cancelled()) {
     redirect(new moodle_url('/blocks/fn_mentor/notification_rules.php'), get_string('successful', 'block_fn_mentor'));
 } else if ($fromform = $mform->get_data()) {
-
     foreach ($_POST as $key => $value) {
         if (strpos($key, "category_") === 0) {
             if (isset($value)) {
-                $fromform->category[] = $value;
+                $fromform->category[] = optional_param('category_'.$value, 0, PARAM_INT);
             }
         } else if (strpos($key, "course_") === 0) {
             if ($value <> '0') {
-                $fromform->course[] = $value;
+                $fromform->course[] = optional_param('course_'.$value, 0, PARAM_INT);
             }
         } else {
-            $fromform->$key = $value;
+            if (is_array($value)) {
+                $fromform->$key = optional_param_array($key, array(), PARAM_RAW);
+            } else {
+                $fromform->$key = optional_param($key, '', PARAM_RAW);
+            }
         }
     }
-
     if (isset($fromform->category)) {
         $fromform->category = implode(',', $fromform->category);
     }

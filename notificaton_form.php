@@ -360,13 +360,6 @@ class notification_form extends moodleform {
         $mform->addElement('html', '</td>');
         $mform->addElement('html', '</tr>');
 
-
-
-
-
-
-
-
         $mform->addElement('html', '<tr>');
         $mform->addElement('html', '<th colspan="2">');
         $mform->addElement('html', get_string('applyto', 'block_fn_mentor'));

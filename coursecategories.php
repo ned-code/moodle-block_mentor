@@ -68,18 +68,22 @@ if ($mform->is_cancelled()) {
 
     set_config('category', '',  'block_fn_mentor');
     set_config('course', '',  'block_fn_mentor');
-
+    
     foreach ($_POST as $key => $value) {
         if (strpos($key, "category_") === 0) {
-            if ($value <> '0') {
-                $fromform->category[] = $value;
+            if (isset($value)) {
+                $fromform->category[] = optional_param('category_'.$value, 0, PARAM_INT);
             }
         } else if (strpos($key, "course_") === 0) {
             if ($value <> '0') {
-                $fromform->course[] = $value;
+                $fromform->course[] = optional_param('course_'.$value, 0, PARAM_INT);
             }
         } else {
-            $fromform->$key = $value;
+            if (is_array($value)) {
+                $fromform->$key = optional_param_array($key, array(), PARAM_RAW);
+            } else {
+                $fromform->$key = optional_param($key, '', PARAM_RAW);
+            }
         }
     }
 
