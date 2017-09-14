@@ -307,3 +307,6 @@ $string['wordformentor'] = 'Word for Mentor';
 $string['wordformentors'] = 'Word for Mentors';
 $string['wordformentorgroup'] = 'Word for Mentor Group';
 $string['wordformentorgroups'] = 'Word for Mentor Groups';
+$string['overview'] = 'Overview';
+$string['grades'] = 'Grades';
+$string['activity'] = 'Activity';

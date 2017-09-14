@@ -350,12 +350,12 @@ echo '<div class="mentee-course-overview-center-course-menu">
           <table class="mentee-menu">
             <tr>
                 <td'.$classoverview.'><a href="'.$CFG->wwwroot.'/blocks/fn_mentor/course_overview_single.php?menteeid='.
-    $menteeid.'&groupid=' . $groupid.'&courseid='.$courseid.'">Overview</a></td>
+    $menteeid.'&groupid=' . $groupid.'&courseid='.$courseid.'">'.get_string('overview', 'block_fn_mentor').'</a></td>
                 <td'.$classgrade.'><a href="'.$CFG->wwwroot.'/blocks/fn_mentor/course_overview_single.php?page=grade&menteeid='.
-    $menteeid.'&groupid=' . $groupid.'&courseid='.$courseid.'">Grades</a></td>
+    $menteeid.'&groupid=' . $groupid.'&courseid='.$courseid.'">'.get_string('grades', 'block_fn_mentor').'</a></td>
                 <td'.$classactivity.'><a href="'.$CFG->wwwroot.
     '/blocks/fn_mentor/course_overview_single.php?page=outline&menteeid='.
-    $menteeid.'&groupid=' . $groupid.'&courseid='.$courseid.'">Activity</a></td>';
+    $menteeid.'&groupid=' . $groupid.'&courseid='.$courseid.'">'.get_string('activity', 'block_fn_mentor').'</a></td>';
 
 echo '</tr>
           </table>
