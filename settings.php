@@ -238,6 +238,15 @@ $settings->add(
 
 $settings->add(
     new admin_setting_configcheckbox(
+        'block_fn_mentor/assignmentorinprofile',
+        get_string('assignmentorinprofile', 'block_fn_mentor'),
+        '',
+        '0'
+    )
+);
+
+$settings->add(
+    new admin_setting_configcheckbox(
         'block_fn_mentor/includeextranedcolumns',
         get_string('includeextranedcolumns', 'block_fn_mentor'),
         '',

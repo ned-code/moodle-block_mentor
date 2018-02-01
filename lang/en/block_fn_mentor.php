@@ -310,3 +310,5 @@ $string['wordformentorgroups'] = 'Word for Mentor Groups';
 $string['overview'] = 'Overview';
 $string['grades'] = 'Grades';
 $string['activity'] = 'Activity';
+$string['assignmentorinprofile'] = 'Allow mentor to be set in profile field';
+$string['mentorptofilefield'] = 'Mentor profile field';

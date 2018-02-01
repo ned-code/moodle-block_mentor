@@ -25,6 +25,7 @@ require_once($CFG->dirroot.'/lib/completionlib.php');
 
 define('BLOCK_FN_MENTOR_MESSAGE_SEND_ALL', 0);
 define('BLOCK_FN_MENTOR_MESSAGE_SEND_APPENDED', 1);
+define('BLOCK_FN_MENTOR_PROFILE_FIELD_EMAIL', 'mentoremail');
 
 function block_fn_mentor_get_all_students($filter = '', $selectedcoursesonly = false, $sessionfilter = false) {
     global $DB;
@@ -3418,4 +3419,24 @@ function block_fn_mentor_concurrent_login($userid, $numofday) {
         }
     }
     return true;
+}
+function block_fn_mentor_assign_mentor_from_profile($userid, $profilevalue) {
+    global $DB;
+    $profilevalue = str_replace(' ', '', $profilevalue);
+    $emails = explode(',', $profilevalue);
+    $systemcontext = context_system::instance();
+    $usercontext = context_user::instance($userid);
+    $mentorrolesystem = get_config('block_fn_mentor', 'mentor_role_system');
+    $mentorroleuser = get_config('block_fn_mentor', 'mentor_role_user');
+
+    if (!$mentorrolesystem || !$mentorroleuser){
+        return false;
+    }
+
+    foreach ($emails as $email) {
+        if ($mentor = $DB->get_record('user', array('email' => $email, 'deleted' => 0))) {
+            role_assign($mentorrolesystem, $mentor->id, $systemcontext->id);
+            role_assign($mentorroleuser, $mentor->id, $usercontext->id);
+        }
+    }
 }

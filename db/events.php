@@ -16,18 +16,28 @@
 
 /**
  * @package    block_fn_mentor
- * @subpackage NED
- * @copyright  NED {@link http://ned.ca}
- * @author     NED {@link http://ned.ca}
+ * @copyright  Michael Gardener <mgardener@cissq.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- * @developer  Michael Gardener <mgardener@cissq.com>
  */
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2018012600;
-$plugin->requires  = 2015111600;
-$plugin->component = 'block_fn_mentor';
-$plugin->cron = 30;
-$plugin->release = '3.3.0';
-$plugin->maturity = MATURITY_STABLE;
+// List of observers.
+$observers = array(
+    array(
+        'eventname'   => '\core\event\user_updated',
+        'callback'    => 'block_fn_mentor_observer::user_updated',
+    ),
+    array(
+        'eventname'   => '\core\event\role_assigned',
+        'callback'    => 'block_fn_mentor_observer::role_assigned',
+    ),
+    array(
+        'eventname'   => '\core\event\role_unassigned',
+        'callback'    => 'block_fn_mentor_observer::role_unassigned',
+    ),
+    array(
+        'eventname'   => '\core\event\user_profile_viewed',
+        'callback'    => 'block_fn_mentor_observer::user_profile_viewed',
+    )
+);
