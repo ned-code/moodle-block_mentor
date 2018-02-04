@@ -534,7 +534,7 @@ function block_fn_mentor_get_mentees($mentorid, $courseid=0, $studentids = '', $
     }
 
 
-    if ($gm = $DB->record_exists('block_fn_mentor_group_mem', array('teamleader' => 1, 'userid' => $mentorid, 'role' => 'M'))) {
+    if (empty($studentids) && $gm = $DB->record_exists('block_fn_mentor_group_mem', array('teamleader' => 1, 'userid' => $mentorid, 'role' => 'M'))) {
         $sql = "SELECT gm2.userid studentid, u.firstname, u.lastname 
                   FROM {block_fn_mentor_group_mem} gm 
                   JOIN {block_fn_mentor_group_mem} gm2 
@@ -1308,7 +1308,8 @@ function block_fn_mentor_get_enrolled_course_users ($courseids) {
                 ON en.courseid = course.id
               JOIN {user_enrolments} ue
                 ON ue.enrolid = en.id
-             WHERE en.courseid IN (?)";
+             WHERE en.courseid IN (?)
+               AND ue.status = 0";
 
     if ($enrolledusers = $DB->get_records_sql($sql, array($courseids))) {
         return $enrolledusers;
