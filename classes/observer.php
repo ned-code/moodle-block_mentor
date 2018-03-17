@@ -28,7 +28,7 @@ defined('MOODLE_INTERNAL') || die();
  * Event observers.
  */
 class block_fn_mentor_observer {
-    public static function user_updated(\core\event\user_updated $event) {
+    public static function user_updated($event) {
         if (!$assignmentorinprofile = get_config('block_fn_mentor', 'assignmentorinprofile')) {
             return;
         }
@@ -83,7 +83,7 @@ class block_fn_mentor_observer {
         }
 
         $data = $event->get_data();
-        self::update_user_profile($data['objectid'], $data['contextid'], $mentorroleuser);
+        self::update_user_profile($data['objectid']);
     }
 
     public static function set_user_profile($menteeid, $mentorid, $fieldname, $action) {
@@ -141,17 +141,17 @@ class block_fn_mentor_observer {
         }
     }
 
-    public static function update_user_profile($menteeid, $contextid=null, $mentorroleuser=null) {
+    public static function update_user_profile($menteeid) {
         global $DB;
-        if (!$mentorroleuser) {
-            if (!$mentorroleuser = get_config('block_fn_mentor', 'mentor_role_user')) {
-                return;
-            }
+
+        if (!$mentorroleuser = get_config('block_fn_mentor', 'mentor_role_user')) {
+            return;
         }
-        if (!$contextid) {
-            $usercontext = context_user::instance($menteeid);
-            $contextid = $usercontext->id;
+
+        if (!$usercontext = context_user::instance($menteeid)) {
+            return;
         }
+
         $sql = "SELECT ra.id,
                        ra.userid
                   FROM {role_assignments} ra
@@ -160,7 +160,7 @@ class block_fn_mentor_observer {
                  WHERE ra.contextid = ?
                    AND ra.roleid = ?
                    AND u.deleted = 0";
-        if ($mentors = $DB->get_records_sql($sql, array($contextid, $mentorroleuser))) {
+        if ($mentors = $DB->get_records_sql($sql, array($usercontext->id, $mentorroleuser))) {
             foreach ($mentors as $mentor) {
                 self::set_user_profile($menteeid, $mentor->userid,
                     BLOCK_FN_MENTOR_PROFILE_FIELD_EMAIL, 'add');

@@ -39,5 +39,9 @@ $observers = array(
     array(
         'eventname'   => '\core\event\user_profile_viewed',
         'callback'    => 'block_fn_mentor_observer::user_profile_viewed',
+    ),
+    array(
+        'eventname'   => '\core\event\user_loggedin',
+        'callback'    => 'block_fn_mentor_observer::user_updated',
     )
 );
