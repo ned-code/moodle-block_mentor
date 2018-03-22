@@ -6,13 +6,14 @@ function myOnComplete() {
 var rules = [];
 
 // Standard form fields.
-rules.push("required,name, Rule name is required.");
+rules.push("required, name, 'Rule name' is required.");
+rules.push("required, messagecontent, 'What to send' is required.");
 rules.push("digits_only, g4_value, This field may only contain digits.");
 rules.push("digits_only, g6_value, This field may only contain digits.");
 rules.push("digits_only, n1_value, This field may only contain digits.");
 rules.push("digits_only, n2_value, This field may only contain digits.");
-rules.push("required, period, This field may only contain digits.");
-rules.push("digits_only, period, This field may only contain digits.");
+rules.push("required, period, 'How often to send' is required");
+rules.push("digits_only, period, 'How often to send' may only contain digits.");
 
 // A custom validation function.
 function my_custom_function() {
