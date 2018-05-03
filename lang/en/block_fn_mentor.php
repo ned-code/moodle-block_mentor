@@ -273,6 +273,7 @@ $string['submit'] = 'Submit';
 $string['submitted_activities'] = 'Submitted Activities';
 $string['successful'] = 'Successful';
 $string['teacher'] = 'Teacher';
+$string['teachers'] = 'Teachers';
 $string['teacherappendedmsg'] = 'Appended Message for Teacher';
 $string['teacheremail'] = 'Teacher (Email)';
 $string['teachernotificationtype'] = 'Teacher ({$a})';

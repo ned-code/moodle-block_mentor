@@ -426,7 +426,7 @@ if ($enrolledcourses) {
                 $teacherlist .= block_fn_mentor_teacher_link ($teacher->id, $lastaccess);
             }
             if ($numofteachers > 1) {
-                $teacherlabel = $teacherlabel.'s';
+                $teacherlabel = get_string('teachers', 'block_fn_mentor');
             }
             echo '<tr><td class="mentee-teacher-table-label" valign="top"><span>' . $teacherlabel . ': </span></td><td valign="top">';
             if ($numofteachers > 1) {
