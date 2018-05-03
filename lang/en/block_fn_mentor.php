@@ -83,7 +83,6 @@ $string['creategroup'] = 'Create group';
 $string['currentgrade'] = 'Current grade';
 $string['dear'] = 'Dear';
 $string['dearfirstname'] = 'Dear {$a}, <br /><br />';
-$string['dearfirstnamestr'] = 'Dear Firstname,';
 $string['dearrolename'] = 'Dear {$a}, <br /><br />';
 $string['dearsirmadam'] = 'Dear Sir or Madam, <br /><br />';
 $string['delete'] = 'Delete';
