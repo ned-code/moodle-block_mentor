@@ -2480,12 +2480,12 @@ function block_fn_mentor_get_tiny_url($url) {
 }
 
 function block_fn_mentor_get_selected_courses($category, &$filtercourses) {
-    if ($category->courses) {
+    if (!empty($category->courses)) {
         foreach ($category->courses as $course) {
             $filtercourses[] = $course->id;
         }
     }
-    if ($category->categories) {
+    if (!empty($category->categories)) {
         foreach ($category->categories as $subcat) {
             block_fn_mentor_get_selected_courses($subcat, $course);
         }
