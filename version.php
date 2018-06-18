@@ -25,9 +25,12 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2018050400;
+$plugin->version   = 2018061800;
 $plugin->requires  = 2015111600;
 $plugin->component = 'block_fn_mentor';
 $plugin->cron = 30;
 $plugin->release = '3.3.1';
 $plugin->maturity = MATURITY_STABLE;
+$plugin->dependencies = array(
+    'local_ned_controller' => ANY_VERSION
+);
