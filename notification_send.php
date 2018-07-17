@@ -97,7 +97,7 @@ if ($process) {
     echo '<span class="fn-send-confirm">';
     echo '<div id="notice" style="display: none" class="box generalbox notice2">'.
         get_string('messagesprocessing', 'block_fn_mentor').
-        '<br><img style="margin-left: 60px;" src="'.$OUTPUT->pix_url('email3', 'block_fn_mentor').'"></div>';
+        '<br><img style="margin-left: 60px;" src="'.block_fn_mentor_pix_url('email3', 'block_fn_mentor').'"></div>';
     echo $OUTPUT->confirm(get_string('confirmsend', 'block_fn_mentor'),
         new moodle_url('/blocks/fn_mentor/notification_send.php',
             array('id' => $id, 'action' => $action, 'sesskey' => sesskey(), 'process' => 1)

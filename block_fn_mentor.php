@@ -282,7 +282,7 @@ class block_fn_mentor extends block_base {
                     $groupmenu[$groupurl[$group->id]] = $group->name;
                 }
                 $this->content->text .= html_writer::tag('form',
-                    html_writer::img($OUTPUT->pix_url('i/group'), get_string('group', 'block_fn_mentor')) . ' ' .
+                    html_writer::img(block_fn_mentor_pix_url('i/group'), get_string('group', 'block_fn_mentor')) . ' ' .
                     html_writer::select($groupmenu, 'groupfilter', $groupurl[$groupfilter], null,
                         array('onChange' => 'location=document.jump3.groupfilter.'.
                             'options[document.jump3.groupfilter.selectedIndex].value;'
@@ -296,7 +296,7 @@ class block_fn_mentor extends block_base {
         // COURSE.
         if (($isteacher || $isadmin || $ismentor) && $courses && ($this->page->course->id == SITEID)) {
             $this->content->text .= html_writer::tag('form',
-                html_writer::img($OUTPUT->pix_url('i/course'), get_string('course', 'block_fn_mentor')) . ' ' .
+                html_writer::img(block_fn_mentor_pix_url('i/course'), get_string('course', 'block_fn_mentor')) . ' ' .
                 html_writer::select($coursemenu, 'coursefilter', $courseurl[$coursefilter], null,
                     array('onChange' => 'location=document.jump2.coursefilter.'.
                         'options[document.jump2.coursefilter.selectedIndex].value;'
@@ -333,7 +333,7 @@ class block_fn_mentor extends block_base {
 
                     $this->content->text .= '<div class="too-many-users last">'.
                         '<a class="btn btn-secondary" href="'.$CFG->wwwroot.'/blocks/fn_mentor/course_overview.php">'.
-                        '<img src="'.$OUTPUT->pix_url('i/group').'" class="mentee-img"> '.
+                        '<img src="'.block_fn_mentor_pix_url('i/group').'" class="mentee-img"> '.
                         get_string('open_progress_reports', 'block_fn_mentor').'</a></div>';
 
 
@@ -349,12 +349,12 @@ class block_fn_mentor extends block_base {
 
                 if (($numberofmentees > $maxnumberofmentees) && (!$showall)) {
                     $this->content->text .= '<div class="mentee-footer-menu">'.
-                        '<div class="mentee-block-menu"><img class="mentee-img" src="'.$OUTPUT->pix_url('i/navigationitem').'">'.
+                        '<div class="mentee-block-menu"><img class="mentee-img" src="'.block_fn_mentor_pix_url('i/navigationitem').'">'.
                         '<a href="'.$CFG->wwwroot.'/blocks/fn_mentor/course_overview.php">'.
                         get_string('open_progress_reports', 'block_fn_mentor').'</a></div>';
 
                     $this->content->text .= '<div class="mentee-block-menu"><img class="mentee-img" src="'.
-                        $OUTPUT->pix_url('i/navigationitem').'">'.
+                        block_fn_mentor_pix_url('i/navigationitem').'">'.
                         '<a href="'.$CFG->wwwroot.'/'.$indexphp.'?sortby='.$sortby.'&coursefilter='.$coursefilter.
                         '&showall=1">'.get_string('show_all', 'block_fn_mentor').'</a></div>';
                     $this->content->text .= '</div>';
@@ -370,13 +370,13 @@ class block_fn_mentor extends block_base {
         }
         if (has_capability('block/fn_mentor:assignmentor', context_system::instance())) {
             $this->content->text .= '<div class="mentee-block-menu">'.
-                '<img class="mentee-img" src="'.$OUTPUT->pix_url('cog_small', 'block_fn_mentor').'">'.
+                '<img class="mentee-img" src="'.block_fn_mentor_pix_url('cog_small', 'block_fn_mentor').'">'.
                 '<a href="'.$CFG->wwwroot.'/blocks/fn_mentor/assign.php">'.
                 get_string('mentors', 'block_fn_mentor').'</a></div>';
         }
         if (has_capability('block/fn_mentor:createnotificationrule', context_system::instance())) {
             $this->content->text .= '<div class="mentee-block-menu">'.
-                '<img class="mentee-img" src="'.$OUTPUT->pix_url('cog_small', 'block_fn_mentor').'">'.
+                '<img class="mentee-img" src="'.block_fn_mentor_pix_url('cog_small', 'block_fn_mentor').'">'.
                 '<a href="'.$CFG->wwwroot.'/blocks/fn_mentor/notification_rules.php">'.
                 get_string('notifications', 'block_fn_mentor').'</a></div>';
         }

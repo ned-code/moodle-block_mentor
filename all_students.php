@@ -743,17 +743,17 @@ foreach ($columns as $column) {
     if ($sort != $column) {
         $columnicon = "";
         $columndir = "DESC";
-        $columnicon = "<img class='iconsort' src=\"" . $OUTPUT->pix_url('sort_inactive', 'block_fn_mentor') . "\" alt=\"\" />";
+        $columnicon = "<img class='iconsort' src=\"" . block_fn_mentor_pix_url('sort_inactive', 'block_fn_mentor') . "\" alt=\"\" />";
     } else {
         if ($dir == 'DESC') {
             $columndir = 'ASC';
-            $columnicon = "<img class='iconsort' src=\"" . $OUTPUT->pix_url('sort_desc', 'block_fn_mentor') . "\" alt=\"\" />";
+            $columnicon = "<img class='iconsort' src=\"" . block_fn_mentor_pix_url('sort_desc', 'block_fn_mentor') . "\" alt=\"\" />";
         } else if ($dir == 'ASC') {
             $columndir = 'CLEAR';
-            $columnicon = "<img class='iconsort' src=\"" . $OUTPUT->pix_url('sort_asc', 'block_fn_mentor') . "\" alt=\"\" />";
+            $columnicon = "<img class='iconsort' src=\"" . block_fn_mentor_pix_url('sort_asc', 'block_fn_mentor') . "\" alt=\"\" />";
         } else {
             $columndir = 'DESC';
-            $columnicon = "<img class='iconsort' src=\"" . $OUTPUT->pix_url('sort_inactive', 'block_fn_mentor') . "\" alt=\"\" />";
+            $columnicon = "<img class='iconsort' src=\"" . block_fn_mentor_pix_url('sort_inactive', 'block_fn_mentor') . "\" alt=\"\" />";
         }
     }
 
@@ -864,27 +864,27 @@ foreach ($tablerows as $tablerow) {
                     if ($tablerow->$column == 100) {
                         if (($completionstatus == 5) || ($completionstatus == 0)) {
                             $cell = new html_table_cell('<img src="' .
-                                $OUTPUT->pix_url('completed_100', 'block_fn_mentor') . '" />');
+                                block_fn_mentor_pix_url('completed_100', 'block_fn_mentor') . '" />');
                         }
                     } else if ($tablerow->$column >= 75) {
                         if (($completionstatus == 4) || ($completionstatus == 0)) {
                             $cell = new html_table_cell('<img src="' .
-                                $OUTPUT->pix_url('completed_75', 'block_fn_mentor') . '" />');
+                                block_fn_mentor_pix_url('completed_75', 'block_fn_mentor') . '" />');
                         }
                     } else if ($tablerow->$column >= 50) {
                         if (($completionstatus == 3) || ($completionstatus == 0)) {
                             $cell = new html_table_cell('<img src="' .
-                                $OUTPUT->pix_url('completed_50', 'block_fn_mentor') . '" />');
+                                block_fn_mentor_pix_url('completed_50', 'block_fn_mentor') . '" />');
                         }
                     } else if ($tablerow->$column > 0) {
                         if (($completionstatus == 2) || ($completionstatus == 0)) {
                             $cell = new html_table_cell('<img src="' .
-                                $OUTPUT->pix_url('completed_25', 'block_fn_mentor') . '" />');
+                                block_fn_mentor_pix_url('completed_25', 'block_fn_mentor') . '" />');
                         }
                     } else if ($tablerow->$column == 0) {
                         if (($completionstatus == 1) || ($completionstatus == 0)) {
                             $cell = new html_table_cell('<img src="' .
-                                $OUTPUT->pix_url('completed_00', 'block_fn_mentor') . '" />');
+                                block_fn_mentor_pix_url('completed_00', 'block_fn_mentor') . '" />');
                         }
                     }
 

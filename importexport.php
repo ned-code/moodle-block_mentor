@@ -80,7 +80,7 @@ $export = html_writer::tag('form',
 
 
 echo html_writer::start_tag('div', array('class' => 'no-overflow'));
-$warningicon = html_writer::img($OUTPUT->pix_url('i/warning'), '');
+$warningicon = html_writer::img(block_fn_mentor_pix_url('i/warning'), '');
 echo html_writer::div(get_string('importexportpagedesc', 'block_fn_mentor', $warningicon), 'import-export-page-desc');
 echo html_writer::end_tag('div');
 echo html_writer::div($import .' '. $export, 'import-export-user-wrapper');

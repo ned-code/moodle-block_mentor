@@ -1240,7 +1240,7 @@ function block_fn_mentor_print_grade_summary ($courseid , $studentid) {
     $html .= '<td class="overview-grade-right '.$class.'" valign="middle">'.$gradesummary->courseaverage.'%</td>';
     $html .= '</tr>';
     if ($courseaverage == false) {
-        $warningimg = '<img class="actionicon" width="16" height="16" alt="" src="'.$OUTPUT->pix_url('i/warning', '').'"> ';
+        $warningimg = '<img class="actionicon" width="16" height="16" alt="" src="'.block_fn_mentor_pix_url('i/warning', '').'"> ';
         $html .= '<tr>';
         $html .= '<td colspan="2" class="overview-grade-right-warning" valign="middle">'.$warningimg.get_string('nocoursetotal', 'block_fn_mentor').'</td>';
         $html .= '</tr>';
@@ -1845,7 +1845,7 @@ function block_fn_mentor_last_activity ($studentid) {
 function block_fn_mentor_report_outline_print_row($mod, $instance, $result) {
     global $OUTPUT, $CFG;
 
-    $image = "<img src=\"" . $OUTPUT->pix_url('icon', $mod->modname) . "\" class=\"icon\" alt=\"$mod->modfullname\" />";
+    $image = "<img src=\"" . block_fn_mentor_pix_url('icon', $mod->modname) . "\" class=\"icon\" alt=\"$mod->modfullname\" />";
 
     echo "<tr>";
     echo "<td valign=\"top\">$image</td>";
@@ -3080,7 +3080,7 @@ function block_fn_mentor_footer() {
         html_writer::div(
             html_writer::link(
                 'http://ned.ca',
-                html_writer::img($OUTPUT->pix_url('ned_26', 'block_fn_mentor'), 'NED'),
+                html_writer::img(block_fn_mentor_pix_url('ned_26', 'block_fn_mentor'), 'NED'),
                 array('target' => '_blank')
             ),
             'mentormanagercontainer-footer-right'
@@ -3439,5 +3439,20 @@ function block_fn_mentor_assign_mentor_from_profile($userid, $profilevalue) {
             role_assign($mentorrolesystem, $mentor->id, $systemcontext->id);
             role_assign($mentorroleuser, $mentor->id, $usercontext->id);
         }
+    }
+}
+
+/**
+ * @param $imagename
+ * @param null $component
+ * @return mixed
+ */
+function block_fn_mentor_pix_url($imagename, $component=null) {
+    global $CFG, $OUTPUT;
+
+    if ($CFG->version >= 2017051500) { // MDL 3.3+.
+        return $OUTPUT->image_url($imagename, $component);
+    } else {
+        return block_fn_mentor_pix_url($imagename, $component);
     }
 }

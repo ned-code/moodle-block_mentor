@@ -154,7 +154,7 @@ if ($groups) {
 
     if ((!$isstudent) || ($isadmin || $ismentor)) {
         $groupmenuhtml = html_writer::tag('form',
-            html_writer::img($OUTPUT->pix_url('i/group'), get_string('group', 'block_fn_mentor')) . ' ' .
+            html_writer::img(block_fn_mentor_pix_url('i/group'), get_string('group', 'block_fn_mentor')) . ' ' .
             html_writer::select(
                 $groupmenu, 'groupfilter', $groupmenuurl[$groupid], null,
                 array('onChange' => 'location=document.jump2.groupfilter.options[document.jump2.groupfilter.selectedIndex].value;')
@@ -187,7 +187,7 @@ $studentmenuhtml = '';
 
 if ((!$isstudent) || ($isadmin || $ismentor  || $isteacher)) {
     $studentmenuhtml = html_writer::tag('form',
-        html_writer::img($OUTPUT->pix_url('i/user'), get_string('user')).' '.
+        html_writer::img(block_fn_mentor_pix_url('i/user'), get_string('user')).' '.
         html_writer::select(
             $studentmenu, 'studentfilter', $studentmenuurl[$menteeid], null,
             array('onChange' => 'location=document.jump1.studentfilter.options[document.jump1.studentfilter.selectedIndex].value;')
