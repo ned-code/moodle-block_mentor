@@ -86,7 +86,13 @@ $cobject->sections = &$sections;
 
 // FIND CURRENT WEEK.
 $courseformatoptions = course_get_format($course)->get_format_options();
-$coursenumsections = $courseformatoptions['numsections'];
+if (isset($courseformatoptions['numsections'])) {
+    $coursenumsections = $courseformatoptions['numsections'];
+} else {
+    if (!$coursenumsections = $DB->count_records('course_sections', array('course' => $course->id))) {
+        $coursenumsections = 10; // Default section number.
+    }
+}
 
 $timenow = time();
 $weekdate = $course->startdate;

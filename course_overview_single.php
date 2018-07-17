@@ -138,9 +138,11 @@ if ($isadmin) {
 }
 
 // Pick a mentee if not selected.
-if ((!$menteeid && $mentees) || (!in_array($menteeid, array_keys($mentees)))) {
-    $var = reset($mentees);
-    $menteeid = $var->studentid;
+if ($mentees) {
+    if (!$menteeid || !in_array($menteeid, array_keys($mentees))) {
+        $var = reset($mentees);
+        $menteeid = $var->studentid;
+    }
 }
 
 $menteeuser = $DB->get_record('user', array('id' => $menteeid), '*', MUST_EXIST);
@@ -211,7 +213,7 @@ $groupmenuhtml = '';
 $groupmenuurl[0] = $CFG->wwwroot.'/blocks/fn_mentor/course_overview_single.php?menteeid='.$menteeid.'&groupid=0';
 $groupmenu[$groupmenuurl[0]] = get_string('allmentorgroups', 'block_fn_mentor');
 
-if ($groups) {
+if (!empty($groups)) {
     foreach ($groups as $group) {
         $groupmenuurl[$group->id] = $CFG->wwwroot . '/blocks/fn_mentor/course_overview_single.php?menteeid=' . $menteeid . '&groupid=' . $group->id;
         $groupmenu[$groupmenuurl[$group->id]] = $group->name;
