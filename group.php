@@ -21,6 +21,7 @@
  */
 
 require_once(dirname(dirname(dirname(__FILE__))) . '/config.php');
+require_once($CFG->dirroot . '/blocks/fn_mentor/lib.php');
 
 // Paging options.
 $page      = optional_param('page', 0, PARAM_INT);

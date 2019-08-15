@@ -3460,6 +3460,6 @@ function block_fn_mentor_pix_url($imagename, $component=null) {
     if ($CFG->version >= 2017051500) { // MDL 3.3+.
         return $OUTPUT->image_url($imagename, $component);
     } else {
-        return block_fn_mentor_pix_url($imagename, $component);
+        return $OUTPUT->pix_url($imagename, $component);
     }
 }

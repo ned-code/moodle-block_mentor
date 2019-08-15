@@ -106,3 +106,6 @@
 .block_fn_mentor .too-many-users.last {
     margin-bottom: 10px;
 }
+#page-blocks-fn_mentor-all_students .custom-select{
+    width: 100%;
+}

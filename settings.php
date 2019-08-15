@@ -262,19 +262,3 @@ $settings->add(
         '0'
     )
 );
-
-$themeconfig = theme_config::load($CFG->theme);
-$layouts = array();
-foreach (array_keys($themeconfig->layouts) as $layout) {
-    $layouts[$layout] = $layout;
-}
-
-$settings->add(
-    new admin_setting_configselect(
-        'block_fn_mentor/pagelayout',
-        get_string('pagelayout', 'block_fn_mentor'),
-        '',
-        'login',
-        $layouts
-    )
-);

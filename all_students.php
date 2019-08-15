@@ -22,7 +22,6 @@
 
 require_once('../../config.php');
 require_once($CFG->dirroot . '/blocks/fn_mentor/lib.php');
-require_once($CFG->dirroot . '/lib/coursecatlib.php');
 require_once($CFG->dirroot . '/notes/lib.php');
 
 // Paging options.
@@ -84,7 +83,7 @@ $studentids = implode(',', array_keys($mentees));
 // Category filter.
 $categorycourses = false;
 if ($categoryid) {
-    $categorycourses = coursecat::get($categoryid)->get_courses(array('recursive' => true, 'coursecontacts' => true));
+    $categorycourses = core_course_category::get($categoryid)->get_courses(array('recursive' => true, 'coursecontacts' => true));
 }
 
 // Group filter.
@@ -104,11 +103,7 @@ $heading = $SITE->fullname;
 $thispageurl = new moodle_url('/blocks/fn_mentor/all_students.php');
 
 $PAGE->set_url($thispageurl);
-if ($pagelayout = get_config('block_fn_mentor', 'pagelayout')) {
-    $PAGE->set_pagelayout($pagelayout);
-} else {
-    $PAGE->set_pagelayout('course');
-}
+$PAGE->set_pagelayout('course');
 $PAGE->set_context(context_system::instance());
 $PAGE->set_title($title);
 $PAGE->set_heading($heading);

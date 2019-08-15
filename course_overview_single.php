@@ -160,13 +160,7 @@ $title = get_string('page_title_assign_mentor', 'block_fn_mentor');
 $heading = $SITE->fullname;
 
 $PAGE->set_url('/blocks/fn_mentor/course_overview_single.php');
-
-if ($pagelayout = get_config('block_fn_mentor', 'pagelayout')) {
-    $PAGE->set_pagelayout($pagelayout);
-} else {
-    $PAGE->set_pagelayout('course');
-}
-
+$PAGE->set_pagelayout('course');
 $PAGE->set_context(context_system::instance());
 $PAGE->set_title($title);
 $PAGE->set_heading($heading);

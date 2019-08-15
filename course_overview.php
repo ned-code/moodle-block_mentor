@@ -96,13 +96,7 @@ $title = get_string('page_title_assign_mentor', 'block_fn_mentor');
 $heading = $SITE->fullname;
 
 $PAGE->set_url('/blocks/fn_mentor/course_overview.php');
-
-if ($pagelayout = get_config('block_fn_mentor', 'pagelayout')) {
-    $PAGE->set_pagelayout($pagelayout);
-} else {
-    $PAGE->set_pagelayout('course');
-}
-
+$PAGE->set_pagelayout('course');
 $PAGE->set_context(context_system::instance());
 $PAGE->set_title($title);
 $PAGE->set_heading($heading);
@@ -187,7 +181,7 @@ if ($mentees) {
 
 $studentmenuhtml = '';
 
-if ((!$isstudent) || ($isadmin || $ismentor  || $isteacher)) {
+if (isset($studentmenuurl[$menteeid]) && (!$isstudent) || ($isadmin || $ismentor  || $isteacher)) {
     $studentmenuhtml = html_writer::tag('form',
         html_writer::img(block_fn_mentor_pix_url('i/user'), get_string('user')).' '.
         html_writer::select(
